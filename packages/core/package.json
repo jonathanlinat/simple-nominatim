@@ -1,0 +1,40 @@
+{
+  "name": "@simple-nominatim/core",
+  "version": "0.0.0",
+  "description": "A lightweight library for the Nominatim geocoding service",
+  "keywords": [
+    "bun",
+    "core",
+    "geocoding",
+    "library",
+    "nominatim",
+    "openstreetmap"
+  ],
+  "homepage": "https://github.com/jonathanlinat/simple-nominatim/packages/core#readme",
+  "bugs": {
+    "url": "https://github.com/jonathanlinat/simple-nominatim/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathanlinat/simple-nominatim.git"
+  },
+  "license": "MIT",
+  "author": "Jonathan Linat (https://github.com/jonathanlinat)",
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "prepare": "bun run build",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "unbuild": "^2.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

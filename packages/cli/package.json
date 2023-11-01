@@ -1,0 +1,48 @@
+{
+  "name": "@simple-nominatim/cli",
+  "version": "0.0.0",
+  "description": "A command-line interface (CLI) tool built on top of the Simple Nominatim Core",
+  "keywords": [
+    "bun",
+    "cli",
+    "geocoding",
+    "library",
+    "nominatim",
+    "openstreetmap"
+  ],
+  "homepage": "https://github.com/jonathanlinat/simple-nominatim/packages/cli#readme",
+  "bugs": {
+    "url": "https://github.com/jonathanlinat/simple-nominatim/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathanlinat/simple-nominatim.git"
+  },
+  "license": "MIT",
+  "author": "Jonathan Linat (https://github.com/jonathanlinat)",
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "bin": {
+    "simple-nominatim": "./dist/index.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "prepare": "bun run build",
+    "simple-nominatim": "bun ./src",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@simple-nominatim/core": "workspace:*",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "unbuild": "^2.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

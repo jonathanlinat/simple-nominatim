@@ -1,0 +1,13 @@
+name: Install tools and dependencies of the application
+description: Local action to install tools and dependencies of the application
+runs:
+  using: composite
+  steps:
+    - name: Setup Bun runtime
+      uses: antongolub/action-setup-bun@v1
+      with:
+        cache: true
+        cache-bin: true
+    - name: Install all the dependencies
+      shell: bash
+      run: bun install

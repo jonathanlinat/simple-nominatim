@@ -1,0 +1,58 @@
+{
+  "name": "simple-nominatim",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Monorepo for Simple Nominatim packages",
+  "homepage": "https://github.com/jonathanlinat/simple-nominatim#readme",
+  "bugs": {
+    "url": "https://github.com/jonathanlinat/simple-nominatim/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathanlinat/simple-nominatim.git"
+  },
+  "license": "MIT",
+  "author": "Jonathan Linat (https://github.com/jonathanlinat)",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "ci:release": "changeset publish",
+    "ci:version": "changeset version",
+    "preinstall": "bun simple-git-hooks",
+    "packages:build": "turbo run build",
+    "packages:lint:code": "eslint packages/**/*.mjs --fix",
+    "packages:lint:markdown": "markdownlint-cli2 'packages/**/*.md' '#node_modules'",
+    "packages:test": "turbo run test --"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.2",
+    "@commitlint/cli": "^18.2.0",
+    "@commitlint/config-conventional": "^18.1.0",
+    "@commitlint/format": "^18.1.0",
+    "@svitejs/changesets-changelog-github-compact": "^1.1.0",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-prettier-standard": "^4.0.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-n": "^16.2.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "lint-staged": "^15.0.2",
+    "markdownlint": "^0.31.1",
+    "markdownlint-cli2": "^0.10.0",
+    "prettier": "^3.0.3",
+    "prettier-config-standard": "^7.0.0",
+    "simple-git-hooks": "^2.9.0",
+    "turbo": "^1.10.16"
+  },
+  "engines": {
+    "bun": ">=1.0.0",
+    "deno": "please-use-bun",
+    "npm": "please-use-bun",
+    "pnpm": "please-use-bun",
+    "yarn": "please-use-bun"
+  }
+}
