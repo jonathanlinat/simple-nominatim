@@ -1,6 +1,6 @@
 {
   "name": "@simple-nominatim/cli",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A command-line interface (CLI) tool built on top of the Simple Nominatim Core",
   "keywords": [
     "bun",
