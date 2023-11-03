@@ -1,6 +1,6 @@
 import { structuredSearch } from '@simple-nominatim/core'
 
-import { responseParser } from '../_shared/responseParser'
+import { responseParser } from '../_shared/responseParser.mjs'
 
 export const structuredSearchWrapper = (argv) => {
   const {

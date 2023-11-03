@@ -1,6 +1,6 @@
 import { freeFormSearch } from '@simple-nominatim/core'
 
-import { responseParser } from '../_shared/responseParser'
+import { responseParser } from '../_shared/responseParser.mjs'
 
 export const freeFormSearchWrapper = (argv) => {
   const { email, format, limit, query } = argv

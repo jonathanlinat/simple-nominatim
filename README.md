@@ -23,7 +23,7 @@ For detailed instructions on how to use the tools, navigate to the `./packages` 
 
 ### Pre-requisites
 
-- **Bun** v1.x [[Link](https://bun.sh/)]
+- **pnpm** v7.x [[Link](https://pnpm.io/)]
 
 ### Coding Standards & Tools
 
@@ -56,7 +56,7 @@ It's recommended to familiarize yourself with these tools, their configurations,
 2. Once inside the project directory, install the required dependencies:
 
    ```bash
-   $ bun install
+   $ pnpm install
    ```
 
 ## License

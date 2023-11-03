@@ -1,6 +1,6 @@
 import { geocodeReverse } from '@simple-nominatim/core'
 
-import { responseParser } from '../_shared/responseParser'
+import { responseParser } from '../_shared/responseParser.mjs'
 
 export const geocodeReverseWrapper = (argv) => {
   const { email, format, latitude, longitude } = argv

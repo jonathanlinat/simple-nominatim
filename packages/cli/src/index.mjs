@@ -3,10 +3,10 @@
 import yargs from 'yargs/yargs'
 import { hideBin } from 'yargs/helpers'
 
-import { freeFormSearchWrapper } from './search/free-form'
-import { geocodeReverseWrapper } from './reverse/geocode'
-import { serviceStatusWrapper } from './status/service'
-import { structuredSearchWrapper } from './search/structured'
+import { freeFormSearchWrapper } from './search/free-form.mjs'
+import { geocodeReverseWrapper } from './reverse/geocode.mjs'
+import { serviceStatusWrapper } from './status/service.mjs'
+import { structuredSearchWrapper } from './search/structured.mjs'
 import {
   amenityOption,
   cityOption,
@@ -22,7 +22,7 @@ import {
   stateOption,
   statusFormatOption,
   streetOption
-} from './_shared/yargsOptions'
+} from './_shared/yargsOptions.mjs'
 ;(() =>
   yargs(hideBin(process.argv))
     .command(
