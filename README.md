@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://gist.githubusercontent.com/jonathanlinat/01c28d52f3d6686f36a3ee9ddb916a11/raw/3612e3f9e0309c9922a6c1358689fc18d40d79a6/simple-nominatim.svg" alt="Simple Nominatim Logo" height="200">
+  <img src="https://raw.githubusercontent.com/jonathanlinat/simple-nominatim/main/.github/images/simple-nominatim.svg" alt="Simple Nominatim Logo" height="200">
 </p>
 
 <h1 align="center">Simple Nominatim</h1>
@@ -23,7 +23,7 @@ For detailed instructions on how to use the tools, navigate to the `./packages` 
 
 ### Pre-requisites
 
-- **Bun** v1.x [[Link](https://bun.sh/)]
+- **pnpm** v7.x [[Link](https://pnpm.io/)]
 
 ### Coding Standards & Tools
 
@@ -56,7 +56,7 @@ It's recommended to familiarize yourself with these tools, their configurations,
 2. Once inside the project directory, install the required dependencies:
 
    ```bash
-   $ bun install
+   $ pnpm install
    ```
 
 ## License

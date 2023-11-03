@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="https://gist.githubusercontent.com/jonathanlinat/01c28d52f3d6686f36a3ee9ddb916a11/raw/3612e3f9e0309c9922a6c1358689fc18d40d79a6/simple-nominatim.svg" alt="Simple Nominatim Logo" height="200">
+  <img src="https://raw.githubusercontent.com/jonathanlinat/simple-nominatim/main/.github/images/simple-nominatim.svg" alt="Simple Nominatim Logo" height="200">
 </p>
 
 <h1 align="center">Simple Nominatim Core</h1>
 
-THis is a library designed to facilitate requests to the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/).
+This is a library designed to facilitate requests to the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/).
 
-This package is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo.
+It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo.
 
 > The utilization of this project is governed by the [Nominatim Usage Policy (aka Geocoding Policy)](https://operations.osmfoundation.org/policies/nominatim/). Please adhere to fair usage practices as outlined by the [OSMF Operations Working Group](https://operations.osmfoundation.org/).
 >
