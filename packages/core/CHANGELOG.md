@@ -1,5 +1,11 @@
 # @simple-nominatim/core
 
+## 0.1.2
+
+### Patch Changes
+
+- Migrate project and packages from bun to pnpm 7 ([#3](https://github.com/jonathanlinat/simple-nominatim/pull/3))
+
 ## 0.1.1
 
 ### Patch Changes
