@@ -4,7 +4,7 @@
 
 <h1 align="center">Simple Nominatim</h1>
 
-**Simple Nominatim** (`@simple-nominatim`) is a monorepo packed with bespoke tools crafted to seamlessly integrate with the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/), all within the Bun environment.
+This is a monorepo packed with bespoke tools crafted to seamlessly integrate with the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/).
 
 > The utilization of this project is governed by the [Nominatim Usage Policy (aka Geocoding Policy)](https://operations.osmfoundation.org/policies/nominatim/). Please adhere to fair usage practices as outlined by the [OSMF Operations Working Group](https://operations.osmfoundation.org/).
 >

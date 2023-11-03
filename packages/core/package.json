@@ -1,7 +1,7 @@
 {
   "name": "@simple-nominatim/core",
   "version": "0.1.0",
-  "description": "A lightweight library for the Nominatim geocoding service",
+  "description": "A lightweight library to make requests to the Nominatim API from Node programs",
   "keywords": [
     "bun",
     "core",
@@ -10,7 +10,7 @@
     "nominatim",
     "openstreetmap"
   ],
-  "homepage": "https://github.com/jonathanlinat/simple-nominatim/packages/core#readme",
+  "homepage": "https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/core#readme",
   "bugs": {
     "url": "https://github.com/jonathanlinat/simple-nominatim/issues"
   },

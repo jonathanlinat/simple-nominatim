@@ -35,8 +35,8 @@ jobs:
         with:
           version: bun run ci:version
           publish: bun run ci:release
-          commit: "chore: new release"
-          title: "chore: new release candidate"
+          commit: "chore: new release candidate"
+          title: "New release candidate"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

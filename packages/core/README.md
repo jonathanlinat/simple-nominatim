@@ -4,9 +4,9 @@
 
 <h1 align="center">Simple Nominatim Core</h1>
 
-**Simple Nominatim Core** (`@simple-nominatim/core`) is a package designed to facilitate requests to the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/).
+THis is a library designed to facilitate requests to the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/).
 
-This library is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/) monorepo.
+This package is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo.
 
 > The utilization of this project is governed by the [Nominatim Usage Policy (aka Geocoding Policy)](https://operations.osmfoundation.org/policies/nominatim/). Please adhere to fair usage practices as outlined by the [OSMF Operations Working Group](https://operations.osmfoundation.org/).
 >
