@@ -1,6 +1,6 @@
 {
   "name": "@simple-nominatim/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A command-line interface (CLI) tool built on top of the @simple-nominatim/core library to make requests to the Nominatim API from a terminal",
   "keywords": [
     "bun",
