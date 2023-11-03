@@ -1,5 +1,4 @@
 "packages/**/*.md":
-  - bun run packages:lint:markdown
+  - pnpm packages:lint:markdown
 "packages/**/*.mjs":
-  - bun run packages:lint:code
-  - bun run packages:test
+  - pnpm packages:lint:code

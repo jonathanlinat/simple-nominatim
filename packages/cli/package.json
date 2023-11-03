@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "description": "A command-line interface (CLI) tool built on top of the @simple-nominatim/core library to make requests to the Nominatim API from a terminal",
   "keywords": [
-    "bun",
     "cli",
     "geocoding",
     "library",
+    "node",
     "nominatim",
     "openstreetmap"
   ],
@@ -30,9 +30,8 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "prepare": "bun run build",
-    "simple-nominatim": "bun ./src",
-    "test": "bun test"
+    "prepare": "pnpm build",
+    "simple-nominatim": "pnpm ./src/index.mjs"
   },
   "dependencies": {
     "@simple-nominatim/core": "workspace:*",
@@ -40,6 +39,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
+    "typescript": "^5.2.2",
     "unbuild": "^2.0.0"
   },
   "publishConfig": {

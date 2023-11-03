@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "description": "A lightweight library to make requests to the Nominatim API from Node programs",
   "keywords": [
-    "bun",
     "core",
     "geocoding",
     "library",
+    "node",
     "nominatim",
     "openstreetmap"
   ],
@@ -27,11 +27,11 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "prepare": "bun run build",
-    "test": "bun test"
+    "prepare": "pnpm build"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
+    "typescript": "^5.2.2",
     "unbuild": "^2.0.0"
   },
   "publishConfig": {

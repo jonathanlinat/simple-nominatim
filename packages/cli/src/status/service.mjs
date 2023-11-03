@@ -1,6 +1,6 @@
 import { serviceStatus } from '@simple-nominatim/core'
 
-import { responseParser } from '../_shared/responseParser'
+import { responseParser } from '../_shared/responseParser.mjs'
 
 export const serviceStatusWrapper = (argv) => {
   const { format } = argv
