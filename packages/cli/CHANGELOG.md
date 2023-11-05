@@ -1,5 +1,14 @@
 # @simple-nominatim/cli
 
+## 0.1.2
+
+### Patch Changes
+
+- Migrate project and packages from bun to pnpm 7 ([#3](https://github.com/jonathanlinat/simple-nominatim/pull/3))
+
+- Updated dependencies [[`52524a1`](https://github.com/jonathanlinat/simple-nominatim/commit/52524a1b929d60faa38eb110cc2f3b22c84436ef)]:
+  - @simple-nominatim/core@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes
