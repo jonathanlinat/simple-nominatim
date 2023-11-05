@@ -1,5 +1,14 @@
 # @simple-nominatim/cli
 
+## 0.1.3
+
+### Patch Changes
+
+- Fix broken logo in README files
+
+- Updated dependencies []:
+  - @simple-nominatim/core@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @simple-nominatim/core
 
+## 0.1.3
+
+### Patch Changes
+
+- Fix broken logo in README files
+
 ## 0.1.2
 
 ### Patch Changes
