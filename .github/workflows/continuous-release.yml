@@ -5,8 +5,8 @@ on:
       - main
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
-  lint-and-test:
-    name: Lint and test the source code
+  lint:
+    name: Lint the source code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.ref }}
@@ -20,7 +20,7 @@ jobs:
   prepare-and-release:
     name: Prepare and release the packages
     runs-on: ubuntu-latest
-    needs: lint-and-test
+    needs: lint
     timeout-minutes: 20
     steps:
       - name: Checkout ${{ github.ref }}
