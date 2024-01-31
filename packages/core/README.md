@@ -6,7 +6,7 @@
 
 This is a library designed to facilitate requests to the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/).
 
-It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo.
+It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo. You can also search for the `@simple-nominatim/core` package on [npm]([https://www.npmjs.com/package/@simple-nominatim/core](https://www.npmjs.com/package/@simple-nominatim/core)).
 
 > **Disclaimers**
 >

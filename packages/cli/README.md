@@ -6,7 +6,7 @@
 
 This is a command-line binary built over **Simple Nominatim Core** (`@simple-nominatim/core`) as a terminal interface to make requests to the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/).
 
-It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo.
+It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo. You can also search for the `@simple-nominatim/cli` package on [npm]([https://www.npmjs.com/package/@simple-nominatim/cli](https://www.npmjs.com/package/@simple-nominatim/cli)).
 
 > **Disclaimers**
 >
