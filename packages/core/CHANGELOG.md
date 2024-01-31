@@ -1,5 +1,11 @@
 # @simple-nominatim/core
 
+## 0.1.4
+
+### Patch Changes
+
+- Update the NPM dependencies to their latest available version ([#6](https://github.com/jonathanlinat/simple-nominatim/pull/6))
+
 ## 0.1.3
 
 ### Patch Changes
