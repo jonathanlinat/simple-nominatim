@@ -23,7 +23,7 @@ For detailed instructions on how to use the tools, navigate to the `./packages` 
 
 ### Pre-requisites
 
-- **pnpm** v7.x [[Link](https://pnpm.io/)]
+- **pnpm** v8.x [[Link](https://pnpm.io/)]
 
 ### Coding Standards & Tools
 
