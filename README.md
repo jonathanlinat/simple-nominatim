@@ -6,18 +6,24 @@
 
 This is a monorepo packed with bespoke tools crafted to seamlessly integrate with the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/).
 
+> **Disclaimers**
+>
 > The utilization of this project is governed by the [Nominatim Usage Policy (aka Geocoding Policy)](https://operations.osmfoundation.org/policies/nominatim/). Please adhere to fair usage practices as outlined by the [OSMF Operations Working Group](https://operations.osmfoundation.org/).
 >
 > The owner and contributors of the **Simple Nominatim** project, including its libraries, assume no responsibility for any misuse.
 
 ## Usage
 
-> **Simple Nominatim** currently only supports the [Search](https://nominatim.org/release-docs/develop/api/Search/), [Reverse](https://nominatim.org/release-docs/develop/api/Reverse/) and [Status](https://nominatim.org/release-docs/develop/api/Status/) endpoints of the Nominatim API.
+> **Simple Nominatim** currently only supports the [Search](https://nominatim.org/release-docs/develop/api/Search/), [Reverse](https://nominatim.org/release-docs/develop/api/Reverse/) and [Status](https://nominatim.org/release-docs/develop/api/Status/) endpoints.
 
 For detailed instructions on how to use the tools, navigate to the `./packages` directory and consult the corresponding **README.md** file associated with each package.
 
-- [Simple Nominatim Core](https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/core#readme)
-- [Simple Nominatim CLI](https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/cli#readme)
+- **Simple Nominatim Core**
+   * GitHub: https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/core#readme
+   * npm: https://www.npmjs.com/package/@simple-nominatim/core
+- **Simple Nominatim CLI**
+   * GitHub: https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/clie#readme
+   * npm: https://www.npmjs.com/package/@simple-nominatim/cli
 
 ## How to Contribute
 

@@ -8,13 +8,15 @@ This is a command-line binary built over **Simple Nominatim Core** (`@simple-nom
 
 It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo.
 
+> **Disclaimers**
+>
 > The utilization of this project is governed by the [Nominatim Usage Policy (aka Geocoding Policy)](https://operations.osmfoundation.org/policies/nominatim/). Please adhere to fair usage practices as outlined by the [OSMF Operations Working Group](https://operations.osmfoundation.org/).
 >
 > The owner and contributors of the **Simple Nominatim** project, including its libraries, assume no responsibility for any misuse.
 
 ## Installation
 
-> **Simple Nominatim** currently only supports the [Search](https://nominatim.org/release-docs/develop/api/Search/), [Reverse](https://nominatim.org/release-docs/develop/api/Reverse/) and [Status](https://nominatim.org/release-docs/develop/api/Status/) endpoints of the Nominatim API.
+> **Simple Nominatim** currently only supports the [Search](https://nominatim.org/release-docs/develop/api/Search/), [Reverse](https://nominatim.org/release-docs/develop/api/Reverse/) and [Status](https://nominatim.org/release-docs/develop/api/Status/) endpoints.
 
 ```bash
 $ npm install -g @simple-nominatim/cli
