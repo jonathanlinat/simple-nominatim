@@ -8,9 +8,9 @@ runs:
       with:
         node-version: 20
     - name: Install pnpm 8
-      uses: pnpm/action-setup@v2
+      uses: pnpm/action-setup@v4
       with:
-        version: 8
+        version: 8.15.8
         run_install: false
     - name: Get the pnpm store directory
       shell: bash

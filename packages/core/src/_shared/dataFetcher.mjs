@@ -22,8 +22,7 @@
  * SOFTWARE.
  */
 
-const FETCHER_BASE_URL = 'https://nominatim.openstreetmap.org'
-const FETCHER_USER_AGENT = '@simple-nominatim/core'
+import { FETCHER_BASE_URL, FETCHER_USER_AGENT } from './constants'
 
 export const dataFetcher = async (endpoint, params) => {
   const requestInfo = `${FETCHER_BASE_URL}/${endpoint}?${params.toString()}`

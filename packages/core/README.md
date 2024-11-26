@@ -19,7 +19,7 @@ It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nom
 > **Simple Nominatim** currently only supports the [Search](https://nominatim.org/release-docs/develop/api/Search/), [Reverse](https://nominatim.org/release-docs/develop/api/Reverse/) and [Status](https://nominatim.org/release-docs/develop/api/Status/) endpoints.
 
 ```bash
-$ npm install -g @simple-nominatim/core
+npm install -g @simple-nominatim/core
 ```
 
 ## Usage

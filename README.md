@@ -29,7 +29,11 @@ For detailed instructions on how to use the tools, navigate to the `./packages` 
 
 ### Pre-requisites
 
-- **pnpm** v8.x [[Link](https://pnpm.io/)]
+Before you can modify the source code and test the application locally, ensure you have the following tools/packages installed:
+
+- **Git**: [Download Git](https://git-scm.com/)
+- **Node.js (v20.x)**: [Download Node.js](https://nodejs.org/dist/latest-v20.x/) or use [NVM](https://github.com/nvm-sh/nvm) for version management
+- **pnpm (v8.15.8)**: [Install pnpm](https://pnpm.io/installation#installing-a-specific-version)
 
 ### Coding Standards & Tools
 
