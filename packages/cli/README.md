@@ -19,7 +19,7 @@ It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nom
 > **Simple Nominatim** currently only supports the [Search](https://nominatim.org/release-docs/develop/api/Search/), [Reverse](https://nominatim.org/release-docs/develop/api/Reverse/) and [Status](https://nominatim.org/release-docs/develop/api/Status/) endpoints.
 
 ```bash
-$ npm install -g @simple-nominatim/cli
+npm install -g @simple-nominatim/cli
 ```
 
 ## Usage
@@ -29,7 +29,7 @@ $ npm install -g @simple-nominatim/cli
 For a list of all available commands and their descriptions, use the help option:
 
 ```bash
-$ simple-nominatim --help (or -h)
+simple-nominatim --help (or -h)
 ```
 
 ### Reverse Endpoint
@@ -39,7 +39,7 @@ $ simple-nominatim --help (or -h)
 To reverse geocode a coordinate, utilize the `--latitude` and `--longitude` options:
 
 ```bash
-$ simple-nominatim reverse:geocode --latitude \"37.4219999\" --longitude \"-122.0840575\" --format \"jsonv2\"
+simple-nominatim reverse:geocode --latitude '37.4219999' --longitude '-122.0840575' --format 'jsonv2'
 ```
 
 ##### Parameters
@@ -61,7 +61,7 @@ $ simple-nominatim reverse:geocode --latitude \"37.4219999\" --longitude \"-122.
 For a list of all available options and their descriptions, use the help option:
 
 ```bash
-$ simple-nominatim reverse:geocode --help (or -h)
+simple-nominatim reverse:geocode --help (or -h)
 ```
 
 ### Search Endpoint
@@ -71,7 +71,7 @@ $ simple-nominatim reverse:geocode --help (or -h)
 To use a free-form query, utilize the `--query` option:
 
 ```bash
-$ simple-nominatim search:free-form --query \"1600 Amphitheatre Parkway, Mountain View, CA, USA\" --format \"jsonv2\"
+simple-nominatim search:free-form --query '1600 Amphitheatre Parkway, Mountain View, CA, USA' --format 'jsonv2'
 ```
 
 ##### Parameters
@@ -92,7 +92,7 @@ $ simple-nominatim search:free-form --query \"1600 Amphitheatre Parkway, Mountai
 For a list of all available options and their descriptions, use the help option:
 
 ```bash
-$ simple-nominatim search:free-form --help (or -h)
+simple-nominatim search:free-form --help (or -h)
 ```
 
 #### Structured Query
@@ -100,7 +100,7 @@ $ simple-nominatim search:free-form --help (or -h)
 For structured queries, you can combine multiple options such as `--amenity`, `--city`, `--country`, `--county`, `--postalcode`, `--state`, and `--street`:
 
 ```bash
-$ simple-nominatim search:structured --country \"Canada\" --format \"jsonv2\"
+simple-nominatim search:structured --country 'Canada' --format 'jsonv2'
 ```
 
 ##### Parameters
@@ -127,7 +127,7 @@ $ simple-nominatim search:structured --country \"Canada\" --format \"jsonv2\"
 For a list of all available options and their descriptions, use the help option:
 
 ```bash
-$ simple-nominatim search:structured --help (or -h)
+simple-nominatim search:structured --help (or -h)
 ```
 
 ### Status Endpoint
@@ -135,7 +135,7 @@ $ simple-nominatim search:structured --help (or -h)
 #### Service
 
 ```bash
-$ simple-nominatim status:service --format \"json\"
+simple-nominatim status:service --format 'json'
 ```
 
 ##### Options
@@ -149,7 +149,7 @@ $ simple-nominatim status:service --format \"json\"
 For a list of all available options and their descriptions, use the help option:
 
 ```bash
-$ simple-nominatim status:service --help (or -h)
+simple-nominatim status:service --help (or -h)
 ```
 
 ## License
