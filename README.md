@@ -32,7 +32,7 @@ For detailed instructions on how to use the tools, navigate to the `./packages` 
 Before you can modify the source code and test the application locally, ensure you have the following tools/packages installed:
 
 - **Git**: [Download Git](https://git-scm.com/)
-- **Node.js (v20.x)**: [Download Node.js](https://nodejs.org/dist/latest-v20.x/) or use [NVM](https://github.com/nvm-sh/nvm) for version management
+- **Node.js (v22.17.1)**: [Download Node.js](https://nodejs.org/dist/latest-v22.x/) or use [NVM](https://github.com/nvm-sh/nvm) for version management
 - **pnpm (v10.18.3)**: [Install pnpm](https://pnpm.io/installation#installing-a-specific-version)
 
 ### Coding Standards & Tools
