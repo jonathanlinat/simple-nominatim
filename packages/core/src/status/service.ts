@@ -33,24 +33,10 @@ import type { StatusOptions } from './status.types'
  * monitoring and health checks.
  *
  * @template T - The expected response type (defaults to unknown)
- * @param {StatusOptions} options - Configuration options for the status request
+ * @param {StatusOptions} options Configuration options for the status request
  * @returns {Promise<T>} A promise that resolves to the status information
  *
  * @throws {Error} If the HTTP request fails or returns a non-2xx status code
- *
- * @example
- * ```typescript
- * // Get status as JSON
- * const status = await serviceStatus({ format: 'json' });
- * console.log(status); // { status: 0, message: 'OK', ... }
- * ```
- *
- * @example
- * ```typescript
- * // Get status as plain text
- * const status = await serviceStatus({ format: 'text' });
- * console.log(status); // "OK"
- * ```
  *
  * @see {@link https://nominatim.org/release-docs/develop/api/Status/ | Nominatim Status API Documentation}
  */
@@ -60,14 +46,20 @@ export const serviceStatus = async <T = unknown>(
   const endpoint = 'status'
   const urlSearchParams = new URLSearchParams()
 
-  Object.keys(options).forEach((key) => {
-    const value = options[key]
+  const { cache, rateLimiter, ...apiOptions } = options
+
+  Object.keys(apiOptions).forEach((key) => {
+    const value = apiOptions[key as keyof typeof apiOptions]
+
     if (value !== undefined) {
       urlSearchParams.append(key, String(value))
     }
   })
 
-  const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams)
+  const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
+    cache,
+    rateLimiter
+  })
 
   return fetchedData
 }

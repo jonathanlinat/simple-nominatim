@@ -29,7 +29,11 @@ import type {
 } from '@simple-nominatim/core'
 
 import { responseParser } from '../_shared/responseParser'
-import { safeValidateArgs, freeFormSearchSchema } from '../_shared/validation'
+import {
+  safeValidateArgs,
+  freeFormSearchSchema,
+  handleValidationError
+} from '../_shared/validation'
 import type { FreeFormArgv } from './search.types'
 
 /**
@@ -39,20 +43,10 @@ import type { FreeFormArgv } from './search.types'
  * It transforms CLI arguments into the format expected by the core library,
  * executes the search, and outputs the results to the console.
  *
- * @param {FreeFormArgv} argv - Command-line arguments from Yargs
+ * @param {FreeFormArgv} argv Command-line arguments from Yargs
  * @returns {Promise<void>} A promise that resolves when the search is complete
  *
- * @internal This is an internal CLI function called by the command handler
- *
- * @example
- * ```typescript
- * // Called internally by: simple-nominatim search:free-form --query "Paris" --format json
- * await freeFormSearchWrapper({
- *   query: 'Paris',
- *   format: 'json',
- *   limit: 10
- * });
- * ```
+ * @internal
  */
 export const freeFormSearchWrapper = (argv: FreeFormArgv): Promise<void> => {
   const { email, format, limit, query } = argv
@@ -65,11 +59,7 @@ export const freeFormSearchWrapper = (argv: FreeFormArgv): Promise<void> => {
   })
 
   if (!validationResult.success) {
-    console.error('Validation error:')
-    validationResult.error.issues.forEach((err) => {
-      console.error(`  - ${err.path.join('.')}: ${err.message}`)
-    })
-    process.exit(1)
+    handleValidationError(validationResult.error)
   }
 
   const params: FreeFormSearchParams = { query }

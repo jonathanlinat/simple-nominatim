@@ -26,7 +26,11 @@ import { serviceStatus } from '@simple-nominatim/core'
 import type { StatusOptions } from '@simple-nominatim/core'
 
 import { responseParser } from '../_shared/responseParser'
-import { safeValidateArgs, serviceStatusSchema } from '../_shared/validation'
+import {
+  safeValidateArgs,
+  serviceStatusSchema,
+  handleValidationError
+} from '../_shared/validation'
 import type { ServiceStatusArgv } from './status.types'
 
 /**
@@ -36,18 +40,10 @@ import type { ServiceStatusArgv } from './status.types'
  * It transforms CLI arguments into the format expected by the core library,
  * queries the API status, and outputs the results to the console.
  *
- * @param {ServiceStatusArgv} argv - Command-line arguments from Yargs
+ * @param {ServiceStatusArgv} argv Command-line arguments from Yargs
  * @returns {Promise<void>} A promise that resolves when the status check is complete
  *
- * @internal This is an internal CLI function called by the command handler
- *
- * @example
- * ```typescript
- * // Called internally by: simple-nominatim status:service --format json
- * await serviceStatusWrapper({
- *   format: 'json'
- * });
- * ```
+ * @internal
  */
 export const serviceStatusWrapper = (
   argv: ServiceStatusArgv
@@ -59,11 +55,7 @@ export const serviceStatusWrapper = (
   })
 
   if (!validationResult.success) {
-    console.error('Validation error:')
-    validationResult.error.issues.forEach((err) => {
-      console.error(`  - ${err.path.join('.')}: ${err.message}`)
-    })
-    process.exit(1)
+    handleValidationError(validationResult.error)
   }
 
   const options: StatusOptions = { format }

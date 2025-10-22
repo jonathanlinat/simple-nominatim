@@ -3,6 +3,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"]
-    }
+    },
+    "test:types": {}
   }
 }

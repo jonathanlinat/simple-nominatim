@@ -107,7 +107,7 @@ export const structuredSearchSchema = z.object({
   county: z.string().optional(),
   email: emailSchema,
   limit: limitSchema,
-  postalCode: z.string().optional(),
+  postalcode: z.string().optional(),
   state: z.string().optional(),
   street: z.string().optional()
 })
@@ -133,8 +133,8 @@ export const serviceStatusSchema = z.object({
  * Helper function to safely validate arguments and return errors
  *
  * @template T - The inferred schema type
- * @param {z.ZodSchema<T>} schema - The Zod schema to validate against
- * @param {unknown} data - The data to validate
+ * @param {z.ZodSchema<T>} schema The Zod schema to validate against
+ * @param {unknown} data The data to validate
  * @returns {{ success: true; data: T } | { success: false; error: z.ZodError }} Validation result
  */
 export const safeValidateArgs = <T>(
@@ -142,5 +142,27 @@ export const safeValidateArgs = <T>(
   data: unknown
 ): { success: true; data: T } | { success: false; error: z.ZodError } => {
   const result = schema.safeParse(data)
+
   return result
+}
+
+/**
+ * Handles validation errors by logging them to console and exiting the process
+ *
+ * This utility function provides consistent error handling across all CLI commands.
+ * It formats Zod validation errors in a user-friendly way and terminates the process.
+ *
+ * @param {z.ZodError} error The Zod validation error to handle
+ * @returns {never} This function never returns (exits the process)
+ *
+ * @internal
+ */
+export const handleValidationError = (error: z.ZodError): never => {
+  console.error('Validation error:')
+
+  error.issues.forEach((err) => {
+    console.error(`  - ${err.path.join('.')}: ${err.message}`)
+  })
+
+  process.exit(1)
 }

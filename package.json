@@ -17,10 +17,11 @@
   "scripts": {
     "ci:release": "changeset publish",
     "ci:version": "changeset version",
-    "postinstall": "pnpm simple-git-hooks",
     "packages:build": "turbo run build",
-    "packages:lint:code": "eslint --fix packages/**/*.ts",
-    "packages:lint:markdown": "markdownlint-cli2 --fix 'packages/**/*.md' '#packages/**/node_modules/**/*.md'"
+    "packages:lint:code": "eslint --fix",
+    "packages:lint:markdown": "markdownlint-cli2 --fix 'packages/**/*.md' '#packages/**/node_modules/**/*.md'",
+    "packages:test:types": "turbo run test:types",
+    "postinstall": "pnpm simple-git-hooks"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",
@@ -36,10 +37,14 @@
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsdoc": "^61.1.5",
+    "eslint-plugin-jsonc": "^2.21.0",
     "eslint-plugin-n": "^17.23.1",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-promise": "^7.2.1",
+    "expect-type": "^1.2.2",
     "jiti": "^2.6.1",
+    "jsonc-eslint-parser": "^2.4.1",
     "lint-staged": "^16.2.6",
     "markdownlint": "^0.39.0",
     "markdownlint-cli2": "^0.18.1",

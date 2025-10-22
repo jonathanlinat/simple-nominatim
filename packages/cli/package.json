@@ -32,7 +32,8 @@
   "scripts": {
     "build": "unbuild",
     "prepare": "pnpm build",
-    "simple-nominatim": "node --loader ts-node/esm ./src/index.ts"
+    "simple-nominatim": "node --loader ts-node/esm ./src/index.ts",
+    "test:types": "tsc --noEmit --project tsconfig.test.json"
   },
   "dependencies": {
     "@simple-nominatim/core": "workspace:*",

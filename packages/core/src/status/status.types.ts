@@ -1,7 +1,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2023-2024 Jonathan Linat <https://github.com/jonathanlinat>
+ * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software:"), to deal
@@ -22,6 +22,9 @@
  * SOFTWARE.
  */
 
+import type { CacheManager } from '../_shared/cacheManager'
+import type { RateLimiter } from '../_shared/rateLimiter'
+
 /**
  * Status format types supported by Nominatim API
  */
@@ -36,7 +39,15 @@ export interface StatusOptions {
    */
   format: StatusFormat
   /**
+   * Cache manager instance for response caching (optional)
+   */
+  cache?: CacheManager
+  /**
+   * Rate limiter instance for request throttling (optional)
+   */
+  rateLimiter?: RateLimiter
+  /**
    * Index signature for additional query parameters
    */
-  [key: string]: string | number | undefined
+  [key: string]: string | number | CacheManager | RateLimiter | undefined
 }

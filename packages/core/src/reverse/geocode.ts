@@ -34,31 +34,11 @@ import type { GeocodeReverseParams } from './reverse.types'
  * address or place for the given coordinates.
  *
  * @template T - The expected response type (defaults to unknown)
- * @param {GeocodeReverseParams} params - The coordinates to reverse geocode (latitude and longitude)
- * @param {ReverseOptions} options - Configuration options for the reverse geocoding request
+ * @param {GeocodeReverseParams} params The coordinates to reverse geocode (latitude and longitude)
+ * @param {ReverseOptions} options Configuration options for the reverse geocoding request
  * @returns {Promise<T>} A promise that resolves to the reverse geocoding result
  *
  * @throws {Error} If the HTTP request fails or returns a non-2xx status code
- *
- * @example
- * ```typescript
- * // Reverse geocode coordinates
- * const result = await geocodeReverse(
- *   { latitude: '37.4219999', longitude: '-122.0840575' },
- *   { format: 'json' }
- * );
- * // Returns address information for the Googleplex location
- * ```
- *
- * @example
- * ```typescript
- * // Reverse geocode with email identification
- * const result = await geocodeReverse(
- *   { latitude: '48.8584', longitude: '2.2945' },
- *   { format: 'jsonv2', email: 'user@example.com' }
- * );
- * // Returns address information for the Eiffel Tower
- * ```
  *
  * @see {@link https://nominatim.org/release-docs/develop/api/Reverse/ | Nominatim Reverse Geocoding API Documentation}
  */
@@ -74,19 +54,26 @@ export const geocodeReverse = async <T = unknown>(
 
   Object.keys(parsedParams).forEach((key) => {
     const value = parsedParams[key as keyof typeof parsedParams]
+
     if (value) {
       urlSearchParams.append(key, value)
     }
   })
 
-  Object.keys(options).forEach((key) => {
-    const value = options[key]
+  const { cache, rateLimiter, ...apiOptions } = options
+
+  Object.keys(apiOptions).forEach((key) => {
+    const value = apiOptions[key as keyof typeof apiOptions]
+
     if (value !== undefined) {
       urlSearchParams.append(key, String(value))
     }
   })
 
-  const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams)
+  const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
+    cache,
+    rateLimiter
+  })
 
   return fetchedData
 }
