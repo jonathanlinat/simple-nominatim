@@ -1,5 +1,27 @@
 # @simple-nominatim/core
 
+## 0.2.0
+
+### Minor Changes
+
+- Clean up codebase by removing redundant type re-exports and unused validation helper function ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
+- Add optional caching and rate limiting features ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
+- Add retry logic with exponential backoff and TypeScript type tests ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
+- Upgrade the NPM dependencies to their latest available version ([#13](https://github.com/jonathanlinat/simple-nominatim/pull/13))
+
+- Migrate entire codebase from JavaScript (.mjs) to TypeScript (.ts) ([#11](https://github.com/jonathanlinat/simple-nominatim/pull/11))
+
+### Patch Changes
+
+- Add TypeScript build artifacts to gitignore ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
+- Add ESLint JSDoc plugin for automated TSDoc enforcement ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
+- Consolidate TypeScript configuration to eliminate duplication ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
 ## 0.1.5
 
 ### Patch Changes
