@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: ./.github/actions/install-tools-dependencies
       - name: Lint the packages
         shell: bash
@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout ${{ github.ref }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: ./.github/actions/install-tools-dependencies
       - name: Proceed to release
         uses: changesets/action@v1
