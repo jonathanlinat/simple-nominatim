@@ -25,8 +25,6 @@
 import { dataFetcher } from '../_shared/dataFetcher'
 import type { StatusOptions } from './status.types'
 
-export type { StatusOptions, StatusFormat } from './status.types'
-
 /**
  * Checks the status of the Nominatim API service
  *

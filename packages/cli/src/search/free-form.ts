@@ -29,6 +29,7 @@ import type {
 } from '@simple-nominatim/core'
 
 import { responseParser } from '../_shared/responseParser'
+import { safeValidateArgs, freeFormSearchSchema } from '../_shared/validation'
 import type { FreeFormArgv } from './search.types'
 
 /**
@@ -55,6 +56,21 @@ import type { FreeFormArgv } from './search.types'
  */
 export const freeFormSearchWrapper = (argv: FreeFormArgv): Promise<void> => {
   const { email, format, limit, query } = argv
+
+  const validationResult = safeValidateArgs(freeFormSearchSchema, {
+    query,
+    outputFormat: format,
+    email,
+    limit
+  })
+
+  if (!validationResult.success) {
+    console.error('Validation error:')
+    validationResult.error.issues.forEach((err) => {
+      console.error(`  - ${err.path.join('.')}: ${err.message}`)
+    })
+    process.exit(1)
+  }
 
   const params: FreeFormSearchParams = { query }
   const options: SearchOptions = { email, format, limit }

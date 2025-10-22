@@ -29,6 +29,10 @@ import type {
 } from '@simple-nominatim/core'
 
 import { responseParser } from '../_shared/responseParser'
+import {
+  safeValidateArgs,
+  reverseGeocodeSchema
+} from '../_shared/validation'
 import type { GeocodeReverseArgv } from './reverse.types'
 
 /**
@@ -57,6 +61,21 @@ export const geocodeReverseWrapper = (
   argv: GeocodeReverseArgv
 ): Promise<void> => {
   const { email, format, latitude, longitude } = argv
+
+  const validationResult = safeValidateArgs(reverseGeocodeSchema, {
+    latitude,
+    longitude,
+    outputFormat: format,
+    email
+  })
+
+  if (!validationResult.success) {
+    console.error('Validation error:')
+    validationResult.error.issues.forEach((err) => {
+      console.error(`  - ${err.path.join('.')}: ${err.message}`)
+    })
+    process.exit(1)
+  }
 
   const params: GeocodeReverseParams = { latitude, longitude }
   const options: ReverseOptions = { email, format }

@@ -29,6 +29,10 @@ import type {
 } from '@simple-nominatim/core'
 
 import { responseParser } from '../_shared/responseParser'
+import {
+  safeValidateArgs,
+  structuredSearchSchema
+} from '../_shared/validation'
 import type { StructuredArgv } from './search.types'
 
 /**
@@ -68,6 +72,27 @@ export const structuredSearchWrapper = (
     state,
     street
   } = argv
+
+  const validationResult = safeValidateArgs(structuredSearchSchema, {
+    country,
+    outputFormat: format,
+    amenity,
+    city,
+    county,
+    email,
+    limit,
+    postalCode: postalcode,
+    state,
+    street
+  })
+
+  if (!validationResult.success) {
+    console.error('Validation error:')
+    validationResult.error.issues.forEach((err) => {
+      console.error(`  - ${err.path.join('.')}: ${err.message}`)
+    })
+    process.exit(1)
+  }
 
   const params: StructuredSearchParams = {
     amenity,

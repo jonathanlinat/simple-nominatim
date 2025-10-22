@@ -26,9 +26,6 @@ import { dataFetcher } from '../_shared/dataFetcher'
 import type { SearchOptions } from '../_shared/_shared.types'
 import type { StructuredSearchParams } from './search.types'
 
-export type { StructuredSearchParams } from './search.types'
-export type { SearchOptions } from '../_shared/_shared.types'
-
 /**
  * Performs a structured search query using the Nominatim API
  *

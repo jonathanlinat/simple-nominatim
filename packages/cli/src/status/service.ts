@@ -26,6 +26,7 @@ import { serviceStatus } from '@simple-nominatim/core'
 import type { StatusOptions } from '@simple-nominatim/core'
 
 import { responseParser } from '../_shared/responseParser'
+import { safeValidateArgs, serviceStatusSchema } from '../_shared/validation'
 import type { ServiceStatusArgv } from './status.types'
 
 /**
@@ -52,6 +53,18 @@ export const serviceStatusWrapper = (
   argv: ServiceStatusArgv
 ): Promise<void> => {
   const { format } = argv
+
+  const validationResult = safeValidateArgs(serviceStatusSchema, {
+    statusFormat: format
+  })
+
+  if (!validationResult.success) {
+    console.error('Validation error:')
+    validationResult.error.issues.forEach((err) => {
+      console.error(`  - ${err.path.join('.')}: ${err.message}`)
+    })
+    process.exit(1)
+  }
 
   const options: StatusOptions = { format }
 

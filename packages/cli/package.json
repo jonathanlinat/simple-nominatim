@@ -36,7 +36,8 @@
   },
   "dependencies": {
     "@simple-nominatim/core": "workspace:*",
-    "yargs": "^18.0.0"
+    "yargs": "^18.0.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",

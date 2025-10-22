@@ -26,9 +26,6 @@ import { dataFetcher } from '../_shared/dataFetcher'
 import type { SearchOptions } from '../_shared/_shared.types'
 import type { FreeFormSearchParams } from './search.types'
 
-export type { FreeFormSearchParams } from './search.types'
-export type { SearchOptions } from '../_shared/_shared.types'
-
 /**
  * Performs a free-form search query using the Nominatim API
  *
