@@ -1,7 +1,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2023-2024 Jonathan Linat <https://github.com/jonathanlinat>
+ * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software:"), to deal
@@ -23,13 +23,37 @@
  */
 
 import { serviceStatus } from '@simple-nominatim/core'
+import type { StatusOptions } from '@simple-nominatim/core'
 
-import { responseParser } from '../_shared/responseParser.mjs'
+import { responseParser } from '../_shared/responseParser'
+import type { ServiceStatusArgv } from './status.types'
 
-export const serviceStatusWrapper = (argv) => {
+/**
+ * CLI wrapper for service status functionality
+ *
+ * This function wraps the core service status functionality for use in the CLI.
+ * It transforms CLI arguments into the format expected by the core library,
+ * queries the API status, and outputs the results to the console.
+ *
+ * @param {ServiceStatusArgv} argv - Command-line arguments from Yargs
+ * @returns {Promise<void>} A promise that resolves when the status check is complete
+ *
+ * @internal This is an internal CLI function called by the command handler
+ *
+ * @example
+ * ```typescript
+ * // Called internally by: simple-nominatim status:service --format json
+ * await serviceStatusWrapper({
+ *   format: 'json'
+ * });
+ * ```
+ */
+export const serviceStatusWrapper = (
+  argv: ServiceStatusArgv
+): Promise<void> => {
   const { format } = argv
 
-  const options = { format }
+  const options: StatusOptions = { format }
 
   const response = serviceStatus(options)
   const handledResponse = responseParser(response)

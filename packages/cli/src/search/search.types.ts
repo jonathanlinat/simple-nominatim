@@ -22,18 +22,72 @@
  * SOFTWARE.
  */
 
-import { freeFormSearch } from '@simple-nominatim/core'
+import type { OutputFormat } from '@simple-nominatim/core'
 
-import { responseParser } from '../_shared/responseParser.mjs'
+/**
+ * CLI arguments for free-form search command
+ */
+export interface FreeFormArgv {
+  /**
+   * Email address for identification
+   */
+  email?: string
+  /**
+   * Output format
+   */
+  format: OutputFormat
+  /**
+   * Maximum number of results
+   */
+  limit?: number
+  /**
+   * Free-form query string
+   */
+  query: string
+}
 
-export const freeFormSearchWrapper = (argv) => {
-  const { email, format, limit, query } = argv
-
-  const params = { query }
-  const options = { email, format, limit }
-
-  const response = freeFormSearch(params, options)
-  const handledResponse = responseParser(response)
-
-  return handledResponse
+/**
+ * CLI arguments for structured search command
+ */
+export interface StructuredArgv {
+  /**
+   * Name or type of POI
+   */
+  amenity?: string
+  /**
+   * City name
+   */
+  city?: string
+  /**
+   * Country name
+   */
+  country?: string
+  /**
+   * County name
+   */
+  county?: string
+  /**
+   * Email address for identification
+   */
+  email?: string
+  /**
+   * Output format
+   */
+  format: OutputFormat
+  /**
+   * Maximum number of results
+   */
+  limit?: number
+  /**
+   * Postal code
+   */
+  postalcode?: string
+  /**
+   * State name
+   */
+  state?: string
+  /**
+   * Street name and number
+   */
+  street?: string
 }

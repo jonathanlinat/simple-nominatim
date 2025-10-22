@@ -22,28 +22,26 @@
  * SOFTWARE.
  */
 
-import { dataFetcher } from '../_shared/dataFetcher'
+// Shared types
+export type {
+  OutputFormat,
+  BaseOptions,
+  SearchOptions,
+  ReverseOptions
+} from './_shared/_shared.types'
 
-export const geocodeReverse = async (params, options) => {
-  const endpoint = 'reverse'
-  const urlSearchParams = new URLSearchParams()
+// Reverse geocoding
+export { geocodeReverse } from './reverse/geocode'
+export type { GeocodeReverseParams } from './reverse/reverse.types'
 
-  const { latitude: lat, longitude: lon } = params
-  const parsedParams = { lat, lon }
+// Free-form search
+export { freeFormSearch } from './search/free-form'
+export type { FreeFormSearchParams } from './search/search.types'
 
-  Object.keys(parsedParams).forEach((key) => {
-    if (parsedParams[key]) {
-      urlSearchParams.append(key, parsedParams[key])
-    }
-  })
+// Structured search
+export { structuredSearch } from './search/structured'
+export type { StructuredSearchParams } from './search/search.types'
 
-  Object.keys(options).forEach((key) => {
-    if (options[key]) {
-      urlSearchParams.append(key, options[key])
-    }
-  })
-
-  const fetchedData = await dataFetcher(endpoint, urlSearchParams)
-
-  return fetchedData
-}
+// Service status
+export { serviceStatus } from './status/service'
+export type { StatusOptions, StatusFormat } from './status/status.types'

@@ -1,7 +1,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2023-2024 Jonathan Linat <https://github.com/jonathanlinat>
+ * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software:"), to deal
@@ -22,9 +22,5 @@
  * SOFTWARE.
  */
 
-import { geocodeReverse } from './reverse/geocode'
-import { freeFormSearch } from './search/free-form'
-import { structuredSearch } from './search/structured'
-import { serviceStatus } from './status/service'
-
-export { geocodeReverse, freeFormSearch, structuredSearch, serviceStatus }
+export const FETCHER_BASE_URL: string = 'https://nominatim.openstreetmap.org'
+export const FETCHER_USER_AGENT: string = '@simple-nominatim/core'

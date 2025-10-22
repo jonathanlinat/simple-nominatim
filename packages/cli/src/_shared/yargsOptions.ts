@@ -1,7 +1,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2023-2024 Jonathan Linat <https://github.com/jonathanlinat>
+ * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software:"), to deal
@@ -22,82 +22,84 @@
  * SOFTWARE.
  */
 
-export const amenityOption = {
+import type { Options } from 'yargs'
+
+export const amenityOption: Options = {
   description: 'Specify the name or type of point of interest (POI).',
   type: 'string'
 }
 
-export const cityOption = {
+export const cityOption: Options = {
   description: 'Specify the city name.',
   type: 'string'
 }
 
-export const countryOption = {
+export const countryOption: Options = {
   description: 'Specify the country name.',
   type: 'string',
   demandOption: true
 }
 
-export const countyOption = {
+export const countyOption: Options = {
   description: 'Specify the county name.',
   type: 'string'
 }
 
-export const emailOption = {
+export const emailOption: Options = {
   description:
     'Specify an appropriate email address when making large numbers of request.',
   type: 'string'
 }
 
-export const outputFormatOption = {
+export const outputFormatOption: Options = {
   description: 'Specify the desired output format.',
   type: 'string',
   choices: ['xml', 'json', 'jsonv2', 'geojson', 'geocodejson'],
   demandOption: true
 }
 
-export const latitudeOption = {
+export const latitudeOption: Options = {
   description: 'Specify the latitude of the coordinate.',
   type: 'string',
   demandOption: true
 }
 
-export const limitOption = {
+export const limitOption: Options = {
   description:
     'Specify the maximum number of returned results. Cannot be more than 40.',
   type: 'number'
 }
 
-export const longitudeOption = {
+export const longitudeOption: Options = {
   description: 'Specify the longitude of the coordinate.',
   type: 'string',
   demandOption: true
 }
 
-export const postalCodeOption = {
+export const postalCodeOption: Options = {
   description: 'Specify the postal code',
   type: 'string'
 }
 
-export const queryOption = {
+export const queryOption: Options = {
   description: 'Specify the free-form query string to search.',
   type: 'string',
   demandOption: true
 }
 
-export const stateOption = {
+export const stateOption: Options = {
   description: 'Specify the state name.',
   type: 'string'
 }
 
-export const statusFormatOption = {
+export const statusFormatOption: Options = {
   description: 'Specify the desired output format.',
   type: 'string',
   choices: ['text', 'json'],
   demandOption: true
 }
 
-export const streetOption = {
+export const streetOption: Options = {
   description: 'Specify the house number and street name',
   type: 'string'
 }

@@ -19,7 +19,7 @@
     "ci:version": "changeset version",
     "postinstall": "pnpm simple-git-hooks",
     "packages:build": "turbo run build",
-    "packages:lint:code": "eslint --fix packages/**/*.mjs",
+    "packages:lint:code": "eslint --fix packages/**/*.ts",
     "packages:lint:markdown": "markdownlint-cli2 --fix 'packages/**/*.md' '#packages/**/node_modules/**/*.md'"
   },
   "devDependencies": {
@@ -28,6 +28,9 @@
     "@commitlint/config-conventional": "^19.6.0",
     "@commitlint/format": "^19.5.0",
     "@svitejs/changesets-changelog-github-compact": "^1.2.0",
+    "@types/node": "^24.9.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-prettier-standard": "^4.0.1",
@@ -36,6 +39,7 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-promise": "^6.6.0",
+    "jiti": "^2.6.1",
     "lint-staged": "^15.2.10",
     "markdownlint": "^0.36.1",
     "markdownlint-cli2": "^0.15.0",
@@ -48,10 +52,10 @@
   "engines": {
     "bun": "please-use-pnpm",
     "deno": "please-use-pnpm",
-    "node": ">=20 <21",
+    "node": "22.17.1",
     "npm": "please-use-pnpm",
-    "pnpm": "8.15.8",
+    "pnpm": "10.18.3",
     "yarn": "please-use-pnpm"
   },
-  "packageManager": "pnpm@8.15.8"
+  "packageManager": "pnpm@10.18.3"
 }

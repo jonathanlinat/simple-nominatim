@@ -22,24 +22,26 @@
  * SOFTWARE.
  */
 
-import { FETCHER_BASE_URL, FETCHER_USER_AGENT } from './constants'
+import type { OutputFormat } from '@simple-nominatim/core'
 
-export const dataFetcher = async (endpoint, params) => {
-  const requestInfo = `${FETCHER_BASE_URL}/${endpoint}?${params.toString()}`
-  const requestInit = { headers: { 'User-Agent': FETCHER_USER_AGENT } }
-
-  const requestResponse = await fetch(requestInfo, requestInit)
-
-  if (!requestResponse.ok) {
-    throw new Error(
-      `HTTP error! Status: ${requestResponse.status}. Text: ${requestResponse.statusText}`
-    )
-  }
-
-  const parsedRequestResponse =
-    params.get('format') === 'text' || params.get('format') === 'xml'
-      ? await requestResponse.text()
-      : await requestResponse.json()
-
-  return parsedRequestResponse
+/**
+ * CLI arguments for reverse geocoding command
+ */
+export interface GeocodeReverseArgv {
+  /**
+   * Email address for identification
+   */
+  email?: string
+  /**
+   * Output format
+   */
+  format: OutputFormat
+  /**
+   * Latitude coordinate
+   */
+  latitude: string
+  /**
+   * Longitude coordinate
+   */
+  longitude: string
 }

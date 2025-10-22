@@ -22,29 +22,50 @@
  * SOFTWARE.
  */
 
-import { structuredSearch } from '@simple-nominatim/core'
+/**
+ * Parameters for free-form search query
+ */
+export interface FreeFormSearchParams {
+  /**
+   * Free-form query string to search for
+   */
+  query: string
+}
 
-import { responseParser } from '../_shared/responseParser.mjs'
-
-export const structuredSearchWrapper = (argv) => {
-  const {
-    amenity,
-    city,
-    country,
-    county,
-    email,
-    format,
-    limit,
-    postalcode,
-    state,
-    street
-  } = argv
-
-  const params = { amenity, city, country, county, postalcode, state, street }
-  const options = { email, format, limit }
-
-  const response = structuredSearch(params, options)
-  const handledResponse = responseParser(response)
-
-  return handledResponse
+/**
+ * Parameters for structured search query
+ */
+export interface StructuredSearchParams {
+  /**
+   * Name or type of point of interest (POI)
+   */
+  amenity?: string
+  /**
+   * City name
+   */
+  city?: string
+  /**
+   * Country name
+   */
+  country?: string
+  /**
+   * County name
+   */
+  county?: string
+  /**
+   * Postal code
+   */
+  postalcode?: string
+  /**
+   * State name
+   */
+  state?: string
+  /**
+   * House number and street name
+   */
+  street?: string
+  /**
+   * Index signature for additional search parameters
+   */
+  [key: string]: string | undefined
 }
