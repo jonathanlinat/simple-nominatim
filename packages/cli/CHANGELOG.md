@@ -1,5 +1,30 @@
 # @simple-nominatim/cli
 
+## 0.2.0
+
+### Minor Changes
+
+- Add comprehensive Zod validation schemas for all CLI commands ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
+- Clean up codebase by removing redundant type re-exports and unused validation helper function ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
+- Upgrade the NPM dependencies to their latest available version ([#13](https://github.com/jonathanlinat/simple-nominatim/pull/13))
+
+- Migrate entire codebase from JavaScript (.mjs) to TypeScript (.ts) ([#11](https://github.com/jonathanlinat/simple-nominatim/pull/11))
+
+### Patch Changes
+
+- Add TypeScript build artifacts to gitignore ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
+- Add ESLint JSDoc plugin for automated TSDoc enforcement ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
+- Consolidate TypeScript configuration to eliminate duplication ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
+- Extract duplicate validation error handling to shared utility ([#14](https://github.com/jonathanlinat/simple-nominatim/pull/14))
+
+- Updated dependencies [[`5c5ccf8`](https://github.com/jonathanlinat/simple-nominatim/commit/5c5ccf8f8cbddf9bdf80764ebd4c3160b847c682), [`03a2d19`](https://github.com/jonathanlinat/simple-nominatim/commit/03a2d1911e280f438c3d5b96ee9564f507544b01), [`5c5ccf8`](https://github.com/jonathanlinat/simple-nominatim/commit/5c5ccf8f8cbddf9bdf80764ebd4c3160b847c682), [`5c5ccf8`](https://github.com/jonathanlinat/simple-nominatim/commit/5c5ccf8f8cbddf9bdf80764ebd4c3160b847c682), [`5c5ccf8`](https://github.com/jonathanlinat/simple-nominatim/commit/5c5ccf8f8cbddf9bdf80764ebd4c3160b847c682), [`4de631e`](https://github.com/jonathanlinat/simple-nominatim/commit/4de631ed31d02c878e718daac2986ca62d57e48f), [`5c5ccf8`](https://github.com/jonathanlinat/simple-nominatim/commit/5c5ccf8f8cbddf9bdf80764ebd4c3160b847c682), [`6f3d2c6`](https://github.com/jonathanlinat/simple-nominatim/commit/6f3d2c6debb830ddb5f3fecf00247f8cf4176285)]:
+  - @simple-nominatim/core@0.2.0
+
 ## 0.1.5
 
 ### Patch Changes
