@@ -23,6 +23,52 @@
  */
 
 import { FETCHER_BASE_URL, FETCHER_USER_AGENT } from './constants'
+import type { DataFetcherOptions, RetryConfig } from './_shared.types'
+
+/**
+ * Default retry configuration
+ */
+const DEFAULT_RETRY_CONFIG: Required<RetryConfig> = {
+  enabled: false,
+  maxAttempts: 3,
+  initialDelay: 1000,
+  maxDelay: 10000,
+  backoffMultiplier: 2,
+  useJitter: true,
+  retryableStatusCodes: [408, 429, 500, 502, 503, 504]
+}
+
+/**
+ * Calculate delay with exponential backoff and optional jitter
+ *
+ * @param attempt Current retry attempt number
+ * @param config Retry configuration
+ * @returns Calculated delay in milliseconds
+ */
+const calculateDelay = (
+  attempt: number,
+  config: Required<RetryConfig>
+): number => {
+  const exponentialDelay = Math.min(
+    config.initialDelay * Math.pow(config.backoffMultiplier, attempt - 1),
+    config.maxDelay
+  )
+
+  if (config.useJitter) {
+    return exponentialDelay * (0.5 + Math.random())
+  }
+
+  return exponentialDelay
+}
+
+/**
+ * Sleep for specified milliseconds
+ *
+ * @param ms Milliseconds to sleep
+ * @returns Promise that resolves after the specified delay
+ */
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms))
 
 /**
  * Generic HTTP fetcher for Nominatim API requests
@@ -31,40 +77,106 @@ import { FETCHER_BASE_URL, FETCHER_USER_AGENT } from './constants'
  * It automatically sets the required User-Agent header, constructs the request URL,
  * and parses the response based on the requested format.
  *
+ * Supports optional caching and rate limiting to optimize performance and respect
+ * API usage policies.
+ *
  * @template T - The expected response type (defaults to unknown)
- * @param {string} endpoint - The API endpoint to call (e.g., 'search', 'reverse', 'status')
- * @param {URLSearchParams} params - URL search parameters for the request
+ * @param {string} endpoint The API endpoint to call (e.g., 'search', 'reverse', 'status')
+ * @param {URLSearchParams} params URL search parameters for the request
+ * @param {DataFetcherOptions} options Optional cache and rate limiter instances
  * @returns {Promise<T>} A promise that resolves to the parsed response data
  *
  * @throws {Error} If the HTTP request fails or returns a non-2xx status code
  *
- * @internal This is an internal utility function not meant for direct external use
- *
- * @example
- * ```typescript
- * const params = new URLSearchParams({ format: 'json', q: 'Paris' });
- * const result = await dataFetcher('search', params);
- * ```
+ * @internal
  */
 export const dataFetcher = async <T = unknown>(
   endpoint: string,
-  params: URLSearchParams
+  params: URLSearchParams,
+  options: DataFetcherOptions = {}
 ): Promise<T> => {
-  const requestInfo = `${FETCHER_BASE_URL}/${endpoint}?${params.toString()}`
-  const requestInit = { headers: { 'User-Agent': FETCHER_USER_AGENT } }
-
-  const requestResponse = await fetch(requestInfo, requestInit)
-
-  if (!requestResponse.ok) {
-    throw new Error(
-      `HTTP error! Status: ${requestResponse.status}. Text: ${requestResponse.statusText}`
-    )
+  const { cache, rateLimiter, retry } = options
+  const retryConfig: Required<RetryConfig> = {
+    ...DEFAULT_RETRY_CONFIG,
+    ...retry
   }
 
-  const parsedRequestResponse =
-    params.get('format') === 'text' || params.get('format') === 'xml'
-      ? await requestResponse.text()
-      : await requestResponse.json()
+  if (cache?.isEnabled()) {
+    const cachedResponse = cache.get(endpoint, params)
 
-  return parsedRequestResponse as T
+    if (cachedResponse !== undefined) {
+      return cachedResponse as T
+    }
+  }
+
+  const performFetch = async (): Promise<T> => {
+    const requestInfo = `${FETCHER_BASE_URL}/${endpoint}?${params.toString()}`
+    const requestInit = { headers: { 'User-Agent': FETCHER_USER_AGENT } }
+
+    let lastError: Error | undefined
+    let attempt = 0
+
+    while (attempt < (retryConfig.enabled ? retryConfig.maxAttempts : 1)) {
+      attempt++
+
+      try {
+        const requestResponse = await fetch(requestInfo, requestInit)
+
+        if (!requestResponse.ok) {
+          const statusCode = requestResponse.status
+          const shouldRetry =
+            retryConfig.enabled &&
+            attempt < retryConfig.maxAttempts &&
+            retryConfig.retryableStatusCodes.includes(statusCode)
+
+          if (shouldRetry) {
+            const delay = calculateDelay(attempt, retryConfig)
+
+            await sleep(delay)
+
+            continue
+          }
+
+          throw new Error(
+            `HTTP error! Status: ${requestResponse.status}. Text: ${requestResponse.statusText}`
+          )
+        }
+
+        const parsedRequestResponse =
+          params.get('format') === 'text' || params.get('format') === 'xml'
+            ? await requestResponse.text()
+            : await requestResponse.json()
+
+        return parsedRequestResponse as T
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error))
+
+        const isNetworkError = !error || !(error as { status?: number }).status
+        const shouldRetry =
+          retryConfig.enabled && attempt < retryConfig.maxAttempts && isNetworkError
+
+        if (shouldRetry) {
+          const delay = calculateDelay(attempt, retryConfig)
+
+          await sleep(delay)
+
+          continue
+        }
+
+        throw lastError
+      }
+    }
+
+    throw lastError || new Error('Request failed after all retry attempts')
+  }
+
+  const response = rateLimiter?.isEnabled()
+    ? await rateLimiter.execute(performFetch)
+    : await performFetch()
+
+  if (cache?.isEnabled()) {
+    cache.set(endpoint, params, response as object)
+  }
+
+  return response
 }

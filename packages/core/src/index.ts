@@ -1,7 +1,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2023-2024 Jonathan Linat <https://github.com/jonathanlinat>
+ * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software:"), to deal
@@ -22,26 +22,28 @@
  * SOFTWARE.
  */
 
-// Shared types
+export { CacheManager } from './_shared/cacheManager'
+export type { CacheConfig } from './_shared/cacheManager'
+export { RateLimiter } from './_shared/rateLimiter'
+export type { RateLimitConfig } from './_shared/rateLimiter'
+
 export type {
   OutputFormat,
   BaseOptions,
   SearchOptions,
-  ReverseOptions
+  ReverseOptions,
+  DataFetcherOptions,
+  RetryConfig
 } from './_shared/_shared.types'
 
-// Reverse geocoding
 export { geocodeReverse } from './reverse/geocode'
 export type { GeocodeReverseParams } from './reverse/reverse.types'
 
-// Free-form search
 export { freeFormSearch } from './search/free-form'
 export type { FreeFormSearchParams } from './search/search.types'
 
-// Structured search
 export { structuredSearch } from './search/structured'
 export type { StructuredSearchParams } from './search/search.types'
 
-// Service status
 export { serviceStatus } from './status/service'
 export type { StatusOptions, StatusFormat } from './status/status.types'

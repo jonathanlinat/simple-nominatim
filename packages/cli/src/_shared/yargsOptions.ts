@@ -24,33 +24,63 @@
 
 import type { Options } from 'yargs'
 
+/**
+ * Yargs option for amenity parameter
+ *
+ * Specifies the name or type of point of interest (POI) for structured search
+ */
 export const amenityOption: Options = {
   description: 'Specify the name or type of point of interest (POI).',
   type: 'string'
 }
 
+/**
+ * Yargs option for city parameter
+ *
+ * Specifies the city name for structured search
+ */
 export const cityOption: Options = {
   description: 'Specify the city name.',
   type: 'string'
 }
 
+/**
+ * Yargs option for country parameter
+ *
+ * Specifies the country name for structured search (required)
+ */
 export const countryOption: Options = {
   description: 'Specify the country name.',
   type: 'string',
   demandOption: true
 }
 
+/**
+ * Yargs option for county parameter
+ *
+ * Specifies the county name for structured search
+ */
 export const countyOption: Options = {
   description: 'Specify the county name.',
   type: 'string'
 }
 
+/**
+ * Yargs option for email parameter
+ *
+ * Email address for identification when making large numbers of requests
+ */
 export const emailOption: Options = {
   description:
     'Specify an appropriate email address when making large numbers of request.',
   type: 'string'
 }
 
+/**
+ * Yargs option for output format parameter
+ *
+ * Specifies the desired output format (xml, json, jsonv2, geojson, geocodejson) - required
+ */
 export const outputFormatOption: Options = {
   description: 'Specify the desired output format.',
   type: 'string',
@@ -58,40 +88,75 @@ export const outputFormatOption: Options = {
   demandOption: true
 }
 
+/**
+ * Yargs option for latitude parameter
+ *
+ * Specifies the latitude coordinate for reverse geocoding (required)
+ */
 export const latitudeOption: Options = {
   description: 'Specify the latitude of the coordinate.',
   type: 'string',
   demandOption: true
 }
 
+/**
+ * Yargs option for limit parameter
+ *
+ * Specifies the maximum number of returned results (max 40)
+ */
 export const limitOption: Options = {
   description:
     'Specify the maximum number of returned results. Cannot be more than 40.',
   type: 'number'
 }
 
+/**
+ * Yargs option for longitude parameter
+ *
+ * Specifies the longitude coordinate for reverse geocoding (required)
+ */
 export const longitudeOption: Options = {
   description: 'Specify the longitude of the coordinate.',
   type: 'string',
   demandOption: true
 }
 
+/**
+ * Yargs option for postal code parameter
+ *
+ * Specifies the postal code for structured search
+ */
 export const postalCodeOption: Options = {
   description: 'Specify the postal code',
   type: 'string'
 }
 
+/**
+ * Yargs option for query parameter
+ *
+ * Specifies the free-form query string for search (required)
+ */
 export const queryOption: Options = {
   description: 'Specify the free-form query string to search.',
   type: 'string',
   demandOption: true
 }
 
+/**
+ * Yargs option for state parameter
+ *
+ * Specifies the state name for structured search
+ */
 export const stateOption: Options = {
   description: 'Specify the state name.',
   type: 'string'
 }
 
+/**
+ * Yargs option for status format parameter
+ *
+ * Specifies the desired output format for status endpoint (text or json) - required
+ */
 export const statusFormatOption: Options = {
   description: 'Specify the desired output format.',
   type: 'string',
@@ -99,6 +164,11 @@ export const statusFormatOption: Options = {
   demandOption: true
 }
 
+/**
+ * Yargs option for street parameter
+ *
+ * Specifies the house number and street name for structured search
+ */
 export const streetOption: Options = {
   description: 'Specify the house number and street name',
   type: 'string'

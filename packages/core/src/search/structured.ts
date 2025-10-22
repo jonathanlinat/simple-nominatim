@@ -26,9 +26,6 @@ import { dataFetcher } from '../_shared/dataFetcher'
 import type { SearchOptions } from '../_shared/_shared.types'
 import type { StructuredSearchParams } from './search.types'
 
-export type { StructuredSearchParams } from './search.types'
-export type { SearchOptions } from '../_shared/_shared.types'
-
 /**
  * Performs a structured search query using the Nominatim API
  *
@@ -37,35 +34,11 @@ export type { SearchOptions } from '../_shared/_shared.types'
  * precise results when you have structured address data.
  *
  * @template T - The expected response type (defaults to unknown)
- * @param {StructuredSearchParams} params - The structured address parameters (city, street, country, etc.)
- * @param {SearchOptions} options - Configuration options for the search request
+ * @param {StructuredSearchParams} params The structured address parameters (city, street, country, etc.)
+ * @param {SearchOptions} options Configuration options for the search request
  * @returns {Promise<T>} A promise that resolves to the search results
  *
  * @throws {Error} If the HTTP request fails or returns a non-2xx status code
- *
- * @example
- * ```typescript
- * // Search by country and city
- * const results = await structuredSearch(
- *   { country: 'USA', city: 'San Francisco' },
- *   { format: 'json', limit: 10 }
- * );
- * ```
- *
- * @example
- * ```typescript
- * // Search with full address components
- * const results = await structuredSearch(
- *   {
- *     street: '1600 Amphitheatre Parkway',
- *     city: 'Mountain View',
- *     state: 'California',
- *     country: 'USA',
- *     postalcode: '94043'
- *   },
- *   { format: 'geojson', email: 'user@example.com' }
- * );
- * ```
  *
  * @see {@link https://nominatim.org/release-docs/develop/api/Search/ | Nominatim Search API Documentation}
  */
@@ -77,20 +50,27 @@ export const structuredSearch = async <T = unknown>(
   const urlSearchParams = new URLSearchParams()
 
   Object.keys(params).forEach((key) => {
-    const value = params[key]
+    const value = params[key as keyof typeof params]
+
     if (value) {
       urlSearchParams.append(key, value)
     }
   })
 
-  Object.keys(options).forEach((key) => {
-    const value = options[key]
+  const { cache, rateLimiter, ...apiOptions } = options
+
+  Object.keys(apiOptions).forEach((key) => {
+    const value = apiOptions[key as keyof typeof apiOptions]
+
     if (value !== undefined) {
       urlSearchParams.append(key, String(value))
     }
   })
 
-  const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams)
+  const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
+    cache,
+    rateLimiter
+  })
 
   return fetchedData
 }

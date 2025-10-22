@@ -29,6 +29,11 @@ import type {
 } from '@simple-nominatim/core'
 
 import { responseParser } from '../_shared/responseParser'
+import {
+  safeValidateArgs,
+  reverseGeocodeSchema,
+  handleValidationError
+} from '../_shared/validation'
 import type { GeocodeReverseArgv } from './reverse.types'
 
 /**
@@ -38,25 +43,26 @@ import type { GeocodeReverseArgv } from './reverse.types'
  * It transforms CLI arguments with coordinates into the format expected by the
  * core library, executes the reverse geocoding, and outputs the results to the console.
  *
- * @param {GeocodeReverseArgv} argv - Command-line arguments from Yargs containing coordinates
+ * @param {GeocodeReverseArgv} argv Command-line arguments from Yargs containing coordinates
  * @returns {Promise<void>} A promise that resolves when the reverse geocoding is complete
  *
- * @internal This is an internal CLI function called by the command handler
- *
- * @example
- * ```typescript
- * // Called internally by: simple-nominatim reverse:geocode --latitude "48.8584" --longitude "2.2945" --format json
- * await geocodeReverseWrapper({
- *   latitude: '48.8584',
- *   longitude: '2.2945',
- *   format: 'json'
- * });
- * ```
+ * @internal
  */
 export const geocodeReverseWrapper = (
   argv: GeocodeReverseArgv
 ): Promise<void> => {
   const { email, format, latitude, longitude } = argv
+
+  const validationResult = safeValidateArgs(reverseGeocodeSchema, {
+    latitude,
+    longitude,
+    outputFormat: format,
+    email
+  })
+
+  if (!validationResult.success) {
+    handleValidationError(validationResult.error)
+  }
 
   const params: GeocodeReverseParams = { latitude, longitude }
   const options: ReverseOptions = { email, format }

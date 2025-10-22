@@ -1,7 +1,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2023-2024 Jonathan Linat <https://github.com/jonathanlinat>
+ * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software:"), to deal
@@ -22,6 +22,9 @@
  * SOFTWARE.
  */
 
+import type { CacheManager } from './cacheManager'
+import type { RateLimiter } from './rateLimiter'
+
 /**
  * Output format types supported by Nominatim API
  */
@@ -40,9 +43,17 @@ export interface BaseOptions {
    */
   format: OutputFormat
   /**
+   * Cache manager instance for response caching (optional)
+   */
+  cache?: CacheManager
+  /**
+   * Rate limiter instance for request throttling (optional)
+   */
+  rateLimiter?: RateLimiter
+  /**
    * Index signature for additional query parameters
    */
-  [key: string]: string | number | undefined
+  [key: string]: string | number | CacheManager | RateLimiter | undefined
 }
 
 /**
@@ -59,3 +70,62 @@ export interface SearchOptions extends BaseOptions {
  * Alias for reverse geocoding options
  */
 export type ReverseOptions = BaseOptions
+
+/**
+ * Retry configuration for failed requests
+ */
+export interface RetryConfig {
+  /**
+   * Enable or disable retry logic
+   * @default false
+   */
+  enabled?: boolean
+  /**
+   * Maximum number of retry attempts
+   * @default 3
+   */
+  maxAttempts?: number
+  /**
+   * Initial delay in milliseconds before first retry
+   * @default 1000
+   */
+  initialDelay?: number
+  /**
+   * Maximum delay between retries in milliseconds
+   * @default 10000 (10 seconds)
+   */
+  maxDelay?: number
+  /**
+   * Multiplier for exponential backoff
+   * @default 2
+   */
+  backoffMultiplier?: number
+  /**
+   * Whether to add random jitter to delays
+   * @default true
+   */
+  useJitter?: boolean
+  /**
+   * HTTP status codes that should trigger a retry
+   * @default [408, 429, 500, 502, 503, 504]
+   */
+  retryableStatusCodes?: number[]
+}
+
+/**
+ * Options for data fetching with caching, rate limiting, and retries
+ */
+export interface DataFetcherOptions {
+  /**
+   * Cache manager instance for response caching
+   */
+  cache?: CacheManager
+  /**
+   * Rate limiter instance for request throttling
+   */
+  rateLimiter?: RateLimiter
+  /**
+   * Retry configuration for failed requests
+   */
+  retry?: RetryConfig
+}

@@ -31,21 +31,10 @@
  * error and outputs a user-friendly message to stderr.
  *
  * @template T - The type of the API response
- * @param {Promise<T>} promise - A promise that resolves with the API response
+ * @param {Promise<T>} promise A promise that resolves with the API response
  * @returns {Promise<void>} A promise that resolves when output is complete
  *
- * @internal This is an internal CLI utility function
- *
- * @example
- * ```typescript
- * // Parse and output a successful response
- * await responseParser(freeFormSearch({ query: 'Paris' }, { format: 'json' }));
- * // Console output: {"display_name":"Paris, France",...}
- *
- * // Handle an error response
- * await responseParser(freeFormSearch({ query: '' }, { format: 'json' }));
- * // Console error: Ups! Something went wrong... Invalid query parameter
- * ```
+ * @internal
  */
 export async function responseParser<T>(promise: Promise<T>): Promise<void> {
   try {

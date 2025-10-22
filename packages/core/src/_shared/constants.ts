@@ -22,5 +22,18 @@
  * SOFTWARE.
  */
 
+/**
+ * Base URL for the Nominatim API
+ *
+ * @constant
+ * @default 'https://nominatim.openstreetmap.org'
+ */
 export const FETCHER_BASE_URL: string = 'https://nominatim.openstreetmap.org'
+
+/**
+ * User-Agent string sent with all API requests
+ *
+ * @constant
+ * @default '@simple-nominatim/core'
+ */
 export const FETCHER_USER_AGENT: string = '@simple-nominatim/core'

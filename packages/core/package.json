@@ -34,14 +34,19 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "prepare": "pnpm build"
+    "prepare": "pnpm build",
+    "test:types": "tsc --noEmit --project tsconfig.test.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "lru-cache": "^11.2.2",
+    "p-throttle": "^8.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "typescript": "^5.9.3",
     "unbuild": "^3.6.1"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

@@ -29,6 +29,11 @@ import type {
 } from '@simple-nominatim/core'
 
 import { responseParser } from '../_shared/responseParser'
+import {
+  safeValidateArgs,
+  structuredSearchSchema,
+  handleValidationError
+} from '../_shared/validation'
 import type { StructuredArgv } from './search.types'
 
 /**
@@ -38,20 +43,10 @@ import type { StructuredArgv } from './search.types'
  * It transforms CLI arguments with structured address components into the format
  * expected by the core library, executes the search, and outputs the results to the console.
  *
- * @param {StructuredArgv} argv - Command-line arguments from Yargs containing address components
+ * @param {StructuredArgv} argv Command-line arguments from Yargs containing address components
  * @returns {Promise<void>} A promise that resolves when the search is complete
  *
- * @internal This is an internal CLI function called by the command handler
- *
- * @example
- * ```typescript
- * // Called internally by: simple-nominatim search:structured --country USA --city "San Francisco" --format json
- * await structuredSearchWrapper({
- *   country: 'USA',
- *   city: 'San Francisco',
- *   format: 'json'
- * });
- * ```
+ * @internal
  */
 export const structuredSearchWrapper = (
   argv: StructuredArgv
@@ -68,6 +63,23 @@ export const structuredSearchWrapper = (
     state,
     street
   } = argv
+
+  const validationResult = safeValidateArgs(structuredSearchSchema, {
+    country,
+    outputFormat: format,
+    amenity,
+    city,
+    county,
+    email,
+    limit,
+    postalcode,
+    state,
+    street
+  })
+
+  if (!validationResult.success) {
+    handleValidationError(validationResult.error)
+  }
 
   const params: StructuredSearchParams = {
     amenity,

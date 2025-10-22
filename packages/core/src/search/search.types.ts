@@ -1,7 +1,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2023-2024 Jonathan Linat <https://github.com/jonathanlinat>
+ * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software:"), to deal
@@ -45,7 +45,7 @@ export interface StructuredSearchParams {
    */
   city?: string
   /**
-   * Country name
+   * Country name (required for structured search)
    */
   country?: string
   /**

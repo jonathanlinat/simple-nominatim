@@ -32,11 +32,13 @@
   "scripts": {
     "build": "unbuild",
     "prepare": "pnpm build",
-    "simple-nominatim": "node --loader ts-node/esm ./src/index.ts"
+    "simple-nominatim": "node --loader ts-node/esm ./src/index.ts",
+    "test:types": "tsc --noEmit --project tsconfig.test.json"
   },
   "dependencies": {
     "@simple-nominatim/core": "workspace:*",
-    "yargs": "^18.0.0"
+    "yargs": "^18.0.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
