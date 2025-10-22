@@ -1,4 +1,4 @@
 "packages/**/*.md":
   - pnpm packages:lint:markdown
-"packages/**/*.mjs":
+"packages/**/*.{ts,mjs}":
   - pnpm packages:lint:code

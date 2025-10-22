@@ -22,28 +22,40 @@
  * SOFTWARE.
  */
 
-import { dataFetcher } from '../_shared/dataFetcher'
+/**
+ * Output format types supported by Nominatim API
+ */
+export type OutputFormat = 'xml' | 'json' | 'jsonv2' | 'geojson' | 'geocodejson'
 
-export const freeFormSearch = async (params, options) => {
-  const endpoint = 'search'
-  const urlSearchParams = new URLSearchParams()
-
-  const { query: q } = params
-  const parsedParams = { q }
-
-  Object.keys(parsedParams).forEach((key) => {
-    if (parsedParams[key]) {
-      urlSearchParams.append(key, parsedParams[key])
-    }
-  })
-
-  Object.keys(options).forEach((key) => {
-    if (options[key]) {
-      urlSearchParams.append(key, options[key])
-    }
-  })
-
-  const fetchedData = await dataFetcher(endpoint, urlSearchParams)
-
-  return fetchedData
+/**
+ * Common options for search and reverse geocoding requests
+ */
+export interface BaseOptions {
+  /**
+   * Email address for identification when making large numbers of requests
+   */
+  email?: string
+  /**
+   * Output format for the response
+   */
+  format: OutputFormat
+  /**
+   * Index signature for additional query parameters
+   */
+  [key: string]: string | number | undefined
 }
+
+/**
+ * Options specific to search requests
+ */
+export interface SearchOptions extends BaseOptions {
+  /**
+   * Maximum number of returned results (cannot be more than 40)
+   */
+  limit?: number
+}
+
+/**
+ * Alias for reverse geocoding options
+ */
+export type ReverseOptions = BaseOptions

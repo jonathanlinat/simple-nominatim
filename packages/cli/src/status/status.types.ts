@@ -22,5 +22,14 @@
  * SOFTWARE.
  */
 
-export const FETCHER_BASE_URL = 'https://nominatim.openstreetmap.org'
-export const FETCHER_USER_AGENT = '@simple-nominatim/core'
+import type { StatusFormat } from '@simple-nominatim/core'
+
+/**
+ * CLI arguments for service status command
+ */
+export interface ServiceStatusArgv {
+  /**
+   * Output format for status response
+   */
+  format: StatusFormat
+}

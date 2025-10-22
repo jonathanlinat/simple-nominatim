@@ -22,13 +22,21 @@
  * SOFTWARE.
  */
 
-export async function responseParser(promise) {
-  try {
-    const response = await promise
-    const stringifiedResponse = JSON.stringify(response)
+/**
+ * Status format types supported by Nominatim API
+ */
+export type StatusFormat = 'text' | 'json'
 
-    console.log(stringifiedResponse)
-  } catch (error) {
-    console.error(`Ups! Something went wrong... ${error.message}`)
-  }
+/**
+ * Options for service status requests
+ */
+export interface StatusOptions {
+  /**
+   * Output format for the status response
+   */
+  format: StatusFormat
+  /**
+   * Index signature for additional query parameters
+   */
+  [key: string]: string | number | undefined
 }

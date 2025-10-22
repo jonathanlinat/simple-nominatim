@@ -3,7 +3,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2023-2024 Jonathan Linat <https://github.com/jonathanlinat>
+ * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software:"), to deal
@@ -27,10 +27,10 @@
 import yargs from 'yargs/yargs'
 import { hideBin } from 'yargs/helpers'
 
-import { freeFormSearchWrapper } from './search/free-form.mjs'
-import { geocodeReverseWrapper } from './reverse/geocode.mjs'
-import { serviceStatusWrapper } from './status/service.mjs'
-import { structuredSearchWrapper } from './search/structured.mjs'
+import { freeFormSearchWrapper } from './search/free-form'
+import { geocodeReverseWrapper } from './reverse/geocode'
+import { serviceStatusWrapper } from './status/service'
+import { structuredSearchWrapper } from './search/structured'
 import {
   amenityOption,
   cityOption,
@@ -46,7 +46,7 @@ import {
   stateOption,
   statusFormatOption,
   streetOption
-} from './_shared/yargsOptions.mjs'
+} from './_shared/yargsOptions'
 ;(() =>
   yargs(hideBin(process.argv))
     .command(
@@ -60,7 +60,8 @@ import {
           .option('longitude', longitudeOption)
       },
       (argv) => {
-        geocodeReverseWrapper(argv)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        geocodeReverseWrapper(argv as any)
       }
     )
     .command(
@@ -74,7 +75,8 @@ import {
           .option('query', queryOption)
       },
       (argv) => {
-        freeFormSearchWrapper(argv)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        freeFormSearchWrapper(argv as any)
       }
     )
     .command(
@@ -94,7 +96,8 @@ import {
           .option('street', streetOption)
       },
       (argv) => {
-        structuredSearchWrapper(argv)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        structuredSearchWrapper(argv as any)
       }
     )
     .command(
@@ -104,7 +107,8 @@ import {
         return yargs.option('format', statusFormatOption)
       },
       (argv) => {
-        serviceStatusWrapper(argv)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        serviceStatusWrapper(argv as any)
       }
     )
     .demandCommand(
