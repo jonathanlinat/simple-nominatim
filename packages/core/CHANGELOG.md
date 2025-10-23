@@ -1,5 +1,19 @@
 # @simple-nominatim/core
 
+## 0.3.0
+
+### Minor Changes
+
+- Cache, rate limiting, and retry logic are now enabled by default with sensible defaults following Nominatim's official recommendations. ([#15](https://github.com/jonathanlinat/simple-nominatim/pull/15))
+
+### Patch Changes
+
+- Applied comprehensive ESLint rules enforcement and code quality improvements. ([#15](https://github.com/jonathanlinat/simple-nominatim/pull/15))
+
+- Migrated build system from unbuild to tsdown for faster builds. ([#15](https://github.com/jonathanlinat/simple-nominatim/pull/15))
+
+- Added comprehensive unit tests with Vitest for full code coverage. ([#15](https://github.com/jonathanlinat/simple-nominatim/pull/15))
+
 ## 0.2.0
 
 ### Minor Changes
