@@ -1,5 +1,11 @@
 # @simple-nominatim/cli
 
+## 0.3.1
+
+### Patch Changes
+
+- Fix dist output file extension to point the binary to .js instead of .mjs. ([#17](https://github.com/jonathanlinat/simple-nominatim/pull/17))
+
 ## 0.3.0
 
 ### Minor Changes
