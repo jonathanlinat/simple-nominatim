@@ -25,7 +25,8 @@
 import { freeFormSearch } from '@simple-nominatim/core'
 import type {
   FreeFormSearchParams,
-  SearchOptions
+  SearchOptions,
+  RetryConfig
 } from '@simple-nominatim/core'
 
 import { responseParser } from '../_shared/responseParser'
@@ -34,6 +35,7 @@ import {
   freeFormSearchSchema,
   handleValidationError
 } from '../_shared/validation'
+
 import type { FreeFormArgv } from './search.types'
 
 /**
@@ -43,13 +45,43 @@ import type { FreeFormArgv } from './search.types'
  * It transforms CLI arguments into the format expected by the core library,
  * executes the search, and outputs the results to the console.
  *
+ * Supports optional configuration overrides for caching, rate limiting, and retry logic.
+ * When no configuration flags are provided, sensible defaults are applied automatically.
+ *
  * @param {FreeFormArgv} argv Command-line arguments from Yargs
+ * @param {string} argv.query Free-form query string to search (required)
+ * @param {string} [argv.email] Email address for identification when making large numbers of requests
+ * @param {OutputFormat} argv.format Output format (required)
+ * @param {number} [argv.limit] Maximum number of returned results (cannot be more than 40)
+ * @param {boolean} [argv.noCache] Disable response caching
+ * @param {number} [argv.cacheTtl] Cache time-to-live in milliseconds
+ * @param {number} [argv.cacheMaxSize] Maximum number of cached entries
+ * @param {boolean} [argv.noRateLimit] Disable rate limiting
+ * @param {number} [argv.rateLimit] Maximum number of requests per interval
+ * @param {number} [argv.rateLimitInterval] Time interval in milliseconds for rate limiting
+ * @param {boolean} [argv.noRetry] Disable retry logic on failures
+ * @param {number} [argv.retryMaxAttempts] Maximum number of retry attempts
+ * @param {number} [argv.retryInitialDelay] Initial delay in milliseconds before first retry
  * @returns {Promise<void>} A promise that resolves when the search is complete
  *
  * @internal
  */
 export const freeFormSearchWrapper = (argv: FreeFormArgv): Promise<void> => {
-  const { email, format, limit, query } = argv
+  const {
+    email,
+    format,
+    limit,
+    query,
+    noCache,
+    cacheTtl,
+    cacheMaxSize,
+    noRateLimit,
+    rateLimit,
+    rateLimitInterval,
+    noRetry,
+    retryMaxAttempts,
+    retryInitialDelay
+  } = argv
 
   const validationResult = safeValidateArgs(freeFormSearchSchema, {
     query,
@@ -64,6 +96,30 @@ export const freeFormSearchWrapper = (argv: FreeFormArgv): Promise<void> => {
 
   const params: FreeFormSearchParams = { query }
   const options: SearchOptions = { email, format, limit }
+
+  if (noCache !== undefined || cacheTtl !== undefined || cacheMaxSize !== undefined) {
+    options.cache = {
+      ...(noCache && { enabled: false }),
+      ...(cacheTtl !== undefined && { ttl: cacheTtl }),
+      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize })
+    }
+  }
+
+  if (noRateLimit !== undefined || rateLimit !== undefined || rateLimitInterval !== undefined) {
+    options.rateLimit = {
+      ...(noRateLimit && { enabled: false }),
+      ...(rateLimit !== undefined && { limit: rateLimit }),
+      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval })
+    }
+  }
+
+  if (noRetry !== undefined || retryMaxAttempts !== undefined || retryInitialDelay !== undefined) {
+    options.retry = {
+      ...(noRetry && { enabled: false }),
+      ...(retryMaxAttempts !== undefined && { maxAttempts: retryMaxAttempts }),
+      ...(retryInitialDelay !== undefined && { initialDelay: retryInitialDelay })
+    } as RetryConfig
+  }
 
   const response = freeFormSearch(params, options)
   const handledResponse = responseParser(response)

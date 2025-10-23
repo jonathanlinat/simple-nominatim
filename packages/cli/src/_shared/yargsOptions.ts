@@ -173,3 +173,96 @@ export const streetOption: Options = {
   description: 'Specify the house number and street name',
   type: 'string'
 }
+
+/**
+ * Yargs option to disable caching
+ *
+ * When set, disables response caching
+ */
+export const noCacheOption: Options = {
+  description: 'Disable response caching',
+  type: 'boolean',
+  default: false
+}
+
+/**
+ * Yargs option for cache TTL
+ *
+ * Specifies cache time-to-live in milliseconds
+ */
+export const cacheTtlOption: Options = {
+  description: 'Cache time-to-live in milliseconds',
+  type: 'number'
+}
+
+/**
+ * Yargs option for cache max size
+ *
+ * Specifies maximum number of cached entries
+ */
+export const cacheMaxSizeOption: Options = {
+  description: 'Maximum number of cached entries',
+  type: 'number'
+}
+
+/**
+ * Yargs option to disable rate limiting
+ *
+ * When set, disables rate limiting
+ */
+export const noRateLimitOption: Options = {
+  description: 'Disable rate limiting',
+  type: 'boolean',
+  default: false
+}
+
+/**
+ * Yargs option for rate limit requests per interval
+ *
+ * Specifies maximum number of requests per interval
+ */
+export const rateLimitOption: Options = {
+  description: 'Maximum number of requests per interval',
+  type: 'number'
+}
+
+/**
+ * Yargs option for rate limit interval
+ *
+ * Specifies time interval in milliseconds for rate limiting
+ */
+export const rateLimitIntervalOption: Options = {
+  description: 'Time interval in milliseconds for rate limiting',
+  type: 'number'
+}
+
+/**
+ * Yargs option to disable retry logic
+ *
+ * When set, disables retry on failures
+ */
+export const noRetryOption: Options = {
+  description: 'Disable retry logic on failures',
+  type: 'boolean',
+  default: false
+}
+
+/**
+ * Yargs option for retry max attempts
+ *
+ * Specifies maximum number of retry attempts
+ */
+export const retryMaxAttemptsOption: Options = {
+  description: 'Maximum number of retry attempts',
+  type: 'number'
+}
+
+/**
+ * Yargs option for retry initial delay
+ *
+ * Specifies initial delay in milliseconds before first retry
+ */
+export const retryInitialDelayOption: Options = {
+  description: 'Initial delay in milliseconds before first retry',
+  type: 'number'
+}

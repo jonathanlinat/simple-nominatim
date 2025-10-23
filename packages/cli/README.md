@@ -152,6 +152,95 @@ For a list of all available options and their descriptions, use the help option:
 simple-nominatim status:service --help (or -h)
 ```
 
+## Configuration Flags
+
+All commands support optional configuration flags to override default behavior for caching, rate limiting, and retry logic. When no configuration flags are provided, sensible defaults are applied automatically.
+
+### Cache Configuration
+
+Control response caching behavior:
+
+- `--no-cache`: Disable response caching entirely
+- `--cache-ttl <milliseconds>`: Set cache time-to-live in milliseconds (default: 300000 - 5 minutes)
+- `--cache-max-size <number>`: Set maximum number of cached entries (default: 100)
+
+#### Examples
+
+```bash
+# Disable caching
+simple-nominatim search:free-form --query 'Paris, France' --format 'jsonv2' --no-cache
+
+# Set cache TTL to 10 minutes
+simple-nominatim reverse:geocode --latitude '48.8566' --longitude '2.3522' --format 'jsonv2' --cache-ttl 600000
+
+# Configure cache with custom TTL and max size
+simple-nominatim search:structured --country 'France' --format 'jsonv2' --cache-ttl 600000 --cache-max-size 200
+```
+
+### Rate Limiting Configuration
+
+Control request rate limiting:
+
+- `--no-rate-limit`: Disable rate limiting (use with caution - respect Nominatim usage policy)
+- `--rate-limit <number>`: Set maximum number of requests per interval (default: 1)
+- `--rate-limit-interval <milliseconds>`: Set time interval in milliseconds for rate limiting (default: 1000 - 1 second)
+
+#### Examples
+
+```bash
+# Disable rate limiting (not recommended for public Nominatim API)
+simple-nominatim search:free-form --query 'London, UK' --format 'jsonv2' --no-rate-limit
+
+# Allow 2 requests per second
+simple-nominatim reverse:geocode --latitude '51.5074' --longitude '-0.1278' --format 'jsonv2' --rate-limit 2 --rate-limit-interval 1000
+
+# More conservative: 1 request every 2 seconds
+simple-nominatim search:structured --country 'UK' --city 'London' --format 'jsonv2' --rate-limit 1 --rate-limit-interval 2000
+```
+
+### Retry Configuration
+
+Control retry behavior on failures:
+
+- `--no-retry`: Disable retry logic on failures
+- `--retry-max-attempts <number>`: Set maximum number of retry attempts (default: 3)
+- `--retry-initial-delay <milliseconds>`: Set initial delay in milliseconds before first retry (default: 1000 - 1 second)
+
+#### Examples
+
+```bash
+# Disable retries
+simple-nominatim status:service --format 'json' --no-retry
+
+# Configure custom retry behavior
+simple-nominatim search:free-form --query 'Tokyo, Japan' --format 'jsonv2' --retry-max-attempts 5 --retry-initial-delay 2000
+
+# Aggressive retry strategy
+simple-nominatim reverse:geocode --latitude '35.6762' --longitude '139.6503' --format 'jsonv2' --retry-max-attempts 10 --retry-initial-delay 500
+```
+
+### Combined Configuration
+
+You can combine multiple configuration flags to fine-tune behavior:
+
+```bash
+# Example: Disable cache, allow 2 requests per second, retry up to 5 times
+simple-nominatim search:free-form --query 'New York, USA' --format 'jsonv2' --no-cache --rate-limit 2 --rate-limit-interval 1000 --retry-max-attempts 5 --retry-initial-delay 2000
+
+# Example: Custom configuration for all aspects
+simple-nominatim search:structured --country 'USA' --city 'New York' --format 'jsonv2' --cache-ttl 900000 --cache-max-size 150 --rate-limit 1 --rate-limit-interval 1500 --retry-max-attempts 4 --retry-initial-delay 1500
+```
+
+### Default Behavior
+
+When no configuration flags are provided, the following defaults are applied:
+
+- **Cache**: Enabled with 5-minute TTL and maximum 100 entries
+- **Rate Limiting**: 1 request per second
+- **Retry**: Up to 3 attempts with 1-second initial delay
+
+These defaults are designed to respect the [Nominatim Usage Policy](https://operations.osmfoundation.org/policies/nominatim/) while providing reasonable performance.
+
 ## License
 
 **Simple Nominatim CLI** is [MIT licensed](LICENSE).

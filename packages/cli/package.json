@@ -30,10 +30,13 @@
     "dist"
   ],
   "scripts": {
-    "build": "unbuild",
+    "build": "tsdown",
     "prepare": "pnpm build",
     "simple-nominatim": "node --loader ts-node/esm ./src/index.ts",
-    "test:types": "tsc --noEmit --project tsconfig.test.json"
+    "test": "vitest run --typecheck",
+    "test:coverage": "vitest run --typecheck --coverage",
+    "test:ui": "vitest --typecheck --ui",
+    "test:watch": "vitest --typecheck"
   },
   "dependencies": {
     "@simple-nominatim/core": "workspace:*",
@@ -43,8 +46,7 @@
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "@types/yargs": "^17.0.33",
-    "typescript": "^5.9.3",
-    "unbuild": "^3.6.1"
+    "typescript": "^5.9.3"
   },
   "publishConfig": {
     "access": "public"

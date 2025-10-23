@@ -22,21 +22,17 @@
  * SOFTWARE.
  */
 
-import { FETCHER_BASE_URL, FETCHER_USER_AGENT } from './constants'
-import type { DataFetcherOptions, RetryConfig } from './_shared.types'
+import { CacheManager } from './cacheManager'
+import {
+  FETCHER_BASE_URL,
+  FETCHER_USER_AGENT,
+  DEFAULT_CACHE_CONFIG,
+  DEFAULT_RATE_LIMIT_CONFIG,
+  DEFAULT_RETRY_CONFIG
+} from './constants'
+import { RateLimiter } from './rateLimiter'
 
-/**
- * Default retry configuration
- */
-const DEFAULT_RETRY_CONFIG: Required<RetryConfig> = {
-  enabled: false,
-  maxAttempts: 3,
-  initialDelay: 1000,
-  maxDelay: 10000,
-  backoffMultiplier: 2,
-  useJitter: true,
-  retryableStatusCodes: [408, 429, 500, 502, 503, 504]
-}
+import type { DataFetcherOptions, RetryConfig } from './_shared.types'
 
 /**
  * Calculate delay with exponential backoff and optional jitter
@@ -83,7 +79,7 @@ const sleep = (ms: number): Promise<void> =>
  * @template T - The expected response type (defaults to unknown)
  * @param {string} endpoint The API endpoint to call (e.g., 'search', 'reverse', 'status')
  * @param {URLSearchParams} params URL search parameters for the request
- * @param {DataFetcherOptions} options Optional cache and rate limiter instances
+ * @param {DataFetcherOptions} options Optional cache and rate limiter configurations
  * @returns {Promise<T>} A promise that resolves to the parsed response data
  *
  * @throws {Error} If the HTTP request fails or returns a non-2xx status code
@@ -95,13 +91,24 @@ export const dataFetcher = async <T = unknown>(
   params: URLSearchParams,
   options: DataFetcherOptions = {}
 ): Promise<T> => {
-  const { cache, rateLimiter, retry } = options
-  const retryConfig: Required<RetryConfig> = {
+  const { cache: cacheConfig, rateLimit: rateLimitConfig, retry: retryConfig } = options
+
+  const retry: Required<RetryConfig> = {
     ...DEFAULT_RETRY_CONFIG,
-    ...retry
+    ...retryConfig
   }
 
-  if (cache?.isEnabled()) {
+  const cache = new CacheManager({
+    ...DEFAULT_CACHE_CONFIG,
+    ...cacheConfig
+  })
+
+  const rateLimiter = new RateLimiter({
+    ...DEFAULT_RATE_LIMIT_CONFIG,
+    ...rateLimitConfig
+  })
+
+  if (cache.isEnabled()) {
     const cachedResponse = cache.get(endpoint, params)
 
     if (cachedResponse !== undefined) {
@@ -116,7 +123,7 @@ export const dataFetcher = async <T = unknown>(
     let lastError: Error | undefined
     let attempt = 0
 
-    while (attempt < (retryConfig.enabled ? retryConfig.maxAttempts : 1)) {
+    while (attempt < (retry.enabled ? retry.maxAttempts : 1)) {
       attempt++
 
       try {
@@ -125,12 +132,12 @@ export const dataFetcher = async <T = unknown>(
         if (!requestResponse.ok) {
           const statusCode = requestResponse.status
           const shouldRetry =
-            retryConfig.enabled &&
-            attempt < retryConfig.maxAttempts &&
-            retryConfig.retryableStatusCodes.includes(statusCode)
+            retry.enabled &&
+            attempt < retry.maxAttempts &&
+            retry.retryableStatusCodes.includes(statusCode)
 
           if (shouldRetry) {
-            const delay = calculateDelay(attempt, retryConfig)
+            const delay = calculateDelay(attempt, retry)
 
             await sleep(delay)
 
@@ -153,10 +160,10 @@ export const dataFetcher = async <T = unknown>(
 
         const isNetworkError = !error || !(error as { status?: number }).status
         const shouldRetry =
-          retryConfig.enabled && attempt < retryConfig.maxAttempts && isNetworkError
+          retry.enabled && attempt < retry.maxAttempts && isNetworkError
 
         if (shouldRetry) {
-          const delay = calculateDelay(attempt, retryConfig)
+          const delay = calculateDelay(attempt, retry)
 
           await sleep(delay)
 
@@ -170,11 +177,11 @@ export const dataFetcher = async <T = unknown>(
     throw lastError || new Error('Request failed after all retry attempts')
   }
 
-  const response = rateLimiter?.isEnabled()
+  const response = rateLimiter.isEnabled()
     ? await rateLimiter.execute(performFetch)
     : await performFetch()
 
-  if (cache?.isEnabled()) {
+  if (cache.isEnabled()) {
     cache.set(endpoint, params, response as object)
   }
 
