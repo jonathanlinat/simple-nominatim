@@ -30,7 +30,7 @@ import { LRUCache } from 'lru-cache'
 export interface CacheConfig {
   /**
    * Enable or disable caching
-   * @default false
+   * @default true
    */
   enabled?: boolean
 
@@ -68,7 +68,7 @@ export class CacheManager<T extends object = object> {
    * @param config Cache configuration options
    */
   constructor(config: CacheConfig = {}) {
-    this.enabled = config.enabled ?? false
+    this.enabled = config.enabled ?? true
     this.cache = new LRUCache<string, T>({
       max: config.maxSize ?? 500,
       ttl: config.ttl ?? 300000,
@@ -139,6 +139,7 @@ export class CacheManager<T extends object = object> {
     if (!this.enabled) return false
 
     const key = this.generateKey(endpoint, params)
+
     return this.cache.has(key)
   }
 
@@ -190,9 +191,3 @@ export class CacheManager<T extends object = object> {
     }
   }
 }
-
-/**
- * Default cache instance (disabled by default)
- * Users can enable it by passing cache config to API functions
- */
-export const defaultCache = new CacheManager()

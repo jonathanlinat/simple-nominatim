@@ -44,6 +44,7 @@ export async function responseParser<T>(promise: Promise<T>): Promise<void> {
     console.log(stringifiedResponse)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
+
     console.error(`Ups! Something went wrong... ${message}`)
   }
 }

@@ -32,4 +32,40 @@ export interface ServiceStatusArgv {
    * Output format for status response
    */
   format: StatusFormat
+  /**
+   * Disable caching
+   */
+  noCache?: boolean
+  /**
+   * Cache TTL in milliseconds
+   */
+  cacheTtl?: number
+  /**
+   * Cache max size
+   */
+  cacheMaxSize?: number
+  /**
+   * Disable rate limiting
+   */
+  noRateLimit?: boolean
+  /**
+   * Rate limit requests per interval
+   */
+  rateLimit?: number
+  /**
+   * Rate limit interval in milliseconds
+   */
+  rateLimitInterval?: number
+  /**
+   * Disable retry logic
+   */
+  noRetry?: boolean
+  /**
+   * Retry max attempts
+   */
+  retryMaxAttempts?: number
+  /**
+   * Retry initial delay in milliseconds
+   */
+  retryInitialDelay?: number
 }

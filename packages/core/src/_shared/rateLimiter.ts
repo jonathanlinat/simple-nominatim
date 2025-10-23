@@ -30,7 +30,7 @@ import pThrottle from 'p-throttle'
 export interface RateLimitConfig {
   /**
    * Enable or disable rate limiting
-   * @default false
+   * @default true
    */
   enabled?: boolean
 
@@ -74,7 +74,7 @@ export class RateLimiter {
    * @param config Rate limiter configuration options
    */
   constructor(config: RateLimitConfig = {}) {
-    this.enabled = config.enabled ?? false
+    this.enabled = config.enabled ?? true
 
     const limit = config.limit ?? 1
     const interval = config.interval ?? 1000
@@ -154,14 +154,3 @@ export class RateLimiter {
     }
   }
 }
-
-/**
- * Default rate limiter instance (disabled by default)
- * Follows Nominatim's recommendation of 1 request per second when enabled
- */
-export const defaultRateLimiter = new RateLimiter({
-  enabled: false,
-  limit: 1,
-  interval: 1000,
-  strict: true
-})

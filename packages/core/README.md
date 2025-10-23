@@ -22,6 +22,24 @@ It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nom
 npm install @simple-nominatim/core
 ```
 
+## Default Configuration
+
+**Simple Nominatim Core comes with sensible defaults** that follow **Nominatim**'s official recommendations:
+
+- **Caching**: Enabled (5-minute TTL, 500 entry limit)
+- **Rate Limiting**: Enabled (1 request per second)
+- **Retry Logic**: Enabled (3 attempts with exponential backoff)
+
+You can override any of these settings or import the default configurations:
+
+```javascript
+import {
+  DEFAULT_CACHE_CONFIG,
+  DEFAULT_RATE_LIMIT_CONFIG,
+  DEFAULT_RETRY_CONFIG
+} from '@simple-nominatim/core'
+```
+
 ## Usage
 
 ### Reverse Endpoint
@@ -124,131 +142,133 @@ const results = await serviceStatus({ format: 'json' })
 
 ## Advanced Features
 
-### Cache Manager
+### Caching
 
-The `CacheManager` class provides LRU (Least Recently Used) caching to reduce redundant API calls and improve performance.
+**Caching is enabled by default** to reduce redundant API calls and improve performance. The cache uses LRU (Least Recently Used) eviction policy with a 5-minute TTL.
 
 #### Basic Usage
 
 ```javascript
-import { CacheManager, freeFormSearch } from '@simple-nominatim/core'
+import { freeFormSearch } from '@simple-nominatim/core'
 
-const cache = new CacheManager({
-  enabled: true,
-  ttl: 300000,
-  maxSize: 500
-})
-
+// Caching is enabled by default with recommended settings
 const results = await freeFormSearch(
   { query: 'Paris, France' },
-  { format: 'json', cache }
+  { format: 'json' }
+)
+
+// Override cache settings if needed
+const customResults = await freeFormSearch(
+  { query: 'Paris, France' },
+  {
+    format: 'json',
+    cache: {
+      ttl: 600000,
+      maxSize: 1000
+    }
+  }
+)
+
+// Disable caching if needed
+const uncachedResults = await freeFormSearch(
+  { query: 'Paris, France' },
+  {
+    format: 'json',
+    cache: { enabled: false }
+  }
 )
 ```
 
 #### Configuration Options
 
-- `enabled`: Enable or disable caching (default: `false`)
+- `enabled`: Enable or disable caching (default: `true`)
 - `ttl`: Time-to-live for cached entries in milliseconds (default: `300000` - 5 minutes)
 - `maxSize`: Maximum number of cached entries (default: `500`)
 
-#### Cache Methods
+### Rate Limiting
 
-```javascript
-// Check if caching is enabled
-cache.isEnabled()
-
-// Get cache statistics
-const stats = cache.getStats()
-console.log(stats) // { hits: 10, misses: 5, hitRate: 0.67, size: 15 }
-
-// Clear all cached entries
-cache.clear()
-
-// Disable caching
-cache.disable()
-
-// Re-enable caching
-cache.enable()
-```
-
-### Rate Limiter
-
-The `RateLimiter` class implements rate limiting to respect the OpenStreetMap Foundation's usage policy (maximum 1 request per second by default).
+**Rate limiting is enabled by default** to respect the [Nominatim Usage Policy (aka Geocoding Policy)](https://operations.osmfoundation.org/policies/nominatim/) (maximum 1 request per second).
 
 #### Basic Usage
 
 ```javascript
-import { RateLimiter, geocodeReverse } from '@simple-nominatim/core'
+import { geocodeReverse } from '@simple-nominatim/core'
 
-const rateLimiter = new RateLimiter({
-  enabled: true,
-  limit: 1,
-  interval: 1000,
-  strict: true
-})
-
+// Rate limiting is enabled by default (1 req/sec)
 const results = await geocodeReverse(
   { latitude: '48.8566', longitude: '2.3522' },
-  { format: 'json', rateLimiter }
+  { format: 'json' }
+)
+
+// Override rate limit settings if needed (e.g., for your own Nominatim instance)
+const customResults = await geocodeReverse(
+  { latitude: '48.8566', longitude: '2.3522' },
+  {
+    format: 'json',
+    rateLimit: {
+      limit: 10,
+      interval: 1000
+    }
+  }
+)
+
+// Disable rate limiting if needed (not recommended for public API)
+const unlimitedResults = await geocodeReverse(
+  { latitude: '48.8566', longitude: '2.3522' },
+  {
+    format: 'json',
+    rateLimit: { enabled: false }
+  }
 )
 ```
 
 #### Configuration Options
 
-- `enabled`: Enable or disable rate limiting (default: `false`)
+- `enabled`: Enable or disable rate limiting (default: `true`)
 - `limit`: Maximum number of requests per interval (default: `1`)
 - `interval`: Time interval in milliseconds (default: `1000` - 1 second)
 - `strict`: Whether to use strict rate limiting to prevent bursts (default: `true`)
 
-#### Rate Limiter Methods
-
-```javascript
-// Check if rate limiting is enabled
-rateLimiter.isEnabled()
-
-// Get rate limiter statistics
-const stats = rateLimiter.getStats()
-console.log(stats) // { requestCount: 42, queuedCount: 3 }
-
-// Reset statistics
-rateLimiter.resetStats()
-
-// Disable rate limiting
-rateLimiter.disable()
-
-// Re-enable rate limiting
-rateLimiter.enable()
-```
-
 ### Retry Logic
 
-All API functions support automatic retry with exponential backoff for failed requests.
+**Retry logic is enabled by default** with exponential backoff for transient failures like network errors and server timeouts.
 
 #### Basic Usage
 
 ```javascript
 import { structuredSearch } from '@simple-nominatim/core'
 
+// Retry is enabled by default (3 attempts max)
 const results = await structuredSearch(
+  { country: 'France', city: 'Paris' },
+  { format: 'json' }
+)
+
+// Override retry settings if needed
+const customResults = await structuredSearch(
   { country: 'France', city: 'Paris' },
   {
     format: 'json',
     retry: {
-      enabled: true,
-      maxAttempts: 3,
-      initialDelay: 1000,
-      maxDelay: 10000,
-      backoffMultiplier: 2,
-      useJitter: true,
-      retryableStatusCodes: [408, 429, 500, 502, 503, 504]
+      maxAttempts: 5,
+      initialDelay: 2000
     }
+  }
+)
+
+// Disable retry if needed
+const noRetryResults = await structuredSearch(
+  { country: 'France', city: 'Paris' },
+  {
+    format: 'json',
+    retry: { enabled: false }
   }
 )
 ```
 
 #### Retry Configuration Options
 
-- `enabled`: Enable or disable retry logic (default: `false`)
+- `enabled`: Enable or disable retry logic (default: `true`)
 - `maxAttempts`: Maximum number of retry attempts (default: `3`)
 - `initialDelay`: Initial delay in milliseconds before first retry (default: `1000`)
 - `maxDelay`: Maximum delay between retries in milliseconds (default: `10000`)
@@ -256,23 +276,43 @@ const results = await structuredSearch(
 - `useJitter`: Whether to add random jitter to delays (default: `true`)
 - `retryableStatusCodes`: HTTP status codes that should trigger a retry (default: `[408, 429, 500, 502, 503, 504]`)
 
-### Combining Features
+### Default Behavior
 
-You can combine caching, rate limiting, and retry logic for optimal performance and reliability:
+All features are **enabled by default** with sensible defaults based on **Nominatim**'s official recommendations:
+
+- **Caching**: Enabled with 5-minute TTL and 500 entry limit
+- **Rate Limiting**: Enabled at 1 request per second
+- **Retry**: Enabled with 3 max attempts and exponential backoff
+
+You can override any of these settings or disable specific features as needed:
 
 ```javascript
-import { CacheManager, RateLimiter, freeFormSearch } from '@simple-nominatim/core'
+import { freeFormSearch } from '@simple-nominatim/core'
 
-const cache = new CacheManager({ enabled: true })
-const rateLimiter = new RateLimiter({ enabled: true })
+// Use all defaults (recommended for public Nominatim API)
+const results1 = await freeFormSearch(
+  { query: 'Berlin, Germany' },
+  { format: 'json' }
+)
 
-const results = await freeFormSearch(
+// Customize specific settings while keeping others at default
+const results2 = await freeFormSearch(
   { query: 'Berlin, Germany' },
   {
     format: 'json',
-    cache,
-    rateLimiter,
-    retry: { enabled: true, maxAttempts: 3 }
+    cache: { ttl: 600000 },
+    rateLimit: { limit: 2 }
+  }
+)
+
+// Disable all optional features (not recommended)
+const results3 = await freeFormSearch(
+  { query: 'Berlin, Germany' },
+  {
+    format: 'json',
+    cache: { enabled: false },
+    rateLimit: { enabled: false },
+    retry: { enabled: false }
   }
 )
 ```

@@ -23,6 +23,7 @@
  */
 
 import { dataFetcher } from '../_shared/dataFetcher'
+
 import type { StatusOptions } from './status.types'
 
 /**
@@ -46,7 +47,7 @@ export const serviceStatus = async <T = unknown>(
   const endpoint = 'status'
   const urlSearchParams = new URLSearchParams()
 
-  const { cache, rateLimiter, ...apiOptions } = options
+  const { cache, rateLimit, retry, ...apiOptions } = options
 
   Object.keys(apiOptions).forEach((key) => {
     const value = apiOptions[key as keyof typeof apiOptions]
@@ -58,7 +59,8 @@ export const serviceStatus = async <T = unknown>(
 
   const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
     cache,
-    rateLimiter
+    rateLimit,
+    retry
   })
 
   return fetchedData

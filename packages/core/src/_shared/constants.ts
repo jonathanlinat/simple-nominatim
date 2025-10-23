@@ -22,6 +22,10 @@
  * SOFTWARE.
  */
 
+import type { RetryConfig } from './_shared.types'
+import type { CacheConfig } from './cacheManager'
+import type { RateLimitConfig } from './rateLimiter'
+
 /**
  * Base URL for the Nominatim API
  *
@@ -37,3 +41,62 @@ export const FETCHER_BASE_URL: string = 'https://nominatim.openstreetmap.org'
  * @default '@simple-nominatim/core'
  */
 export const FETCHER_USER_AGENT: string = '@simple-nominatim/core'
+
+/**
+ * Default cache configuration
+ * Based on Nominatim recommendations for reasonable caching
+ *
+ * - enabled: true
+ * - ttl: 300000 (5 minutes)
+ * - maxSize: 500
+ *
+ * @constant
+ */
+export const DEFAULT_CACHE_CONFIG: Required<CacheConfig> = {
+  enabled: true,
+  ttl: 300000,
+  maxSize: 500
+}
+
+/**
+ * Default rate limiter configuration
+ * Respects Nominatim's usage policy of 1 request per second
+ *
+ * - enabled: true
+ * - limit: 1 (1 request per interval)
+ * - interval: 1000 (1 second)
+ * - strict: true
+ *
+ * @constant
+ * @see https://operations.osmfoundation.org/policies/nominatim/
+ */
+export const DEFAULT_RATE_LIMIT_CONFIG: Required<RateLimitConfig> = {
+  enabled: true,
+  limit: 1,
+  interval: 1000,
+  strict: true
+}
+
+/**
+ * Default retry configuration
+ * Implements exponential backoff for transient failures
+ *
+ * - enabled: true
+ * - maxAttempts: 3
+ * - initialDelay: 1000 (1 second)
+ * - maxDelay: 10000 (10 seconds)
+ * - backoffMultiplier: 2
+ * - useJitter: true
+ * - retryableStatusCodes: [408, 429, 500, 502, 503, 504]
+ *
+ * @constant
+ */
+export const DEFAULT_RETRY_CONFIG: Required<RetryConfig> = {
+  enabled: true,
+  maxAttempts: 3,
+  initialDelay: 1000,
+  maxDelay: 10000,
+  backoffMultiplier: 2,
+  useJitter: true,
+  retryableStatusCodes: [408, 429, 500, 502, 503, 504]
+}
