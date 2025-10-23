@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import type { OutputFormat } from '@simple-nominatim/core'
+import type { OutputFormat } from "@simple-nominatim/core";
 
 /**
  * CLI arguments for free-form search command
@@ -31,55 +31,55 @@ export interface FreeFormArgv {
   /**
    * Email address for identification
    */
-  email?: string
+  email?: string;
   /**
    * Output format
    */
-  format: OutputFormat
+  format: OutputFormat;
   /**
    * Maximum number of results
    */
-  limit?: number
+  limit?: number;
   /**
    * Free-form query string
    */
-  query: string
+  query: string;
   /**
    * Disable caching
    */
-  noCache?: boolean
+  noCache?: boolean;
   /**
    * Cache TTL in milliseconds
    */
-  cacheTtl?: number
+  cacheTtl?: number;
   /**
    * Cache max size
    */
-  cacheMaxSize?: number
+  cacheMaxSize?: number;
   /**
    * Disable rate limiting
    */
-  noRateLimit?: boolean
+  noRateLimit?: boolean;
   /**
    * Rate limit requests per interval
    */
-  rateLimit?: number
+  rateLimit?: number;
   /**
    * Rate limit interval in milliseconds
    */
-  rateLimitInterval?: number
+  rateLimitInterval?: number;
   /**
    * Disable retry logic
    */
-  noRetry?: boolean
+  noRetry?: boolean;
   /**
    * Retry max attempts
    */
-  retryMaxAttempts?: number
+  retryMaxAttempts?: number;
   /**
    * Retry initial delay in milliseconds
    */
-  retryInitialDelay?: number
+  retryInitialDelay?: number;
 }
 
 /**
@@ -89,77 +89,77 @@ export interface StructuredArgv {
   /**
    * Name or type of POI
    */
-  amenity?: string
+  amenity?: string;
   /**
    * City name
    */
-  city?: string
+  city?: string;
   /**
    * Country name
    */
-  country?: string
+  country?: string;
   /**
    * County name
    */
-  county?: string
+  county?: string;
   /**
    * Email address for identification
    */
-  email?: string
+  email?: string;
   /**
    * Output format
    */
-  format: OutputFormat
+  format: OutputFormat;
   /**
    * Maximum number of results
    */
-  limit?: number
+  limit?: number;
   /**
    * Postal code
    */
-  postalcode?: string
+  postalcode?: string;
   /**
    * State name
    */
-  state?: string
+  state?: string;
   /**
    * Street name and number
    */
-  street?: string
+  street?: string;
   /**
    * Disable caching
    */
-  noCache?: boolean
+  noCache?: boolean;
   /**
    * Cache TTL in milliseconds
    */
-  cacheTtl?: number
+  cacheTtl?: number;
   /**
    * Cache max size
    */
-  cacheMaxSize?: number
+  cacheMaxSize?: number;
   /**
    * Disable rate limiting
    */
-  noRateLimit?: boolean
+  noRateLimit?: boolean;
   /**
    * Rate limit requests per interval
    */
-  rateLimit?: number
+  rateLimit?: number;
   /**
    * Rate limit interval in milliseconds
    */
-  rateLimitInterval?: number
+  rateLimitInterval?: number;
   /**
    * Disable retry logic
    */
-  noRetry?: boolean
+  noRetry?: boolean;
   /**
    * Retry max attempts
    */
-  retryMaxAttempts?: number
+  retryMaxAttempts?: number;
   /**
    * Retry initial delay in milliseconds
    */
-  retryInitialDelay?: number
+  retryInitialDelay?: number;
 }

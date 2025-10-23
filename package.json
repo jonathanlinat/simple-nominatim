@@ -17,12 +17,18 @@
   "scripts": {
     "ci:release": "changeset publish",
     "ci:version": "changeset version",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "packages:build": "turbo run build",
+    "packages:build:watch": "turbo run build --watch",
     "packages:lint:code": "eslint --fix",
     "packages:lint:markdown": "markdownlint-cli2 --fix 'packages/**/*.md' '#packages/**/node_modules/**/*.md'",
     "packages:test": "turbo run test",
     "packages:test:coverage": "turbo run test:coverage",
-    "postinstall": "pnpm simple-git-hooks"
+    "packages:typecheck": "turbo run typecheck",
+    "postinstall": "pnpm simple-git-hooks",
+    "prepublishOnly": "pnpm packages:build && pnpm packages:test"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",

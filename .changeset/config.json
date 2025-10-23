@@ -1,6 +1,9 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@2.3.1/schema.json",
-  "changelog": ["@svitejs/changesets-changelog-github-compact", { "repo": "jonathanlinat/simple-nominatim" }],
+  "changelog": [
+    "@svitejs/changesets-changelog-github-compact",
+    { "repo": "jonathanlinat/simple-nominatim" }
+  ],
   "commit": false,
   "fixed": [],
   "linked": [],

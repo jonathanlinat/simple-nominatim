@@ -22,20 +22,17 @@
  * SOFTWARE.
  */
 
-import { serviceStatus } from '@simple-nominatim/core'
-import type {
-  StatusOptions,
-  RetryConfig
-} from '@simple-nominatim/core'
+import { serviceStatus } from "@simple-nominatim/core";
+import type { StatusOptions, RetryConfig } from "@simple-nominatim/core";
 
-import { responseParser } from '../_shared/responseParser'
+import { responseParser } from "../_shared/responseParser";
 import {
   safeValidateArgs,
   serviceStatusSchema,
-  handleValidationError
-} from '../_shared/validation'
+  handleValidationError,
+} from "../_shared/validation";
 
-import type { ServiceStatusArgv } from './status.types'
+import type { ServiceStatusArgv } from "./status.types";
 
 /**
  * CLI wrapper for service status functionality
@@ -62,7 +59,7 @@ import type { ServiceStatusArgv } from './status.types'
  * @internal
  */
 export const serviceStatusWrapper = (
-  argv: ServiceStatusArgv
+  argv: ServiceStatusArgv,
 ): Promise<void> => {
   const {
     format,
@@ -74,45 +71,59 @@ export const serviceStatusWrapper = (
     rateLimitInterval,
     noRetry,
     retryMaxAttempts,
-    retryInitialDelay
-  } = argv
+    retryInitialDelay,
+  } = argv;
 
   const validationResult = safeValidateArgs(serviceStatusSchema, {
-    statusFormat: format
-  })
+    statusFormat: format,
+  });
 
   if (!validationResult.success) {
-    handleValidationError(validationResult.error)
+    handleValidationError(validationResult.error);
   }
 
-  const options: StatusOptions = { format }
+  const options: StatusOptions = { format };
 
-  if (noCache !== undefined || cacheTtl !== undefined || cacheMaxSize !== undefined) {
+  if (
+    noCache !== undefined ||
+    cacheTtl !== undefined ||
+    cacheMaxSize !== undefined
+  ) {
     options.cache = {
       ...(noCache && { enabled: false }),
       ...(cacheTtl !== undefined && { ttl: cacheTtl }),
-      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize })
-    }
+      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize }),
+    };
   }
 
-  if (noRateLimit !== undefined || rateLimit !== undefined || rateLimitInterval !== undefined) {
+  if (
+    noRateLimit !== undefined ||
+    rateLimit !== undefined ||
+    rateLimitInterval !== undefined
+  ) {
     options.rateLimit = {
       ...(noRateLimit && { enabled: false }),
       ...(rateLimit !== undefined && { limit: rateLimit }),
-      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval })
-    }
+      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval }),
+    };
   }
 
-  if (noRetry !== undefined || retryMaxAttempts !== undefined || retryInitialDelay !== undefined) {
+  if (
+    noRetry !== undefined ||
+    retryMaxAttempts !== undefined ||
+    retryInitialDelay !== undefined
+  ) {
     options.retry = {
       ...(noRetry && { enabled: false }),
       ...(retryMaxAttempts !== undefined && { maxAttempts: retryMaxAttempts }),
-      ...(retryInitialDelay !== undefined && { initialDelay: retryInitialDelay })
-    } as RetryConfig
+      ...(retryInitialDelay !== undefined && {
+        initialDelay: retryInitialDelay,
+      }),
+    } as RetryConfig;
   }
 
-  const response = serviceStatus(options)
-  const handledResponse = responseParser(response)
+  const response = serviceStatus(options);
+  const handledResponse = responseParser(response);
 
-  return handledResponse
-}
+  return handledResponse;
+};

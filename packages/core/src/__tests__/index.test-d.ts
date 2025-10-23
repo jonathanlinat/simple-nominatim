@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
 import {
   freeFormSearch,
@@ -34,94 +34,113 @@ import {
   type GeocodeReverseParams,
   type SearchOptions,
   type ReverseOptions,
-  type StatusOptions
-} from '../index'
+  type StatusOptions,
+} from "../index";
 
 /**
  * Test freeFormSearch function signature
  */
-expectTypeOf(freeFormSearch).toBeFunction()
-expectTypeOf(freeFormSearch).parameter(0).toMatchTypeOf<FreeFormSearchParams>()
-expectTypeOf(freeFormSearch).parameter(1).toMatchTypeOf<SearchOptions>()
-expectTypeOf(freeFormSearch).returns.resolves.toBeUnknown()
+expectTypeOf(freeFormSearch).toBeFunction();
+expectTypeOf(freeFormSearch).parameter(0).toMatchTypeOf<FreeFormSearchParams>();
+expectTypeOf(freeFormSearch).parameter(1).toMatchTypeOf<SearchOptions>();
+expectTypeOf(freeFormSearch).returns.resolves.toBeUnknown();
 
 /**
  * Test freeFormSearch with generic type
  */
 interface CustomResponse {
-  lat: string
-  lon: string
+  lat: string;
+  lon: string;
 }
-expectTypeOf(freeFormSearch<CustomResponse>).returns.resolves.toEqualTypeOf<CustomResponse>()
+expectTypeOf(
+  freeFormSearch<CustomResponse>,
+).returns.resolves.toEqualTypeOf<CustomResponse>();
 
 /**
  * Test structuredSearch function signature
  */
-expectTypeOf(structuredSearch).toBeFunction()
-expectTypeOf(structuredSearch).parameter(0).toMatchTypeOf<StructuredSearchParams>()
-expectTypeOf(structuredSearch).parameter(1).toMatchTypeOf<SearchOptions>()
-expectTypeOf(structuredSearch).returns.resolves.toBeUnknown()
+expectTypeOf(structuredSearch).toBeFunction();
+expectTypeOf(structuredSearch)
+  .parameter(0)
+  .toMatchTypeOf<StructuredSearchParams>();
+expectTypeOf(structuredSearch).parameter(1).toMatchTypeOf<SearchOptions>();
+expectTypeOf(structuredSearch).returns.resolves.toBeUnknown();
 
 /**
  * Test structuredSearch with generic type
  */
-expectTypeOf(structuredSearch<CustomResponse>).returns.resolves.toEqualTypeOf<CustomResponse>()
+expectTypeOf(
+  structuredSearch<CustomResponse>,
+).returns.resolves.toEqualTypeOf<CustomResponse>();
 
 /**
  * Test geocodeReverse function signature
  */
-expectTypeOf(geocodeReverse).toBeFunction()
-expectTypeOf(geocodeReverse).parameter(0).toMatchTypeOf<GeocodeReverseParams>()
-expectTypeOf(geocodeReverse).parameter(1).toMatchTypeOf<ReverseOptions>()
-expectTypeOf(geocodeReverse).returns.resolves.toBeUnknown()
+expectTypeOf(geocodeReverse).toBeFunction();
+expectTypeOf(geocodeReverse).parameter(0).toMatchTypeOf<GeocodeReverseParams>();
+expectTypeOf(geocodeReverse).parameter(1).toMatchTypeOf<ReverseOptions>();
+expectTypeOf(geocodeReverse).returns.resolves.toBeUnknown();
 
 /**
  * Test geocodeReverse with generic type
  */
-expectTypeOf(geocodeReverse<CustomResponse>).returns.resolves.toEqualTypeOf<CustomResponse>()
+expectTypeOf(
+  geocodeReverse<CustomResponse>,
+).returns.resolves.toEqualTypeOf<CustomResponse>();
 
 /**
  * Test serviceStatus function signature
  */
-expectTypeOf(serviceStatus).toBeFunction()
-expectTypeOf(serviceStatus).parameter(0).toMatchTypeOf<StatusOptions>()
-expectTypeOf(serviceStatus).returns.resolves.toBeUnknown()
+expectTypeOf(serviceStatus).toBeFunction();
+expectTypeOf(serviceStatus).parameter(0).toMatchTypeOf<StatusOptions>();
+expectTypeOf(serviceStatus).returns.resolves.toBeUnknown();
 
 /**
  * Test serviceStatus with generic type
  */
 interface StatusResponse {
-  status: number
-  message: string
+  status: number;
+  message: string;
 }
-expectTypeOf(serviceStatus<StatusResponse>).returns.resolves.toEqualTypeOf<StatusResponse>()
+expectTypeOf(
+  serviceStatus<StatusResponse>,
+).returns.resolves.toEqualTypeOf<StatusResponse>();
 
 /**
  * Test that optional parameters work correctly
  */
-const result1 = freeFormSearch({ query: 'test' }, { format: 'json' })
-expectTypeOf(result1).toEqualTypeOf<Promise<unknown>>()
+const result1 = freeFormSearch({ query: "test" }, { format: "json" });
+expectTypeOf(result1).toEqualTypeOf<Promise<unknown>>();
 
-const result2 = freeFormSearch({ query: 'test' }, { format: 'json', email: 'test@example.com' })
-expectTypeOf(result2).toEqualTypeOf<Promise<unknown>>()
+const result2 = freeFormSearch(
+  { query: "test" },
+  { format: "json", email: "test@example.com" },
+);
+expectTypeOf(result2).toEqualTypeOf<Promise<unknown>>();
 
-const result3 = freeFormSearch({ query: 'test' }, { format: 'json', limit: 10 })
-expectTypeOf(result3).toEqualTypeOf<Promise<unknown>>()
+const result3 = freeFormSearch(
+  { query: "test" },
+  { format: "json", limit: 10 },
+);
+expectTypeOf(result3).toEqualTypeOf<Promise<unknown>>();
 
 /**
  * Test cache and rateLimit integration
  */
-const result4 = freeFormSearch({ query: 'test' }, { format: 'json', cache: { enabled: true } })
-expectTypeOf(result4).toEqualTypeOf<Promise<unknown>>()
+const result4 = freeFormSearch(
+  { query: "test" },
+  { format: "json", cache: { enabled: true } },
+);
+expectTypeOf(result4).toEqualTypeOf<Promise<unknown>>();
 
 const result5 = freeFormSearch(
-  { query: 'test' },
-  { format: 'json', rateLimit: { enabled: true } }
-)
-expectTypeOf(result5).toEqualTypeOf<Promise<unknown>>()
+  { query: "test" },
+  { format: "json", rateLimit: { enabled: true } },
+);
+expectTypeOf(result5).toEqualTypeOf<Promise<unknown>>();
 
 const result6 = freeFormSearch(
-  { query: 'test' },
-  { format: 'json', cache: { enabled: true }, rateLimit: { enabled: true } }
-)
-expectTypeOf(result6).toEqualTypeOf<Promise<unknown>>()
+  { query: "test" },
+  { format: "json", cache: { enabled: true }, rateLimit: { enabled: true } },
+);
+expectTypeOf(result6).toEqualTypeOf<Promise<unknown>>();

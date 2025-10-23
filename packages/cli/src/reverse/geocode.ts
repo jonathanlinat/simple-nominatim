@@ -22,21 +22,21 @@
  * SOFTWARE.
  */
 
-import { geocodeReverse } from '@simple-nominatim/core'
+import { geocodeReverse } from "@simple-nominatim/core";
 import type {
   GeocodeReverseParams,
   ReverseOptions,
-  RetryConfig
-} from '@simple-nominatim/core'
+  RetryConfig,
+} from "@simple-nominatim/core";
 
-import { responseParser } from '../_shared/responseParser'
+import { responseParser } from "../_shared/responseParser";
 import {
   safeValidateArgs,
   reverseGeocodeSchema,
-  handleValidationError
-} from '../_shared/validation'
+  handleValidationError,
+} from "../_shared/validation";
 
-import type { GeocodeReverseArgv } from './reverse.types'
+import type { GeocodeReverseArgv } from "./reverse.types";
 
 /**
  * CLI wrapper for reverse geocoding functionality
@@ -67,7 +67,7 @@ import type { GeocodeReverseArgv } from './reverse.types'
  * @internal
  */
 export const geocodeReverseWrapper = (
-  argv: GeocodeReverseArgv
+  argv: GeocodeReverseArgv,
 ): Promise<void> => {
   const {
     email,
@@ -82,49 +82,63 @@ export const geocodeReverseWrapper = (
     rateLimitInterval,
     noRetry,
     retryMaxAttempts,
-    retryInitialDelay
-  } = argv
+    retryInitialDelay,
+  } = argv;
 
   const validationResult = safeValidateArgs(reverseGeocodeSchema, {
     latitude,
     longitude,
     outputFormat: format,
-    email
-  })
+    email,
+  });
 
   if (!validationResult.success) {
-    handleValidationError(validationResult.error)
+    handleValidationError(validationResult.error);
   }
 
-  const params: GeocodeReverseParams = { latitude, longitude }
-  const options: ReverseOptions = { email, format }
+  const params: GeocodeReverseParams = { latitude, longitude };
+  const options: ReverseOptions = { email, format };
 
-  if (noCache !== undefined || cacheTtl !== undefined || cacheMaxSize !== undefined) {
+  if (
+    noCache !== undefined ||
+    cacheTtl !== undefined ||
+    cacheMaxSize !== undefined
+  ) {
     options.cache = {
       ...(noCache && { enabled: false }),
       ...(cacheTtl !== undefined && { ttl: cacheTtl }),
-      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize })
-    }
+      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize }),
+    };
   }
 
-  if (noRateLimit !== undefined || rateLimit !== undefined || rateLimitInterval !== undefined) {
+  if (
+    noRateLimit !== undefined ||
+    rateLimit !== undefined ||
+    rateLimitInterval !== undefined
+  ) {
     options.rateLimit = {
       ...(noRateLimit && { enabled: false }),
       ...(rateLimit !== undefined && { limit: rateLimit }),
-      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval })
-    }
+      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval }),
+    };
   }
 
-  if (noRetry !== undefined || retryMaxAttempts !== undefined || retryInitialDelay !== undefined) {
+  if (
+    noRetry !== undefined ||
+    retryMaxAttempts !== undefined ||
+    retryInitialDelay !== undefined
+  ) {
     options.retry = {
       ...(noRetry && { enabled: false }),
       ...(retryMaxAttempts !== undefined && { maxAttempts: retryMaxAttempts }),
-      ...(retryInitialDelay !== undefined && { initialDelay: retryInitialDelay })
-    } as RetryConfig
+      ...(retryInitialDelay !== undefined && {
+        initialDelay: retryInitialDelay,
+      }),
+    } as RetryConfig;
   }
 
-  const response = geocodeReverse(params, options)
-  const handledResponse = responseParser(response)
+  const response = geocodeReverse(params, options);
+  const handledResponse = responseParser(response);
 
-  return handledResponse
-}
+  return handledResponse;
+};

@@ -22,402 +22,408 @@
  * SOFTWARE.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { geocodeReverse } from '../../reverse/geocode'
+import { geocodeReverse } from "../../reverse/geocode";
 
-describe('geocodeReverse', () => {
+describe("geocodeReverse", () => {
   const mockResponse = {
     place_id: 123,
-    display_name: 'Test Location',
+    display_name: "Test Location",
     address: {
-      city: 'London',
-      country: 'United Kingdom'
-    }
-  }
+      city: "London",
+      country: "United Kingdom",
+    },
+  };
 
   beforeEach(() => {
-    vi.restoreAllMocks()
-    vi.clearAllMocks()
+    vi.restoreAllMocks();
+    vi.clearAllMocks();
     // @ts-expect-error - Overriding global fetch for testing
-    global.fetch = undefined
-  })
+    global.fetch = undefined;
+  });
 
-  describe('basic functionality', () => {
-    it('should perform reverse geocoding with coordinates', async () => {
+  describe("basic functionality", () => {
+    it("should perform reverse geocoding with coordinates", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       const result = await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json' }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        { format: "json" },
+      );
 
-      expect(result).toEqual(mockResponse)
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
-    it('should construct URL with latitude and longitude', async () => {
+    it("should construct URL with latitude and longitude", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '40.7128', longitude: '-74.0060' },
-        { format: 'json' }
-      )
+        { latitude: "40.7128", longitude: "-74.0060" },
+        { format: "json" },
+      );
 
-      const callArgs = vi.mocked(global.fetch).mock.calls[0]
-      expect(callArgs).toBeDefined()
-      const url = callArgs![0] as string
-      expect(url).toContain('reverse?')
-      expect(url).toContain('lat=40.7128')
-      expect(url).toContain('lon=-74.0060')
-    })
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      const url = callArgs![0] as string;
+      expect(url).toContain("reverse?");
+      expect(url).toContain("lat=40.7128");
+      expect(url).toContain("lon=-74.0060");
+    });
 
-    it('should return parsed response', async () => {
+    it("should return parsed response", async () => {
       const customResponse = {
         place_id: 456,
-        display_name: 'New York'
-      }
+        display_name: "New York",
+      };
 
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => customResponse
-      })
+        json: async () => customResponse,
+      });
 
       const result = await geocodeReverse(
-        { latitude: '40.7128', longitude: '-74.0060' },
-        { format: 'json' }
-      )
+        { latitude: "40.7128", longitude: "-74.0060" },
+        { format: "json" },
+      );
 
-      expect(result).toEqual(customResponse)
-    })
-  })
+      expect(result).toEqual(customResponse);
+    });
+  });
 
-  describe('API options', () => {
-    it('should include format parameter', async () => {
+  describe("API options", () => {
+    it("should include format parameter", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json' }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        { format: "json" },
+      );
 
-      const callArgs = vi.mocked(global.fetch).mock.calls[0]
-      expect(callArgs).toBeDefined()
-      const url = callArgs![0] as string
-      expect(url).toContain('format=json')
-    })
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      const url = callArgs![0] as string;
+      expect(url).toContain("format=json");
+    });
 
-    it('should include addressdetails parameter', async () => {
+    it("should include addressdetails parameter", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json', addressdetails: 1 }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        { format: "json", addressdetails: 1 },
+      );
 
-      const callArgs = vi.mocked(global.fetch).mock.calls[0]
-      expect(callArgs).toBeDefined()
-      const url = callArgs![0] as string
-      expect(url).toContain('addressdetails=1')
-    })
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      const url = callArgs![0] as string;
+      expect(url).toContain("addressdetails=1");
+    });
 
-    it('should include zoom parameter', async () => {
+    it("should include zoom parameter", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json', zoom: 18 }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        { format: "json", zoom: 18 },
+      );
 
-      const callArgs = vi.mocked(global.fetch).mock.calls[0]
-      expect(callArgs).toBeDefined()
-      const url = callArgs![0] as string
-      expect(url).toContain('zoom=18')
-    })
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      const url = callArgs![0] as string;
+      expect(url).toContain("zoom=18");
+    });
 
-    it('should include multiple parameters', async () => {
+    it("should include multiple parameters", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
+        { latitude: "51.5074", longitude: "-0.1278" },
         {
-          format: 'json',
+          format: "json",
           addressdetails: 1,
           zoom: 18,
-          'accept-language': 'en'
-        }
-      )
+          "accept-language": "en",
+        },
+      );
 
-      const callArgs = vi.mocked(global.fetch).mock.calls[0]
-      expect(callArgs).toBeDefined()
-      const url = callArgs![0] as string
-      expect(url).toContain('format=json')
-      expect(url).toContain('addressdetails=1')
-      expect(url).toContain('zoom=18')
-      expect(url).toContain('accept-language=en')
-    })
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      const url = callArgs![0] as string;
+      expect(url).toContain("format=json");
+      expect(url).toContain("addressdetails=1");
+      expect(url).toContain("zoom=18");
+      expect(url).toContain("accept-language=en");
+    });
 
-    it('should omit undefined parameters', async () => {
+    it("should omit undefined parameters", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json', zoom: undefined }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        { format: "json", zoom: undefined },
+      );
 
-      const callArgs = vi.mocked(global.fetch).mock.calls[0]
-      expect(callArgs).toBeDefined()
-      const url = callArgs![0] as string
-      expect(url).toContain('format=json')
-      expect(url).not.toContain('zoom=')
-    })
-  })
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      const url = callArgs![0] as string;
+      expect(url).toContain("format=json");
+      expect(url).not.toContain("zoom=");
+    });
+  });
 
-  describe('cache options', () => {
-    it('should pass cache configuration to dataFetcher', async () => {
+  describe("cache options", () => {
+    it("should pass cache configuration to dataFetcher", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json', cache: { enabled: false } }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        { format: "json", cache: { enabled: false } },
+      );
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
-    it('should work with custom cache settings', async () => {
+    it("should work with custom cache settings", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json', cache: { enabled: true, maxSize: 100, ttl: 5000 } }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        { format: "json", cache: { enabled: true, maxSize: 100, ttl: 5000 } },
+      );
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
-  })
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
 
-  describe('rate limit options', () => {
-    it('should pass rate limit configuration to dataFetcher', async () => {
+  describe("rate limit options", () => {
+    it("should pass rate limit configuration to dataFetcher", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json', rateLimit: { enabled: false } }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        { format: "json", rateLimit: { enabled: false } },
+      );
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
-    it('should work with custom rate limit settings', async () => {
+    it("should work with custom rate limit settings", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json', rateLimit: { enabled: true, limit: 2, interval: 500 } }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        {
+          format: "json",
+          rateLimit: { enabled: true, limit: 2, interval: 500 },
+        },
+      );
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
-  })
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
 
-  describe('retry options', () => {
-    it('should pass retry configuration to dataFetcher', async () => {
+  describe("retry options", () => {
+    it("should pass retry configuration to dataFetcher", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json', retry: { enabled: false } }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        { format: "json", retry: { enabled: false } },
+      );
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
-    it('should work with custom retry settings', async () => {
+    it("should work with custom retry settings", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json', retry: { enabled: true, maxAttempts: 2, initialDelay: 100 } }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        {
+          format: "json",
+          retry: { enabled: true, maxAttempts: 2, initialDelay: 100 },
+        },
+      );
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
-    it('should retry on network failure', async () => {
-      let callCount = 0
+    it("should retry on network failure", async () => {
+      let callCount = 0;
       global.fetch = vi.fn().mockImplementation(async () => {
-        callCount++
+        callCount++;
         if (callCount === 1) {
-          throw new Error('Network error')
+          throw new Error("Network error");
         }
 
-        return { ok: true, json: async () => mockResponse }
-      })
+        return { ok: true, json: async () => mockResponse };
+      });
 
       const result = await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
+        { latitude: "51.5074", longitude: "-0.1278" },
         {
-          format: 'json',
+          format: "json",
           retry: {
             enabled: true,
             maxAttempts: 2,
             initialDelay: 10,
-            useJitter: false
+            useJitter: false,
           },
-          rateLimit: { enabled: false }
-        }
-      )
+          rateLimit: { enabled: false },
+        },
+      );
 
-      expect(result).toEqual(mockResponse)
-      expect(global.fetch).toHaveBeenCalledTimes(2)
-    })
-  })
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+    });
+  });
 
-  describe('error handling', () => {
-    it('should throw on HTTP error', async () => {
+  describe("error handling", () => {
+    it("should throw on HTTP error", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 400,
-        statusText: 'Bad Request'
-      })
+        statusText: "Bad Request",
+      });
 
       await expect(
         geocodeReverse(
-          { latitude: 'invalid', longitude: 'invalid' },
-          { format: 'json', retry: { enabled: false } }
-        )
-      ).rejects.toThrow('HTTP error')
-    })
+          { latitude: "invalid", longitude: "invalid" },
+          { format: "json", retry: { enabled: false } },
+        ),
+      ).rejects.toThrow("HTTP error");
+    });
 
-    it('should throw on network error', async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error('Network failure'))
+    it("should throw on network error", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network failure"));
 
       await expect(
         geocodeReverse(
-          { latitude: '51.5074', longitude: '-0.1278' },
-          { format: 'json', retry: { enabled: false } }
-        )
-      ).rejects.toThrow('Network failure')
-    })
-  })
+          { latitude: "51.5074", longitude: "-0.1278" },
+          { format: "json", retry: { enabled: false } },
+        ),
+      ).rejects.toThrow("Network failure");
+    });
+  });
 
-  describe('coordinate variations', () => {
-    it('should handle string coordinates', async () => {
+  describe("coordinate variations", () => {
+    it("should handle string coordinates", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
-        { format: 'json' }
-      )
+        { latitude: "51.5074", longitude: "-0.1278" },
+        { format: "json" },
+      );
 
-      const callArgs = vi.mocked(global.fetch).mock.calls[0]
-      expect(callArgs).toBeDefined()
-      const url = callArgs![0] as string
-      expect(url).toContain('lat=51.5074')
-      expect(url).toContain('lon=-0.1278')
-    })
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      const url = callArgs![0] as string;
+      expect(url).toContain("lat=51.5074");
+      expect(url).toContain("lon=-0.1278");
+    });
 
-    it('should handle positive coordinates', async () => {
+    it("should handle positive coordinates", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '35.6762', longitude: '139.6503' },
-        { format: 'json' }
-      )
+        { latitude: "35.6762", longitude: "139.6503" },
+        { format: "json" },
+      );
 
-      const callArgs = vi.mocked(global.fetch).mock.calls[0]
-      expect(callArgs).toBeDefined()
-      const url = callArgs![0] as string
-      expect(url).toContain('lat=35.6762')
-      expect(url).toContain('lon=139.6503')
-    })
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      const url = callArgs![0] as string;
+      expect(url).toContain("lat=35.6762");
+      expect(url).toContain("lon=139.6503");
+    });
 
-    it('should handle negative coordinates', async () => {
+    it("should handle negative coordinates", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await geocodeReverse(
-        { latitude: '-33.8688', longitude: '151.2093' },
-        { format: 'json' }
-      )
+        { latitude: "-33.8688", longitude: "151.2093" },
+        { format: "json" },
+      );
 
-      const callArgs = vi.mocked(global.fetch).mock.calls[0]
-      expect(callArgs).toBeDefined()
-      const url = callArgs![0] as string
-      expect(url).toContain('lat=-33.8688')
-      expect(url).toContain('lon=151.2093')
-    })
-  })
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      const url = callArgs![0] as string;
+      expect(url).toContain("lat=-33.8688");
+      expect(url).toContain("lon=151.2093");
+    });
+  });
 
-  describe('integration', () => {
-    it('should work with all options combined', async () => {
+  describe("integration", () => {
+    it("should work with all options combined", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       const result = await geocodeReverse(
-        { latitude: '51.5074', longitude: '-0.1278' },
+        { latitude: "51.5074", longitude: "-0.1278" },
         {
-          format: 'json',
+          format: "json",
           addressdetails: 1,
           zoom: 18,
           cache: { enabled: true },
           rateLimit: { enabled: true },
-          retry: { enabled: true }
-        }
-      )
+          retry: { enabled: true },
+        },
+      );
 
-      expect(result).toEqual(mockResponse)
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
-  })
-})
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
+});

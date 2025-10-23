@@ -29,7 +29,7 @@ export interface FreeFormSearchParams {
   /**
    * Free-form query string to search for
    */
-  query: string
+  query: string;
 }
 
 /**
@@ -39,33 +39,33 @@ export interface StructuredSearchParams {
   /**
    * Name or type of point of interest (POI)
    */
-  amenity?: string
+  amenity?: string;
   /**
    * City name
    */
-  city?: string
+  city?: string;
   /**
    * Country name (required for structured search)
    */
-  country?: string
+  country?: string;
   /**
    * County name
    */
-  county?: string
+  county?: string;
   /**
    * Postal code
    */
-  postalcode?: string
+  postalcode?: string;
   /**
    * State name
    */
-  state?: string
+  state?: string;
   /**
    * House number and street name
    */
-  street?: string
+  street?: string;
   /**
    * Index signature for additional search parameters
    */
-  [key: string]: string | undefined
+  [key: string]: string | undefined;
 }

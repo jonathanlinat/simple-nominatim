@@ -29,9 +29,9 @@ export interface GeocodeReverseParams {
   /**
    * Latitude of the coordinate
    */
-  latitude: string
+  latitude: string;
   /**
    * Longitude of the coordinate
    */
-  longitude: string
+  longitude: string;
 }

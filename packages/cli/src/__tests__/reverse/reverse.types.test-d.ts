@@ -22,34 +22,42 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
-import type { OutputFormat } from '@simple-nominatim/core'
+import type { OutputFormat } from "@simple-nominatim/core";
 
-import type { GeocodeReverseArgv } from '../../reverse/reverse.types'
+import type { GeocodeReverseArgv } from "../../reverse/reverse.types";
 
 /**
  * Test GeocodeReverseArgv interface
  */
 expectTypeOf<GeocodeReverseArgv>().toMatchTypeOf<{
-  email?: string
-  format: OutputFormat
-  latitude: string
-  longitude: string
-}>()
+  email?: string;
+  format: OutputFormat;
+  latitude: string;
+  longitude: string;
+}>();
 
-expectTypeOf<GeocodeReverseArgv>().toHaveProperty('format').toEqualTypeOf<OutputFormat>()
-expectTypeOf<GeocodeReverseArgv>().toHaveProperty('latitude').toEqualTypeOf<string>()
-expectTypeOf<GeocodeReverseArgv>().toHaveProperty('longitude').toEqualTypeOf<string>()
-expectTypeOf<GeocodeReverseArgv>().toHaveProperty('email').toEqualTypeOf<string | undefined>()
+expectTypeOf<GeocodeReverseArgv>()
+  .toHaveProperty("format")
+  .toEqualTypeOf<OutputFormat>();
+expectTypeOf<GeocodeReverseArgv>()
+  .toHaveProperty("latitude")
+  .toEqualTypeOf<string>();
+expectTypeOf<GeocodeReverseArgv>()
+  .toHaveProperty("longitude")
+  .toEqualTypeOf<string>();
+expectTypeOf<GeocodeReverseArgv>()
+  .toHaveProperty("email")
+  .toEqualTypeOf<string | undefined>();
 
 /**
  * Test complete workflow type safety
  */
 const reverseArgs: GeocodeReverseArgv = {
-  latitude: '48.8584',
-  longitude: '2.2945',
-  format: 'json',
-  email: 'test@example.com'
-}
-expectTypeOf(reverseArgs).toMatchTypeOf<GeocodeReverseArgv>()
+  latitude: "48.8584",
+  longitude: "2.2945",
+  format: "json",
+  email: "test@example.com",
+};
+expectTypeOf(reverseArgs).toMatchTypeOf<GeocodeReverseArgv>();

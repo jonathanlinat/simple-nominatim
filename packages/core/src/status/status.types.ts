@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-import type { RetryConfig } from '../_shared/_shared.types'
-import type { CacheConfig } from '../_shared/cacheManager'
-import type { RateLimitConfig } from '../_shared/rateLimiter'
+import type { RetryConfig } from "../_shared/_shared.types";
+import type { CacheConfig } from "../_shared/cacheManager";
+import type { RateLimitConfig } from "../_shared/rateLimiter";
 
 /**
  * Status format types supported by Nominatim API
  */
-export type StatusFormat = 'text' | 'json'
+export type StatusFormat = "text" | "json";
 
 /**
  * Options for service status requests
@@ -38,21 +38,27 @@ export interface StatusOptions {
   /**
    * Output format for the status response
    */
-  format: StatusFormat
+  format: StatusFormat;
   /**
    * Cache configuration for response caching (optional)
    */
-  cache?: CacheConfig
+  cache?: CacheConfig;
   /**
    * Rate limiter configuration for request throttling (optional)
    */
-  rateLimit?: RateLimitConfig
+  rateLimit?: RateLimitConfig;
   /**
    * Retry configuration for failed requests (optional)
    */
-  retry?: RetryConfig
+  retry?: RetryConfig;
   /**
    * Index signature for additional query parameters
    */
-  [key: string]: string | number | CacheConfig | RateLimitConfig | RetryConfig | undefined
+  [key: string]:
+    | string
+    | number
+    | CacheConfig
+    | RateLimitConfig
+    | RetryConfig
+    | undefined;
 }

@@ -22,17 +22,17 @@
  * SOFTWARE.
  */
 
-import { CacheManager } from './cacheManager'
+import { CacheManager } from "./cacheManager";
 import {
   FETCHER_BASE_URL,
   FETCHER_USER_AGENT,
   DEFAULT_CACHE_CONFIG,
   DEFAULT_RATE_LIMIT_CONFIG,
-  DEFAULT_RETRY_CONFIG
-} from './constants'
-import { RateLimiter } from './rateLimiter'
+  DEFAULT_RETRY_CONFIG,
+} from "./constants";
+import { RateLimiter } from "./rateLimiter";
 
-import type { DataFetcherOptions, RetryConfig } from './_shared.types'
+import type { DataFetcherOptions, RetryConfig } from "./_shared.types";
 
 /**
  * Calculate delay with exponential backoff and optional jitter
@@ -43,19 +43,19 @@ import type { DataFetcherOptions, RetryConfig } from './_shared.types'
  */
 const calculateDelay = (
   attempt: number,
-  config: Required<RetryConfig>
+  config: Required<RetryConfig>,
 ): number => {
   const exponentialDelay = Math.min(
     config.initialDelay * Math.pow(config.backoffMultiplier, attempt - 1),
-    config.maxDelay
-  )
+    config.maxDelay,
+  );
 
   if (config.useJitter) {
-    return exponentialDelay * (0.5 + Math.random())
+    return exponentialDelay * (0.5 + Math.random());
   }
 
-  return exponentialDelay
-}
+  return exponentialDelay;
+};
 
 /**
  * Sleep for specified milliseconds
@@ -64,7 +64,7 @@ const calculateDelay = (
  * @returns Promise that resolves after the specified delay
  */
 const sleep = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms))
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Generic HTTP fetcher for Nominatim API requests
@@ -89,101 +89,105 @@ const sleep = (ms: number): Promise<void> =>
 export const dataFetcher = async <T = unknown>(
   endpoint: string,
   params: URLSearchParams,
-  options: DataFetcherOptions = {}
+  options: DataFetcherOptions = {},
 ): Promise<T> => {
-  const { cache: cacheConfig, rateLimit: rateLimitConfig, retry: retryConfig } = options
+  const {
+    cache: cacheConfig,
+    rateLimit: rateLimitConfig,
+    retry: retryConfig,
+  } = options;
 
   const retry: Required<RetryConfig> = {
     ...DEFAULT_RETRY_CONFIG,
-    ...retryConfig
-  }
+    ...retryConfig,
+  };
 
   const cache = new CacheManager({
     ...DEFAULT_CACHE_CONFIG,
-    ...cacheConfig
-  })
+    ...cacheConfig,
+  });
 
   const rateLimiter = new RateLimiter({
     ...DEFAULT_RATE_LIMIT_CONFIG,
-    ...rateLimitConfig
-  })
+    ...rateLimitConfig,
+  });
 
   if (cache.isEnabled()) {
-    const cachedResponse = cache.get(endpoint, params)
+    const cachedResponse = cache.get(endpoint, params);
 
     if (cachedResponse !== undefined) {
-      return cachedResponse as T
+      return cachedResponse as T;
     }
   }
 
   const performFetch = async (): Promise<T> => {
-    const requestInfo = `${FETCHER_BASE_URL}/${endpoint}?${params.toString()}`
-    const requestInit = { headers: { 'User-Agent': FETCHER_USER_AGENT } }
+    const requestInfo = `${FETCHER_BASE_URL}/${endpoint}?${params.toString()}`;
+    const requestInit = { headers: { "User-Agent": FETCHER_USER_AGENT } };
 
-    let lastError: Error | undefined
-    let attempt = 0
+    let lastError: Error | undefined;
+    let attempt = 0;
 
     while (attempt < (retry.enabled ? retry.maxAttempts : 1)) {
-      attempt++
+      attempt++;
 
       try {
-        const requestResponse = await fetch(requestInfo, requestInit)
+        const requestResponse = await fetch(requestInfo, requestInit);
 
         if (!requestResponse.ok) {
-          const statusCode = requestResponse.status
+          const statusCode = requestResponse.status;
           const shouldRetry =
             retry.enabled &&
             attempt < retry.maxAttempts &&
-            retry.retryableStatusCodes.includes(statusCode)
+            retry.retryableStatusCodes.includes(statusCode);
 
           if (shouldRetry) {
-            const delay = calculateDelay(attempt, retry)
+            const delay = calculateDelay(attempt, retry);
 
-            await sleep(delay)
+            await sleep(delay);
 
-            continue
+            continue;
           }
 
           throw new Error(
-            `HTTP error! Status: ${requestResponse.status}. Text: ${requestResponse.statusText}`
-          )
+            `HTTP error! Status: ${requestResponse.status}. Text: ${requestResponse.statusText}`,
+          );
         }
 
         const parsedRequestResponse =
-          params.get('format') === 'text' || params.get('format') === 'xml'
+          params.get("format") === "text" || params.get("format") === "xml"
             ? await requestResponse.text()
-            : await requestResponse.json()
+            : await requestResponse.json();
 
-        return parsedRequestResponse as T
+        return parsedRequestResponse as T;
       } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error))
+        lastError = error instanceof Error ? error : new Error(String(error));
 
-        const isNetworkError = !error || !(error as { status?: number }).status
+        const isNetworkError = !error || !(error as { status?: number }).status;
         const shouldRetry =
-          retry.enabled && attempt < retry.maxAttempts && isNetworkError
+          retry.enabled && attempt < retry.maxAttempts && isNetworkError;
 
         if (shouldRetry) {
-          const delay = calculateDelay(attempt, retry)
+          const delay = calculateDelay(attempt, retry);
 
-          await sleep(delay)
+          await sleep(delay);
 
-          continue
+          continue;
         }
 
-        throw lastError
+        throw lastError;
       }
     }
 
-    throw lastError || new Error('Request failed after all retry attempts')
-  }
+    throw lastError || new Error("Request failed after all retry attempts");
+  };
 
   const response = rateLimiter.isEnabled()
     ? await rateLimiter.execute(performFetch)
-    : await performFetch()
+    : await performFetch();
 
   if (cache.isEnabled()) {
-    cache.set(endpoint, params, response as object)
+    cache.set(endpoint, params, response as object);
   }
 
-  return response
-}
+  return response;
+};

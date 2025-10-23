@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import type { StatusFormat } from '@simple-nominatim/core'
+import type { StatusFormat } from "@simple-nominatim/core";
 
 /**
  * CLI arguments for service status command
@@ -31,41 +31,41 @@ export interface ServiceStatusArgv {
   /**
    * Output format for status response
    */
-  format: StatusFormat
+  format: StatusFormat;
   /**
    * Disable caching
    */
-  noCache?: boolean
+  noCache?: boolean;
   /**
    * Cache TTL in milliseconds
    */
-  cacheTtl?: number
+  cacheTtl?: number;
   /**
    * Cache max size
    */
-  cacheMaxSize?: number
+  cacheMaxSize?: number;
   /**
    * Disable rate limiting
    */
-  noRateLimit?: boolean
+  noRateLimit?: boolean;
   /**
    * Rate limit requests per interval
    */
-  rateLimit?: number
+  rateLimit?: number;
   /**
    * Rate limit interval in milliseconds
    */
-  rateLimitInterval?: number
+  rateLimitInterval?: number;
   /**
    * Disable retry logic
    */
-  noRetry?: boolean
+  noRetry?: boolean;
   /**
    * Retry max attempts
    */
-  retryMaxAttempts?: number
+  retryMaxAttempts?: number;
   /**
    * Retry initial delay in milliseconds
    */
-  retryInitialDelay?: number
+  retryInitialDelay?: number;
 }

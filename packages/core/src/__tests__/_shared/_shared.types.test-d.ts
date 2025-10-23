@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
 import type {
   OutputFormat,
@@ -32,55 +32,55 @@ import type {
   DataFetcherOptions,
   RetryConfig,
   CacheConfig,
-  RateLimitConfig
-} from '../../index'
+  RateLimitConfig,
+} from "../../index";
 
 /**
  * Test OutputFormat type
  */
 expectTypeOf<OutputFormat>().toEqualTypeOf<
-  'xml' | 'json' | 'jsonv2' | 'geojson' | 'geocodejson'
->()
+  "xml" | "json" | "jsonv2" | "geojson" | "geocodejson"
+>();
 
 /**
  * Test BaseOptions interface
  */
 expectTypeOf<BaseOptions>().toMatchTypeOf<{
-  email?: string
-  format: OutputFormat
-  cache?: CacheConfig
-  rateLimit?: RateLimitConfig
-}>()
+  email?: string;
+  format: OutputFormat;
+  cache?: CacheConfig;
+  rateLimit?: RateLimitConfig;
+}>();
 
 /**
  * Test SearchOptions extends BaseOptions
  */
-expectTypeOf<SearchOptions>().toMatchTypeOf<BaseOptions>()
-expectTypeOf<SearchOptions>().toMatchTypeOf<{ limit?: number }>()
+expectTypeOf<SearchOptions>().toMatchTypeOf<BaseOptions>();
+expectTypeOf<SearchOptions>().toMatchTypeOf<{ limit?: number }>();
 
 /**
  * Test ReverseOptions is alias of BaseOptions
  */
-expectTypeOf<ReverseOptions>().toEqualTypeOf<BaseOptions>()
+expectTypeOf<ReverseOptions>().toEqualTypeOf<BaseOptions>();
 
 /**
  * Test RetryConfig interface
  */
 expectTypeOf<RetryConfig>().toMatchTypeOf<{
-  enabled?: boolean
-  maxAttempts?: number
-  initialDelay?: number
-  maxDelay?: number
-  backoffMultiplier?: number
-  useJitter?: boolean
-  retryableStatusCodes?: number[]
-}>()
+  enabled?: boolean;
+  maxAttempts?: number;
+  initialDelay?: number;
+  maxDelay?: number;
+  backoffMultiplier?: number;
+  useJitter?: boolean;
+  retryableStatusCodes?: number[];
+}>();
 
 /**
  * Test DataFetcherOptions interface
  */
 expectTypeOf<DataFetcherOptions>().toMatchTypeOf<{
-  cache?: CacheConfig
-  rateLimit?: RateLimitConfig
-  retry?: RetryConfig
-}>()
+  cache?: CacheConfig;
+  rateLimit?: RateLimitConfig;
+  retry?: RetryConfig;
+}>();

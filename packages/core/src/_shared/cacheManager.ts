@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { LRUCache } from 'lru-cache'
+import { LRUCache } from "lru-cache";
 
 /**
  * Configuration options for the cache
@@ -32,19 +32,19 @@ export interface CacheConfig {
    * Enable or disable caching
    * @default true
    */
-  enabled?: boolean
+  enabled?: boolean;
 
   /**
    * Time-to-live for cached entries in milliseconds
    * @default 300000 (5 minutes)
    */
-  ttl?: number
+  ttl?: number;
 
   /**
    * Maximum number of cached entries
    * @default 500
    */
-  maxSize?: number
+  maxSize?: number;
 }
 
 /**
@@ -57,10 +57,10 @@ export interface CacheConfig {
  * @internal
  */
 export class CacheManager<T extends object = object> {
-  private cache: LRUCache<string, T>
-  private enabled: boolean
-  private hits = 0
-  private misses = 0
+  private cache: LRUCache<string, T>;
+  private enabled: boolean;
+  private hits = 0;
+  private misses = 0;
 
   /**
    * Creates a new CacheManager instance
@@ -68,13 +68,13 @@ export class CacheManager<T extends object = object> {
    * @param config Cache configuration options
    */
   constructor(config: CacheConfig = {}) {
-    this.enabled = config.enabled ?? true
+    this.enabled = config.enabled ?? true;
     this.cache = new LRUCache<string, T>({
       max: config.maxSize ?? 500,
       ttl: config.ttl ?? 300000,
       updateAgeOnGet: false,
-      updateAgeOnHas: false
-    })
+      updateAgeOnHas: false,
+    });
   }
 
   /**
@@ -86,10 +86,10 @@ export class CacheManager<T extends object = object> {
    */
   private generateKey(endpoint: string, params: URLSearchParams): string {
     const sortedParams = new URLSearchParams(
-      Array.from(params.entries()).sort(([a], [b]) => a.localeCompare(b))
-    )
+      Array.from(params.entries()).sort(([a], [b]) => a.localeCompare(b)),
+    );
 
-    return `${endpoint}:${sortedParams.toString()}`
+    return `${endpoint}:${sortedParams.toString()}`;
   }
 
   /**
@@ -100,18 +100,18 @@ export class CacheManager<T extends object = object> {
    * @returns The cached value or undefined
    */
   get(endpoint: string, params: URLSearchParams): T | undefined {
-    if (!this.enabled) return undefined
+    if (!this.enabled) return undefined;
 
-    const key = this.generateKey(endpoint, params)
-    const value = this.cache.get(key)
+    const key = this.generateKey(endpoint, params);
+    const value = this.cache.get(key);
 
     if (value !== undefined) {
-      this.hits++
+      this.hits++;
     } else {
-      this.misses++
+      this.misses++;
     }
 
-    return value
+    return value;
   }
 
   /**
@@ -122,10 +122,10 @@ export class CacheManager<T extends object = object> {
    * @param value The value to cache
    */
   set(endpoint: string, params: URLSearchParams, value: T): void {
-    if (!this.enabled) return
+    if (!this.enabled) return;
 
-    const key = this.generateKey(endpoint, params)
-    this.cache.set(key, value)
+    const key = this.generateKey(endpoint, params);
+    this.cache.set(key, value);
   }
 
   /**
@@ -136,20 +136,20 @@ export class CacheManager<T extends object = object> {
    * @returns True if the entry exists and is not expired
    */
   has(endpoint: string, params: URLSearchParams): boolean {
-    if (!this.enabled) return false
+    if (!this.enabled) return false;
 
-    const key = this.generateKey(endpoint, params)
+    const key = this.generateKey(endpoint, params);
 
-    return this.cache.has(key)
+    return this.cache.has(key);
   }
 
   /**
    * Clear all cached entries
    */
   clear(): void {
-    this.cache.clear()
-    this.hits = 0
-    this.misses = 0
+    this.cache.clear();
+    this.hits = 0;
+    this.misses = 0;
   }
 
   /**
@@ -158,15 +158,15 @@ export class CacheManager<T extends object = object> {
    * @returns Object containing cache hits, misses, and hit rate
    */
   getStats(): { hits: number; misses: number; hitRate: number; size: number } {
-    const total = this.hits + this.misses
-    const hitRate = total > 0 ? this.hits / total : 0
+    const total = this.hits + this.misses;
+    const hitRate = total > 0 ? this.hits / total : 0;
 
     return {
       hits: this.hits,
       misses: this.misses,
       hitRate: Math.round(hitRate * 100) / 100,
-      size: this.cache.size
-    }
+      size: this.cache.size,
+    };
   }
 
   /**
@@ -175,7 +175,7 @@ export class CacheManager<T extends object = object> {
    * @returns True if caching is enabled
    */
   isEnabled(): boolean {
-    return this.enabled
+    return this.enabled;
   }
 
   /**
@@ -184,10 +184,10 @@ export class CacheManager<T extends object = object> {
    * @param enabled Whether to enable caching
    */
   setEnabled(enabled: boolean): void {
-    this.enabled = enabled
+    this.enabled = enabled;
 
     if (!enabled) {
-      this.clear()
+      this.clear();
     }
   }
 }

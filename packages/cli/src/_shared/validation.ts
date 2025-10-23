@@ -22,87 +22,87 @@
  * SOFTWARE.
  */
 
-import { z } from 'zod'
+import { z } from "zod";
 
 /**
  * Output format validation schema
  */
 export const outputFormatSchema = z.enum([
-  'xml',
-  'json',
-  'jsonv2',
-  'geojson',
-  'geocodejson'
-])
+  "xml",
+  "json",
+  "jsonv2",
+  "geojson",
+  "geocodejson",
+]);
 
 /**
  * Status format validation schema
  */
-export const statusFormatSchema = z.enum(['text', 'json'])
+export const statusFormatSchema = z.enum(["text", "json"]);
 
 /**
  * Latitude validation schema (-90 to 90)
  */
 export const latitudeSchema = z
   .string()
-  .regex(/^-?\d+\.?\d*$/, 'Latitude must be a valid number')
+  .regex(/^-?\d+\.?\d*$/, "Latitude must be a valid number")
   .refine(
     (val) => {
-      const num = parseFloat(val)
+      const num = parseFloat(val);
 
-      return num >= -90 && num <= 90
+      return num >= -90 && num <= 90;
     },
-    { message: 'Latitude must be between -90 and 90' }
-  )
+    { message: "Latitude must be between -90 and 90" },
+  );
 
 /**
  * Longitude validation schema (-180 to 180)
  */
 export const longitudeSchema = z
   .string()
-  .regex(/^-?\d+\.?\d*$/, 'Longitude must be a valid number')
+  .regex(/^-?\d+\.?\d*$/, "Longitude must be a valid number")
   .refine(
     (val) => {
-      const num = parseFloat(val)
+      const num = parseFloat(val);
 
-      return num >= -180 && num <= 180
+      return num >= -180 && num <= 180;
     },
-    { message: 'Longitude must be between -180 and 180' }
-  )
+    { message: "Longitude must be between -180 and 180" },
+  );
 
 /**
  * Email validation schema (basic format)
  */
 export const emailSchema = z
   .string()
-  .email('Email must be a valid email address')
-  .optional()
+  .email("Email must be a valid email address")
+  .optional();
 
 /**
  * Limit validation schema (1-40 as per Nominatim API limits)
  */
 export const limitSchema = z
   .number()
-  .int('Limit must be an integer')
-  .min(1, 'Limit must be at least 1')
-  .max(40, 'Limit cannot exceed 40 (Nominatim API limit)')
-  .optional()
+  .int("Limit must be an integer")
+  .min(1, "Limit must be at least 1")
+  .max(40, "Limit cannot exceed 40 (Nominatim API limit)")
+  .optional();
 
 /**
  * Free-form search validation schema
  */
 export const freeFormSearchSchema = z.object({
-  query: z.string().min(1, 'Query string cannot be empty'),
+  query: z.string().min(1, "Query string cannot be empty"),
   outputFormat: outputFormatSchema,
   email: emailSchema,
-  limit: limitSchema
-})
+  limit: limitSchema,
+});
 
 /**
  * Structured search validation schema
  */
 export const structuredSearchSchema = z.object({
-  country: z.string().min(1, 'Country is required'),
+  country: z.string().min(1, "Country is required"),
   outputFormat: outputFormatSchema,
   amenity: z.string().optional(),
   city: z.string().optional(),
@@ -111,8 +111,8 @@ export const structuredSearchSchema = z.object({
   limit: limitSchema,
   postalcode: z.string().optional(),
   state: z.string().optional(),
-  street: z.string().optional()
-})
+  street: z.string().optional(),
+});
 
 /**
  * Reverse geocoding validation schema
@@ -121,15 +121,15 @@ export const reverseGeocodeSchema = z.object({
   latitude: latitudeSchema,
   longitude: longitudeSchema,
   outputFormat: outputFormatSchema,
-  email: emailSchema
-})
+  email: emailSchema,
+});
 
 /**
  * Service status validation schema
  */
 export const serviceStatusSchema = z.object({
-  statusFormat: statusFormatSchema
-})
+  statusFormat: statusFormatSchema,
+});
 
 /**
  * Helper function to safely validate arguments and return errors
@@ -141,12 +141,12 @@ export const serviceStatusSchema = z.object({
  */
 export const safeValidateArgs = <T>(
   schema: z.ZodSchema<T>,
-  data: unknown
+  data: unknown,
 ): { success: true; data: T } | { success: false; error: z.ZodError } => {
-  const result = schema.safeParse(data)
+  const result = schema.safeParse(data);
 
-  return result
-}
+  return result;
+};
 
 /**
  * Handles validation errors by logging them to console and exiting the process
@@ -160,11 +160,11 @@ export const safeValidateArgs = <T>(
  * @internal
  */
 export const handleValidationError = (error: z.ZodError): never => {
-  console.error('Validation error:')
+  console.error("Validation error:");
 
   error.issues.forEach((err) => {
-    console.error(`  - ${err.path.join('.')}: ${err.message}`)
-  })
+    console.error(`  - ${err.path.join(".")}: ${err.message}`);
+  });
 
-  process.exit(1)
-}
+  process.exit(1);
+};

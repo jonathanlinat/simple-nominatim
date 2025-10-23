@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
-import type { GeocodeReverseParams } from '../../index'
+import type { GeocodeReverseParams } from "../../index";
 
 /**
  * Test GeocodeReverseParams interface
  */
 expectTypeOf<GeocodeReverseParams>().toMatchTypeOf<{
-  latitude: string
-  longitude: string
-}>()
+  latitude: string;
+  longitude: string;
+}>();

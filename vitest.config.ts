@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from "vitest/config";
 
 /**
  * Shared Vitest configuration for all packages
@@ -32,24 +32,24 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'node',
-    include: ['src/__tests__/**/*.{test,spec}.ts'],
-    exclude: ['node_modules', 'dist', '.turbo'],
+    environment: "node",
+    include: ["src/__tests__/**/*.{test,spec}.ts"],
+    exclude: ["node_modules", "dist", ".turbo"],
     typecheck: {
       enabled: true,
-      include: ['src/__tests__/**/*.test-d.ts']
+      include: ["src/__tests__/**/*.test-d.ts"],
     },
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      provider: "v8",
+      reporter: ["text", "json", "html"],
       exclude: [
-        'node_modules/',
-        'dist/',
-        '**/*.test.ts',
-        '**/*.test-d.ts',
-        '**/__tests__/',
-        '**/types.ts'
-      ]
-    }
-  }
-})
+        "node_modules/",
+        "dist/",
+        "**/*.test.ts",
+        "**/*.test-d.ts",
+        "**/__tests__/",
+        "**/types.ts",
+      ],
+    },
+  },
+});

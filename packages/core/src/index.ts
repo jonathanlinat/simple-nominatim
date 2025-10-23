@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-export type { CacheConfig } from './_shared/cacheManager'
-export type { RateLimitConfig } from './_shared/rateLimiter'
+export type { CacheConfig } from "./_shared/cacheManager";
+export type { RateLimitConfig } from "./_shared/rateLimiter";
 
 export type {
   OutputFormat,
@@ -31,23 +31,23 @@ export type {
   SearchOptions,
   ReverseOptions,
   DataFetcherOptions,
-  RetryConfig
-} from './_shared/_shared.types'
+  RetryConfig,
+} from "./_shared/_shared.types";
 
 export {
   DEFAULT_CACHE_CONFIG,
   DEFAULT_RATE_LIMIT_CONFIG,
-  DEFAULT_RETRY_CONFIG
-} from './_shared/constants'
+  DEFAULT_RETRY_CONFIG,
+} from "./_shared/constants";
 
-export { geocodeReverse } from './reverse/geocode'
-export type { GeocodeReverseParams } from './reverse/reverse.types'
+export { geocodeReverse } from "./reverse/geocode";
+export type { GeocodeReverseParams } from "./reverse/reverse.types";
 
-export { freeFormSearch } from './search/free-form'
-export type { FreeFormSearchParams } from './search/search.types'
+export { freeFormSearch } from "./search/free-form";
+export type { FreeFormSearchParams } from "./search/search.types";
 
-export { structuredSearch } from './search/structured'
-export type { StructuredSearchParams } from './search/search.types'
+export { structuredSearch } from "./search/structured";
+export type { StructuredSearchParams } from "./search/search.types";
 
-export { serviceStatus } from './status/service'
-export type { StatusOptions, StatusFormat } from './status/status.types'
+export { serviceStatus } from "./status/service";
+export type { StatusOptions, StatusFormat } from "./status/status.types";

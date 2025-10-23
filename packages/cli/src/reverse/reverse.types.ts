@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import type { OutputFormat } from '@simple-nominatim/core'
+import type { OutputFormat } from "@simple-nominatim/core";
 
 /**
  * CLI arguments for reverse geocoding command
@@ -31,53 +31,53 @@ export interface GeocodeReverseArgv {
   /**
    * Email address for identification
    */
-  email?: string
+  email?: string;
   /**
    * Output format
    */
-  format: OutputFormat
+  format: OutputFormat;
   /**
    * Latitude coordinate
    */
-  latitude: string
+  latitude: string;
   /**
    * Longitude coordinate
    */
-  longitude: string
+  longitude: string;
   /**
    * Disable caching
    */
-  noCache?: boolean
+  noCache?: boolean;
   /**
    * Cache TTL in milliseconds
    */
-  cacheTtl?: number
+  cacheTtl?: number;
   /**
    * Cache max size
    */
-  cacheMaxSize?: number
+  cacheMaxSize?: number;
   /**
    * Disable rate limiting
    */
-  noRateLimit?: boolean
+  noRateLimit?: boolean;
   /**
    * Rate limit requests per interval
    */
-  rateLimit?: number
+  rateLimit?: number;
   /**
    * Rate limit interval in milliseconds
    */
-  rateLimitInterval?: number
+  rateLimitInterval?: number;
   /**
    * Disable retry logic
    */
-  noRetry?: boolean
+  noRetry?: boolean;
   /**
    * Retry max attempts
    */
-  retryMaxAttempts?: number
+  retryMaxAttempts?: number;
   /**
    * Retry initial delay in milliseconds
    */
-  retryInitialDelay?: number
+  retryInitialDelay?: number;
 }

@@ -22,295 +22,300 @@
  * SOFTWARE.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { serviceStatus } from '../../status/service'
+import { serviceStatus } from "../../status/service";
 
-describe('serviceStatus', () => {
+describe("serviceStatus", () => {
   const mockResponse = {
     status: 0,
-    message: 'OK',
-    data_updated: '2025-10-23T10:00:00+00:00',
-    software_version: '4.4.0'
-  }
+    message: "OK",
+    data_updated: "2025-10-23T10:00:00+00:00",
+    software_version: "4.4.0",
+  };
 
   beforeEach(() => {
-    vi.restoreAllMocks()
-    vi.clearAllMocks()
+    vi.restoreAllMocks();
+    vi.clearAllMocks();
     // @ts-expect-error - Overriding global fetch for testing
-    global.fetch = undefined
-  })
+    global.fetch = undefined;
+  });
 
-  describe('basic functionality', () => {
-    it('should check service status', async () => {
+  describe("basic functionality", () => {
+    it("should check service status", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
-      const result = await serviceStatus({ format: 'json' })
+      const result = await serviceStatus({ format: "json" });
 
-      expect(result).toEqual(mockResponse)
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
-    it('should construct URL for status endpoint', async () => {
+    it("should construct URL for status endpoint", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
-      await serviceStatus({ format: 'json' })
+      await serviceStatus({ format: "json" });
 
-      const callArgs = vi.mocked(global.fetch).mock.calls[0]
-      expect(callArgs).toBeDefined()
-      const url = callArgs![0] as string
-      expect(url).toContain('status?')
-    })
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      const url = callArgs![0] as string;
+      expect(url).toContain("status?");
+    });
 
-    it('should return status object', async () => {
+    it("should return status object", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
-      const result = await serviceStatus({ format: 'json' })
+      const result = await serviceStatus({ format: "json" });
 
-      expect(result).toHaveProperty('status')
-      expect(result).toHaveProperty('message')
-    })
-  })
+      expect(result).toHaveProperty("status");
+      expect(result).toHaveProperty("message");
+    });
+  });
 
-  describe('format options', () => {
-    it('should work with JSON format', async () => {
+  describe("format options", () => {
+    it("should work with JSON format", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
-      const result = await serviceStatus({ format: 'json' })
+      const result = await serviceStatus({ format: "json" });
 
-      expect(result).toEqual(mockResponse)
-    })
+      expect(result).toEqual(mockResponse);
+    });
 
-    it('should work with text format', async () => {
-      const textResponse = 'OK'
+    it("should work with text format", async () => {
+      const textResponse = "OK";
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        text: async () => textResponse
-      })
+        text: async () => textResponse,
+      });
 
-      const result = await serviceStatus({ format: 'text' })
+      const result = await serviceStatus({ format: "text" });
 
-      expect(result).toBe(textResponse)
-    })
-  })
+      expect(result).toBe(textResponse);
+    });
+  });
 
-  describe('cache options', () => {
-    it('should work with cache disabled', async () => {
+  describe("cache options", () => {
+    it("should work with cache disabled", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await serviceStatus({
-        format: 'json',
-        cache: { enabled: false }
-      })
+        format: "json",
+        cache: { enabled: false },
+      });
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
-    it('should work with custom cache settings', async () => {
+    it("should work with custom cache settings", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await serviceStatus({
-        format: 'json',
-        cache: { enabled: true, maxSize: 50, ttl: 10000 }
-      })
+        format: "json",
+        cache: { enabled: true, maxSize: 50, ttl: 10000 },
+      });
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
-  })
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
 
-  describe('rate limit options', () => {
-    it('should work with rate limiting disabled', async () => {
+  describe("rate limit options", () => {
+    it("should work with rate limiting disabled", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await serviceStatus({
-        format: 'json',
-        rateLimit: { enabled: false }
-      })
+        format: "json",
+        rateLimit: { enabled: false },
+      });
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
-    it('should work with custom rate limit settings', async () => {
+    it("should work with custom rate limit settings", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await serviceStatus({
-        format: 'json',
-        rateLimit: { enabled: true, limit: 5 }
-      })
+        format: "json",
+        rateLimit: { enabled: true, limit: 5 },
+      });
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
-  })
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
 
-  describe('retry options', () => {
-    it('should work with retry disabled', async () => {
+  describe("retry options", () => {
+    it("should work with retry disabled", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       await serviceStatus({
-        format: 'json',
-        retry: { enabled: false }
-      })
+        format: "json",
+        retry: { enabled: false },
+      });
 
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
-    it('should retry on failure', async () => {
-      let callCount = 0
+    it("should retry on failure", async () => {
+      let callCount = 0;
       global.fetch = vi.fn().mockImplementation(async () => {
-        callCount++
+        callCount++;
         if (callCount === 1) {
-          throw new Error('Network error')
+          throw new Error("Network error");
         }
 
-        return { ok: true, json: async () => mockResponse }
-      })
+        return { ok: true, json: async () => mockResponse };
+      });
 
       const result = await serviceStatus({
-        format: 'json',
-        retry: { enabled: true, maxAttempts: 2, initialDelay: 10, useJitter: false },
-        rateLimit: { enabled: false }
-      })
+        format: "json",
+        retry: {
+          enabled: true,
+          maxAttempts: 2,
+          initialDelay: 10,
+          useJitter: false,
+        },
+        rateLimit: { enabled: false },
+      });
 
-      expect(result).toEqual(mockResponse)
-      expect(global.fetch).toHaveBeenCalledTimes(2)
-    })
-  })
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+    });
+  });
 
-  describe('error handling', () => {
-    it('should throw on HTTP error', async () => {
+  describe("error handling", () => {
+    it("should throw on HTTP error", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 500,
-        statusText: 'Internal Server Error'
-      })
+        statusText: "Internal Server Error",
+      });
 
       await expect(
         serviceStatus({
-          format: 'json',
-          retry: { enabled: false }
-        })
-      ).rejects.toThrow('HTTP error')
-    })
+          format: "json",
+          retry: { enabled: false },
+        }),
+      ).rejects.toThrow("HTTP error");
+    });
 
-    it('should throw on network error', async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error('Network failure'))
+    it("should throw on network error", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network failure"));
 
       await expect(
         serviceStatus({
-          format: 'json',
-          retry: { enabled: false }
-        })
-      ).rejects.toThrow('Network failure')
-    })
-  })
+          format: "json",
+          retry: { enabled: false },
+        }),
+      ).rejects.toThrow("Network failure");
+    });
+  });
 
-  describe('response variations', () => {
-    it('should handle OK status', async () => {
+  describe("response variations", () => {
+    it("should handle OK status", async () => {
       const okResponse = {
         status: 0,
-        message: 'OK'
-      }
+        message: "OK",
+      };
 
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => okResponse
-      })
+        json: async () => okResponse,
+      });
 
-      const result = await serviceStatus({ format: 'json' })
+      const result = await serviceStatus({ format: "json" });
 
-      expect(result).toEqual(okResponse)
-    })
+      expect(result).toEqual(okResponse);
+    });
 
-    it('should handle status with data timestamp', async () => {
+    it("should handle status with data timestamp", async () => {
       const timestampResponse = {
         status: 0,
-        message: 'OK',
-        data_updated: '2025-10-23T10:00:00+00:00'
-      }
+        message: "OK",
+        data_updated: "2025-10-23T10:00:00+00:00",
+      };
 
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => timestampResponse
-      })
+        json: async () => timestampResponse,
+      });
 
-      const result = await serviceStatus({ format: 'json' })
+      const result = await serviceStatus({ format: "json" });
 
-      expect(result).toEqual(timestampResponse)
-    })
+      expect(result).toEqual(timestampResponse);
+    });
 
-    it('should handle status with version info', async () => {
+    it("should handle status with version info", async () => {
       const versionResponse = {
         status: 0,
-        message: 'OK',
-        software_version: '4.4.0',
-        database_version: '4.4.0'
-      }
+        message: "OK",
+        software_version: "4.4.0",
+        database_version: "4.4.0",
+      };
 
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => versionResponse
-      })
+        json: async () => versionResponse,
+      });
 
-      const result = await serviceStatus({ format: 'json' })
+      const result = await serviceStatus({ format: "json" });
 
-      expect(result).toEqual(versionResponse)
-    })
-  })
+      expect(result).toEqual(versionResponse);
+    });
+  });
 
-  describe('integration', () => {
-    it('should work with all options combined', async () => {
+  describe("integration", () => {
+    it("should work with all options combined", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
       const result = await serviceStatus({
-        format: 'json',
+        format: "json",
         cache: { enabled: true },
         rateLimit: { enabled: true },
-        retry: { enabled: true }
-      })
+        retry: { enabled: true },
+      });
 
-      expect(result).toEqual(mockResponse)
-      expect(global.fetch).toHaveBeenCalledTimes(1)
-    })
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
-    it('should work with minimal options', async () => {
+    it("should work with minimal options", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => mockResponse
-      })
+        json: async () => mockResponse,
+      });
 
-      const result = await serviceStatus({ format: 'json' })
+      const result = await serviceStatus({ format: "json" });
 
-      expect(result).toEqual(mockResponse)
-    })
-  })
-})
+      expect(result).toEqual(mockResponse);
+    });
+  });
+});

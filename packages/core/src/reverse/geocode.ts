@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-import { dataFetcher } from '../_shared/dataFetcher'
+import { dataFetcher } from "../_shared/dataFetcher";
 
-import type { GeocodeReverseParams } from './reverse.types'
-import type { ReverseOptions } from '../_shared/_shared.types'
+import type { GeocodeReverseParams } from "./reverse.types";
+import type { ReverseOptions } from "../_shared/_shared.types";
 
 /**
  * Performs reverse geocoding using the Nominatim API
@@ -45,37 +45,37 @@ import type { ReverseOptions } from '../_shared/_shared.types'
  */
 export const geocodeReverse = async <T = unknown>(
   params: GeocodeReverseParams,
-  options: ReverseOptions
+  options: ReverseOptions,
 ): Promise<T> => {
-  const endpoint = 'reverse'
-  const urlSearchParams = new URLSearchParams()
+  const endpoint = "reverse";
+  const urlSearchParams = new URLSearchParams();
 
-  const { latitude: lat, longitude: lon } = params
-  const parsedParams = { lat, lon }
+  const { latitude: lat, longitude: lon } = params;
+  const parsedParams = { lat, lon };
 
   Object.keys(parsedParams).forEach((key) => {
-    const value = parsedParams[key as keyof typeof parsedParams]
+    const value = parsedParams[key as keyof typeof parsedParams];
 
     if (value) {
-      urlSearchParams.append(key, value)
+      urlSearchParams.append(key, value);
     }
-  })
+  });
 
-  const { cache, rateLimit, retry, ...apiOptions } = options
+  const { cache, rateLimit, retry, ...apiOptions } = options;
 
   Object.keys(apiOptions).forEach((key) => {
-    const value = apiOptions[key as keyof typeof apiOptions]
+    const value = apiOptions[key as keyof typeof apiOptions];
 
     if (value !== undefined) {
-      urlSearchParams.append(key, String(value))
+      urlSearchParams.append(key, String(value));
     }
-  })
+  });
 
   const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
     cache,
     rateLimit,
-    retry
-  })
+    retry,
+  });
 
-  return fetchedData
-}
+  return fetchedData;
+};
