@@ -1,5 +1,22 @@
 # @simple-nominatim/cli
 
+## 0.3.0
+
+### Minor Changes
+
+- Cache, rate limiting, and retry logic are now enabled by default with sensible defaults following Nominatim's official recommendations. ([#15](https://github.com/jonathanlinat/simple-nominatim/pull/15))
+
+### Patch Changes
+
+- Applied comprehensive ESLint rules enforcement and code quality improvements. ([#15](https://github.com/jonathanlinat/simple-nominatim/pull/15))
+
+- Migrated build system from unbuild to tsdown for faster builds. ([#15](https://github.com/jonathanlinat/simple-nominatim/pull/15))
+
+- Added comprehensive unit tests with Vitest for full code coverage. ([#15](https://github.com/jonathanlinat/simple-nominatim/pull/15))
+
+- Updated dependencies [[`81dadd1`](https://github.com/jonathanlinat/simple-nominatim/commit/81dadd1556f348bd61fda511944bbab18904e2c0), [`81dadd1`](https://github.com/jonathanlinat/simple-nominatim/commit/81dadd1556f348bd61fda511944bbab18904e2c0), [`08dcced`](https://github.com/jonathanlinat/simple-nominatim/commit/08dcced2f41ddb82288ea39d193c99fb12af3a32), [`92fb8e1`](https://github.com/jonathanlinat/simple-nominatim/commit/92fb8e126abeb409220817132ecee32c3dd3cf29)]:
+  - @simple-nominatim/core@1.0.0
+
 ## 0.2.0
 
 ### Minor Changes

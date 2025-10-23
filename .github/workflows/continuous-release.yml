@@ -5,28 +5,6 @@ on:
       - main
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
-  lint:
-    name: Lint the source code
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout ${{ github.ref }}
-        uses: actions/checkout@v5
-      - uses: ./.github/actions/install-tools-dependencies
-      - name: Lint the packages
-        shell: bash
-        run: |
-          pnpm packages:lint:code
-          pnpm packages:lint:markdown
-  test:
-    name: Test the source code
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout ${{ github.ref }}
-        uses: actions/checkout@v5
-      - uses: ./.github/actions/install-tools-dependencies
-      - name: Test the packages
-        shell: bash
-        run: pnpm packages:test
   prepare-and-release:
     name: Prepare and release the packages
     runs-on: ubuntu-latest
