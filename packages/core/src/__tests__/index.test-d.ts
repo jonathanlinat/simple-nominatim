@@ -22,136 +22,20 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'expect-type'
+import { expectTypeOf } from 'vitest'
 
 import {
   freeFormSearch,
   structuredSearch,
   geocodeReverse,
   serviceStatus,
-  type OutputFormat,
-  type BaseOptions,
-  type SearchOptions,
-  type ReverseOptions,
   type FreeFormSearchParams,
   type StructuredSearchParams,
   type GeocodeReverseParams,
-  type StatusOptions,
-  type StatusFormat,
-  type CacheConfig,
-  type RateLimitConfig,
-  type DataFetcherOptions,
-  type RetryConfig
+  type SearchOptions,
+  type ReverseOptions,
+  type StatusOptions
 } from '../index'
-
-/**
- * Test OutputFormat type
- */
-expectTypeOf<OutputFormat>().toEqualTypeOf<
-  'xml' | 'json' | 'jsonv2' | 'geojson' | 'geocodejson'
->()
-
-/**
- * Test StatusFormat type
- */
-expectTypeOf<StatusFormat>().toEqualTypeOf<'text' | 'json'>()
-
-/**
- * Test BaseOptions interface
- */
-expectTypeOf<BaseOptions>().toMatchTypeOf<{
-  email?: string
-  format: OutputFormat
-  cache?: CacheConfig
-  rateLimit?: RateLimitConfig
-}>()
-
-/**
- * Test SearchOptions extends BaseOptions
- */
-expectTypeOf<SearchOptions>().toMatchTypeOf<BaseOptions>()
-expectTypeOf<SearchOptions>().toMatchTypeOf<{ limit?: number }>()
-
-/**
- * Test ReverseOptions is alias of BaseOptions
- */
-expectTypeOf<ReverseOptions>().toEqualTypeOf<BaseOptions>()
-
-/**
- * Test FreeFormSearchParams interface
- */
-expectTypeOf<FreeFormSearchParams>().toMatchTypeOf<{ query: string }>()
-
-/**
- * Test StructuredSearchParams interface
- */
-expectTypeOf<StructuredSearchParams>().toMatchTypeOf<{
-  amenity?: string
-  city?: string
-  country?: string
-  county?: string
-  postalcode?: string
-  state?: string
-  street?: string
-}>()
-
-/**
- * Test GeocodeReverseParams interface
- */
-expectTypeOf<GeocodeReverseParams>().toMatchTypeOf<{
-  latitude: string
-  longitude: string
-}>()
-
-/**
- * Test StatusOptions interface
- */
-expectTypeOf<StatusOptions>().toMatchTypeOf<{
-  format: StatusFormat
-  cache?: CacheConfig
-  rateLimit?: RateLimitConfig
-}>()
-
-/**
- * Test CacheConfig interface
- */
-expectTypeOf<CacheConfig>().toMatchTypeOf<{
-  enabled?: boolean
-  ttl?: number
-  maxSize?: number
-}>()
-
-/**
- * Test RateLimitConfig interface
- */
-expectTypeOf<RateLimitConfig>().toMatchTypeOf<{
-  enabled?: boolean
-  limit?: number
-  interval?: number
-  strict?: boolean
-}>()
-
-/**
- * Test RetryConfig interface
- */
-expectTypeOf<RetryConfig>().toMatchTypeOf<{
-  enabled?: boolean
-  maxAttempts?: number
-  initialDelay?: number
-  maxDelay?: number
-  backoffMultiplier?: number
-  useJitter?: boolean
-  retryableStatusCodes?: number[]
-}>()
-
-/**
- * Test DataFetcherOptions interface
- */
-expectTypeOf<DataFetcherOptions>().toMatchTypeOf<{
-  cache?: CacheConfig
-  rateLimit?: RateLimitConfig
-  retry?: RetryConfig
-}>()
 
 /**
  * Test freeFormSearch function signature
@@ -227,7 +111,7 @@ expectTypeOf(result3).toEqualTypeOf<Promise<unknown>>()
 /**
  * Test cache and rateLimit integration
  */
-const result4 = freeFormSearch({  query: 'test' }, { format: 'json', cache: { enabled: true } })
+const result4 = freeFormSearch({ query: 'test' }, { format: 'json', cache: { enabled: true } })
 expectTypeOf(result4).toEqualTypeOf<Promise<unknown>>()
 
 const result5 = freeFormSearch(

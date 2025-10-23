@@ -14,10 +14,10 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   prettier,
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/.turbo/**']
+    ignores: ['**/node_modules/**', '**/dist/**', '**/.turbo/**', '**/coverage/**']
   },
   {
-    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
+    files: ['**/*.ts'],
     plugins: {
       import: importPlugin,
       promise: promisePlugin,
@@ -119,12 +119,7 @@ export default tseslint.config(
   {
     files: ['**/*.ts'],
     rules: {
-      'import/no-default-export': 'off'
-    }
-  },
-  {
-    files: ['**/*.ts'],
-    rules: {
+      'import/no-default-export': 'off',
       'jsdoc/require-jsdoc': [
         'error',
         {
@@ -261,6 +256,13 @@ export default tseslint.config(
           order: { type: 'asc' }
         }
       ]
+    }
+  },
+  {
+    files: ['**/__tests__/**/*.ts'],
+    rules: {
+      'max-nested-callbacks': ['warn', 5],
+      'jsdoc/require-jsdoc': 'off'
     }
   }
 )

@@ -21,12 +21,12 @@
   "license": "MIT",
   "author": "Jonathan Linat (https://github.com/jonathanlinat)",
   "type": "module",
-  "main": "./dist/index.mjs",
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.js"
     }
   },
   "files": [
@@ -35,7 +35,10 @@
   "scripts": {
     "build": "tsdown",
     "prepare": "pnpm build",
-    "test:types": "tsc --noEmit --project tsconfig.test.json"
+    "test": "vitest run --typecheck",
+    "test:coverage": "vitest run --typecheck --coverage",
+    "test:ui": "vitest --typecheck --ui",
+    "test:watch": "vitest --typecheck"
   },
   "publishConfig": {
     "access": "public"

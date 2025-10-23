@@ -17,6 +17,16 @@ jobs:
         run: |
           pnpm packages:lint:code
           pnpm packages:lint:markdown
+  test:
+    name: Test the source code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.ref }}
+        uses: actions/checkout@v5
+      - uses: ./.github/actions/install-tools-dependencies
+      - name: Test the packages
+        shell: bash
+        run: pnpm packages:test
   prepare-and-release:
     name: Prepare and release the packages
     runs-on: ubuntu-latest

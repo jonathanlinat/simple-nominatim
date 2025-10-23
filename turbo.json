@@ -4,8 +4,12 @@
     "build": {
       "dependsOn": ["^build"]
     },
-    "test:types": {
+    "test": {
       "cache": false
+    },
+    "test:coverage": {
+      "cache": false,
+      "outputs": ["coverage/**"]
     }
   }
 }

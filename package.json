@@ -20,7 +20,8 @@
     "packages:build": "turbo run build",
     "packages:lint:code": "eslint --fix",
     "packages:lint:markdown": "markdownlint-cli2 --fix 'packages/**/*.md' '#packages/**/node_modules/**/*.md'",
-    "packages:test:types": "turbo run test:types",
+    "packages:test": "turbo run test",
+    "packages:test:coverage": "turbo run test:coverage",
     "postinstall": "pnpm simple-git-hooks"
   },
   "devDependencies": {
@@ -31,6 +32,8 @@
     "@eslint/js": "^9.38.0",
     "@svitejs/changesets-changelog-github-compact": "^1.2.0",
     "@types/node": "^24.9.1",
+    "@vitest/coverage-v8": "^4.0.1",
+    "@vitest/ui": "^4.0.1",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-eslint-comments": "^3.2.0",
@@ -40,7 +43,6 @@
     "eslint-plugin-n": "^17.23.1",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-promise": "^7.2.1",
-    "expect-type": "^1.2.2",
     "jiti": "^2.6.1",
     "lint-staged": "^16.2.6",
     "markdownlint-cli2": "^0.18.1",
@@ -49,7 +51,8 @@
     "tsdown": "^0.15.9",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.2"
+    "typescript-eslint": "^8.46.2",
+    "vitest": "^4.0.1"
   },
   "engines": {
     "bun": "please-use-pnpm",
