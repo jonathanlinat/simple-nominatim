@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-import { dataFetcher } from '../_shared/dataFetcher'
+import { dataFetcher } from "../_shared/dataFetcher";
 
-import type { StatusOptions } from './status.types'
+import type { StatusOptions } from "./status.types";
 
 /**
  * Checks the status of the Nominatim API service
@@ -42,26 +42,26 @@ import type { StatusOptions } from './status.types'
  * @see {@link https://nominatim.org/release-docs/develop/api/Status/ | Nominatim Status API Documentation}
  */
 export const serviceStatus = async <T = unknown>(
-  options: StatusOptions
+  options: StatusOptions,
 ): Promise<T> => {
-  const endpoint = 'status'
-  const urlSearchParams = new URLSearchParams()
+  const endpoint = "status";
+  const urlSearchParams = new URLSearchParams();
 
-  const { cache, rateLimit, retry, ...apiOptions } = options
+  const { cache, rateLimit, retry, ...apiOptions } = options;
 
   Object.keys(apiOptions).forEach((key) => {
-    const value = apiOptions[key as keyof typeof apiOptions]
+    const value = apiOptions[key as keyof typeof apiOptions];
 
     if (value !== undefined) {
-      urlSearchParams.append(key, String(value))
+      urlSearchParams.append(key, String(value));
     }
-  })
+  });
 
   const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
     cache,
     rateLimit,
-    retry
-  })
+    retry,
+  });
 
-  return fetchedData
-}
+  return fetchedData;
+};

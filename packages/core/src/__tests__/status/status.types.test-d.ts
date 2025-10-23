@@ -22,20 +22,25 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
-import type { StatusOptions, StatusFormat, CacheConfig, RateLimitConfig } from '../../index'
+import type {
+  StatusOptions,
+  StatusFormat,
+  CacheConfig,
+  RateLimitConfig,
+} from "../../index";
 
 /**
  * Test StatusFormat type
  */
-expectTypeOf<StatusFormat>().toEqualTypeOf<'text' | 'json'>()
+expectTypeOf<StatusFormat>().toEqualTypeOf<"text" | "json">();
 
 /**
  * Test StatusOptions interface
  */
 expectTypeOf<StatusOptions>().toMatchTypeOf<{
-  format: StatusFormat
-  cache?: CacheConfig
-  rateLimit?: RateLimitConfig
-}>()
+  format: StatusFormat;
+  cache?: CacheConfig;
+  rateLimit?: RateLimitConfig;
+}>();

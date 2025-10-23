@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-import type { RetryConfig } from './_shared.types'
-import type { CacheConfig } from './cacheManager'
-import type { RateLimitConfig } from './rateLimiter'
+import type { RetryConfig } from "./_shared.types";
+import type { CacheConfig } from "./cacheManager";
+import type { RateLimitConfig } from "./rateLimiter";
 
 /**
  * Base URL for the Nominatim API
@@ -32,7 +32,7 @@ import type { RateLimitConfig } from './rateLimiter'
  * @constant
  * @default 'https://nominatim.openstreetmap.org'
  */
-export const FETCHER_BASE_URL: string = 'https://nominatim.openstreetmap.org'
+export const FETCHER_BASE_URL: string = "https://nominatim.openstreetmap.org";
 
 /**
  * User-Agent string sent with all API requests
@@ -40,7 +40,7 @@ export const FETCHER_BASE_URL: string = 'https://nominatim.openstreetmap.org'
  * @constant
  * @default '@simple-nominatim/core'
  */
-export const FETCHER_USER_AGENT: string = '@simple-nominatim/core'
+export const FETCHER_USER_AGENT: string = "@simple-nominatim/core";
 
 /**
  * Default cache configuration
@@ -55,8 +55,8 @@ export const FETCHER_USER_AGENT: string = '@simple-nominatim/core'
 export const DEFAULT_CACHE_CONFIG: Required<CacheConfig> = {
   enabled: true,
   ttl: 300000,
-  maxSize: 500
-}
+  maxSize: 500,
+};
 
 /**
  * Default rate limiter configuration
@@ -74,8 +74,8 @@ export const DEFAULT_RATE_LIMIT_CONFIG: Required<RateLimitConfig> = {
   enabled: true,
   limit: 1,
   interval: 1000,
-  strict: true
-}
+  strict: true,
+};
 
 /**
  * Default retry configuration
@@ -98,5 +98,5 @@ export const DEFAULT_RETRY_CONFIG: Required<RetryConfig> = {
   maxDelay: 10000,
   backoffMultiplier: 2,
   useJitter: true,
-  retryableStatusCodes: [408, 429, 500, 502, 503, 504]
-}
+  retryableStatusCodes: [408, 429, 500, 502, 503, 504],
+};

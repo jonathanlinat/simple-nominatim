@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from "vitest";
 
 /**
  * Placeholder test for CLI package
  */
-describe('CLI Package', () => {
-  it('should be defined', () => {
-    expect(true).toBe(true)
-  })
-})
+describe("CLI Package", () => {
+  it("should be defined", () => {
+    expect(true).toBe(true);
+  });
+});

@@ -21,6 +21,7 @@
   "license": "MIT",
   "author": "Jonathan Linat (https://github.com/jonathanlinat)",
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -34,11 +35,13 @@
   ],
   "scripts": {
     "build": "tsdown",
+    "clean": "rm -rf dist",
     "prepare": "pnpm build",
     "test": "vitest run --typecheck",
     "test:coverage": "vitest run --typecheck --coverage",
     "test:ui": "vitest --typecheck --ui",
-    "test:watch": "vitest --typecheck"
+    "test:watch": "vitest --typecheck",
+    "typecheck": "tsc --noEmit"
   },
   "publishConfig": {
     "access": "public"
@@ -50,5 +53,8 @@
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
     "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.17.1"
   }
 }

@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
-import type { CacheConfig } from '../../index'
+import type { CacheConfig } from "../../index";
 
 /**
  * Test CacheConfig interface
  */
 expectTypeOf<CacheConfig>().toMatchTypeOf<{
-  enabled?: boolean
-  ttl?: number
-  maxSize?: number
-}>()
+  enabled?: boolean;
+  ttl?: number;
+  maxSize?: number;
+}>();

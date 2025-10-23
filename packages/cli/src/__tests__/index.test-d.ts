@@ -22,32 +22,38 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
-import { geocodeReverseWrapper } from '../reverse/geocode'
-import { freeFormSearchWrapper } from '../search/free-form'
-import { structuredSearchWrapper } from '../search/structured'
-import { serviceStatusWrapper } from '../status/service'
+import { geocodeReverseWrapper } from "../reverse/geocode";
+import { freeFormSearchWrapper } from "../search/free-form";
+import { structuredSearchWrapper } from "../search/structured";
+import { serviceStatusWrapper } from "../status/service";
 
-import type { GeocodeReverseArgv } from '../reverse/reverse.types'
-import type { FreeFormArgv, StructuredArgv } from '../search/search.types'
-import type { ServiceStatusArgv } from '../status/status.types'
+import type { GeocodeReverseArgv } from "../reverse/reverse.types";
+import type { FreeFormArgv, StructuredArgv } from "../search/search.types";
+import type { ServiceStatusArgv } from "../status/status.types";
 
 /**
  * Test wrapper functions signatures
  */
-expectTypeOf(geocodeReverseWrapper).toBeFunction()
-expectTypeOf(geocodeReverseWrapper).parameter(0).toMatchTypeOf<GeocodeReverseArgv>()
-expectTypeOf(geocodeReverseWrapper).returns.resolves.toBeVoid()
+expectTypeOf(geocodeReverseWrapper).toBeFunction();
+expectTypeOf(geocodeReverseWrapper)
+  .parameter(0)
+  .toMatchTypeOf<GeocodeReverseArgv>();
+expectTypeOf(geocodeReverseWrapper).returns.resolves.toBeVoid();
 
-expectTypeOf(freeFormSearchWrapper).toBeFunction()
-expectTypeOf(freeFormSearchWrapper).parameter(0).toMatchTypeOf<FreeFormArgv>()
-expectTypeOf(freeFormSearchWrapper).returns.resolves.toBeVoid()
+expectTypeOf(freeFormSearchWrapper).toBeFunction();
+expectTypeOf(freeFormSearchWrapper).parameter(0).toMatchTypeOf<FreeFormArgv>();
+expectTypeOf(freeFormSearchWrapper).returns.resolves.toBeVoid();
 
-expectTypeOf(structuredSearchWrapper).toBeFunction()
-expectTypeOf(structuredSearchWrapper).parameter(0).toMatchTypeOf<StructuredArgv>()
-expectTypeOf(structuredSearchWrapper).returns.resolves.toBeVoid()
+expectTypeOf(structuredSearchWrapper).toBeFunction();
+expectTypeOf(structuredSearchWrapper)
+  .parameter(0)
+  .toMatchTypeOf<StructuredArgv>();
+expectTypeOf(structuredSearchWrapper).returns.resolves.toBeVoid();
 
-expectTypeOf(serviceStatusWrapper).toBeFunction()
-expectTypeOf(serviceStatusWrapper).parameter(0).toMatchTypeOf<ServiceStatusArgv>()
-expectTypeOf(serviceStatusWrapper).returns.resolves.toBeVoid()
+expectTypeOf(serviceStatusWrapper).toBeFunction();
+expectTypeOf(serviceStatusWrapper)
+  .parameter(0)
+  .toMatchTypeOf<ServiceStatusArgv>();
+expectTypeOf(serviceStatusWrapper).returns.resolves.toBeVoid();

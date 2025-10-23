@@ -22,21 +22,21 @@
  * SOFTWARE.
  */
 
-import { structuredSearch } from '@simple-nominatim/core'
+import { structuredSearch } from "@simple-nominatim/core";
 import type {
   StructuredSearchParams,
   SearchOptions,
-  RetryConfig
-} from '@simple-nominatim/core'
+  RetryConfig,
+} from "@simple-nominatim/core";
 
-import { responseParser } from '../_shared/responseParser'
+import { responseParser } from "../_shared/responseParser";
 import {
   safeValidateArgs,
   structuredSearchSchema,
-  handleValidationError
-} from '../_shared/validation'
+  handleValidationError,
+} from "../_shared/validation";
 
-import type { StructuredArgv } from './search.types'
+import type { StructuredArgv } from "./search.types";
 
 /**
  * CLI wrapper for structured search functionality
@@ -73,7 +73,7 @@ import type { StructuredArgv } from './search.types'
  * @internal
  */
 export const structuredSearchWrapper = (
-  argv: StructuredArgv
+  argv: StructuredArgv,
 ): Promise<void> => {
   const {
     amenity,
@@ -94,8 +94,8 @@ export const structuredSearchWrapper = (
     rateLimitInterval,
     noRetry,
     retryMaxAttempts,
-    retryInitialDelay
-  } = argv
+    retryInitialDelay,
+  } = argv;
 
   const validationResult = safeValidateArgs(structuredSearchSchema, {
     country,
@@ -107,11 +107,11 @@ export const structuredSearchWrapper = (
     limit,
     postalcode,
     state,
-    street
-  })
+    street,
+  });
 
   if (!validationResult.success) {
-    handleValidationError(validationResult.error)
+    handleValidationError(validationResult.error);
   }
 
   const params: StructuredSearchParams = {
@@ -121,36 +121,50 @@ export const structuredSearchWrapper = (
     county,
     postalcode,
     state,
-    street
-  }
-  const options: SearchOptions = { email, format, limit }
+    street,
+  };
+  const options: SearchOptions = { email, format, limit };
 
-  if (noCache !== undefined || cacheTtl !== undefined || cacheMaxSize !== undefined) {
+  if (
+    noCache !== undefined ||
+    cacheTtl !== undefined ||
+    cacheMaxSize !== undefined
+  ) {
     options.cache = {
       ...(noCache && { enabled: false }),
       ...(cacheTtl !== undefined && { ttl: cacheTtl }),
-      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize })
-    }
+      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize }),
+    };
   }
 
-  if (noRateLimit !== undefined || rateLimit !== undefined || rateLimitInterval !== undefined) {
+  if (
+    noRateLimit !== undefined ||
+    rateLimit !== undefined ||
+    rateLimitInterval !== undefined
+  ) {
     options.rateLimit = {
       ...(noRateLimit && { enabled: false }),
       ...(rateLimit !== undefined && { limit: rateLimit }),
-      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval })
-    }
+      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval }),
+    };
   }
 
-  if (noRetry !== undefined || retryMaxAttempts !== undefined || retryInitialDelay !== undefined) {
+  if (
+    noRetry !== undefined ||
+    retryMaxAttempts !== undefined ||
+    retryInitialDelay !== undefined
+  ) {
     options.retry = {
       ...(noRetry && { enabled: false }),
       ...(retryMaxAttempts !== undefined && { maxAttempts: retryMaxAttempts }),
-      ...(retryInitialDelay !== undefined && { initialDelay: retryInitialDelay })
-    } as RetryConfig
+      ...(retryInitialDelay !== undefined && {
+        initialDelay: retryInitialDelay,
+      }),
+    } as RetryConfig;
   }
 
-  const response = structuredSearch(params, options)
-  const handledResponse = responseParser(response)
+  const response = structuredSearch(params, options);
+  const handledResponse = responseParser(response);
 
-  return handledResponse
-}
+  return handledResponse;
+};

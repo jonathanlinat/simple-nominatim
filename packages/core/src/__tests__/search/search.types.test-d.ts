@@ -22,24 +22,24 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
-import type { FreeFormSearchParams, StructuredSearchParams } from '../../index'
+import type { FreeFormSearchParams, StructuredSearchParams } from "../../index";
 
 /**
  * Test FreeFormSearchParams interface
  */
-expectTypeOf<FreeFormSearchParams>().toMatchTypeOf<{ query: string }>()
+expectTypeOf<FreeFormSearchParams>().toMatchTypeOf<{ query: string }>();
 
 /**
  * Test StructuredSearchParams interface
  */
 expectTypeOf<StructuredSearchParams>().toMatchTypeOf<{
-  amenity?: string
-  city?: string
-  country?: string
-  county?: string
-  postalcode?: string
-  state?: string
-  street?: string
-}>()
+  amenity?: string;
+  city?: string;
+  country?: string;
+  county?: string;
+  postalcode?: string;
+  state?: string;
+  street?: string;
+}>();

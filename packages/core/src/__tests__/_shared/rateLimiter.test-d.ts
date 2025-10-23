@@ -22,16 +22,16 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
-import type { RateLimitConfig } from '../../index'
+import type { RateLimitConfig } from "../../index";
 
 /**
  * Test RateLimitConfig interface
  */
 expectTypeOf<RateLimitConfig>().toMatchTypeOf<{
-  enabled?: boolean
-  limit?: number
-  interval?: number
-  strict?: boolean
-}>()
+  enabled?: boolean;
+  limit?: number;
+  interval?: number;
+  strict?: boolean;
+}>();

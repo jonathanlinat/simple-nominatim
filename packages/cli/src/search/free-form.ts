@@ -22,21 +22,21 @@
  * SOFTWARE.
  */
 
-import { freeFormSearch } from '@simple-nominatim/core'
+import { freeFormSearch } from "@simple-nominatim/core";
 import type {
   FreeFormSearchParams,
   SearchOptions,
-  RetryConfig
-} from '@simple-nominatim/core'
+  RetryConfig,
+} from "@simple-nominatim/core";
 
-import { responseParser } from '../_shared/responseParser'
+import { responseParser } from "../_shared/responseParser";
 import {
   safeValidateArgs,
   freeFormSearchSchema,
-  handleValidationError
-} from '../_shared/validation'
+  handleValidationError,
+} from "../_shared/validation";
 
-import type { FreeFormArgv } from './search.types'
+import type { FreeFormArgv } from "./search.types";
 
 /**
  * CLI wrapper for free-form search functionality
@@ -80,49 +80,63 @@ export const freeFormSearchWrapper = (argv: FreeFormArgv): Promise<void> => {
     rateLimitInterval,
     noRetry,
     retryMaxAttempts,
-    retryInitialDelay
-  } = argv
+    retryInitialDelay,
+  } = argv;
 
   const validationResult = safeValidateArgs(freeFormSearchSchema, {
     query,
     outputFormat: format,
     email,
-    limit
-  })
+    limit,
+  });
 
   if (!validationResult.success) {
-    handleValidationError(validationResult.error)
+    handleValidationError(validationResult.error);
   }
 
-  const params: FreeFormSearchParams = { query }
-  const options: SearchOptions = { email, format, limit }
+  const params: FreeFormSearchParams = { query };
+  const options: SearchOptions = { email, format, limit };
 
-  if (noCache !== undefined || cacheTtl !== undefined || cacheMaxSize !== undefined) {
+  if (
+    noCache !== undefined ||
+    cacheTtl !== undefined ||
+    cacheMaxSize !== undefined
+  ) {
     options.cache = {
       ...(noCache && { enabled: false }),
       ...(cacheTtl !== undefined && { ttl: cacheTtl }),
-      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize })
-    }
+      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize }),
+    };
   }
 
-  if (noRateLimit !== undefined || rateLimit !== undefined || rateLimitInterval !== undefined) {
+  if (
+    noRateLimit !== undefined ||
+    rateLimit !== undefined ||
+    rateLimitInterval !== undefined
+  ) {
     options.rateLimit = {
       ...(noRateLimit && { enabled: false }),
       ...(rateLimit !== undefined && { limit: rateLimit }),
-      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval })
-    }
+      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval }),
+    };
   }
 
-  if (noRetry !== undefined || retryMaxAttempts !== undefined || retryInitialDelay !== undefined) {
+  if (
+    noRetry !== undefined ||
+    retryMaxAttempts !== undefined ||
+    retryInitialDelay !== undefined
+  ) {
     options.retry = {
       ...(noRetry && { enabled: false }),
       ...(retryMaxAttempts !== undefined && { maxAttempts: retryMaxAttempts }),
-      ...(retryInitialDelay !== undefined && { initialDelay: retryInitialDelay })
-    } as RetryConfig
+      ...(retryInitialDelay !== undefined && {
+        initialDelay: retryInitialDelay,
+      }),
+    } as RetryConfig;
   }
 
-  const response = freeFormSearch(params, options)
-  const handledResponse = responseParser(response)
+  const response = freeFormSearch(params, options);
+  const handledResponse = responseParser(response);
 
-  return handledResponse
-}
+  return handledResponse;
+};

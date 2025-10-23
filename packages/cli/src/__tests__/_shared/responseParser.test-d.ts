@@ -22,20 +22,20 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
-import { responseParser } from '../../_shared/responseParser'
+import { responseParser } from "../../_shared/responseParser";
 
 /**
  * Test responseParser function
  */
-expectTypeOf(responseParser).toBeFunction()
-expectTypeOf(responseParser).parameter(0).toMatchTypeOf<Promise<unknown>>()
-expectTypeOf(responseParser).returns.resolves.toBeVoid()
+expectTypeOf(responseParser).toBeFunction();
+expectTypeOf(responseParser).parameter(0).toMatchTypeOf<Promise<unknown>>();
+expectTypeOf(responseParser).returns.resolves.toBeVoid();
 
 interface TestResponse {
-  data: string
+  data: string;
 }
-const testPromise: Promise<TestResponse> = Promise.resolve({ data: 'test' })
-const parsedResponse = responseParser(testPromise)
-expectTypeOf(parsedResponse).toEqualTypeOf<Promise<void>>()
+const testPromise: Promise<TestResponse> = Promise.resolve({ data: "test" });
+const parsedResponse = responseParser(testPromise);
+expectTypeOf(parsedResponse).toEqualTypeOf<Promise<void>>();

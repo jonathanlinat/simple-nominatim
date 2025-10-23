@@ -38,13 +38,13 @@
  */
 export async function responseParser<T>(promise: Promise<T>): Promise<void> {
   try {
-    const response = await promise
-    const stringifiedResponse = JSON.stringify(response)
+    const response = await promise;
+    const stringifiedResponse = JSON.stringify(response);
 
-    console.log(stringifiedResponse)
+    console.log(stringifiedResponse);
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
+    const message = error instanceof Error ? error.message : String(error);
 
-    console.error(`Ups! Something went wrong... ${message}`)
+    console.error(`Ups! Something went wrong... ${message}`);
   }
 }

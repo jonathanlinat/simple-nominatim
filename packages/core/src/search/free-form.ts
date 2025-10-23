@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-import { dataFetcher } from '../_shared/dataFetcher'
+import { dataFetcher } from "../_shared/dataFetcher";
 
-import type { FreeFormSearchParams } from './search.types'
-import type { SearchOptions } from '../_shared/_shared.types'
+import type { FreeFormSearchParams } from "./search.types";
+import type { SearchOptions } from "../_shared/_shared.types";
 
 /**
  * Performs a free-form search query using the Nominatim API
@@ -45,37 +45,37 @@ import type { SearchOptions } from '../_shared/_shared.types'
  */
 export const freeFormSearch = async <T = unknown>(
   params: FreeFormSearchParams,
-  options: SearchOptions
+  options: SearchOptions,
 ): Promise<T> => {
-  const endpoint = 'search'
-  const urlSearchParams = new URLSearchParams()
+  const endpoint = "search";
+  const urlSearchParams = new URLSearchParams();
 
-  const { query: q } = params
-  const parsedParams = { q }
+  const { query: q } = params;
+  const parsedParams = { q };
 
   Object.keys(parsedParams).forEach((key) => {
-    const value = parsedParams[key as keyof typeof parsedParams]
+    const value = parsedParams[key as keyof typeof parsedParams];
 
     if (value) {
-      urlSearchParams.append(key, value)
+      urlSearchParams.append(key, value);
     }
-  })
+  });
 
-  const { cache, rateLimit, retry, ...apiOptions } = options
+  const { cache, rateLimit, retry, ...apiOptions } = options;
 
   Object.keys(apiOptions).forEach((key) => {
-    const value = apiOptions[key as keyof typeof apiOptions]
+    const value = apiOptions[key as keyof typeof apiOptions];
 
     if (value !== undefined) {
-      urlSearchParams.append(key, String(value))
+      urlSearchParams.append(key, String(value));
     }
-  })
+  });
 
   const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
     cache,
     rateLimit,
-    retry
-  })
+    retry,
+  });
 
-  return fetchedData
-}
+  return fetchedData;
+};

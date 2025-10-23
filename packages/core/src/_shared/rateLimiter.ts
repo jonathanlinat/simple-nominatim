@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import pThrottle from 'p-throttle'
+import pThrottle from "p-throttle";
 
 /**
  * Configuration options for rate limiting
@@ -32,25 +32,25 @@ export interface RateLimitConfig {
    * Enable or disable rate limiting
    * @default true
    */
-  enabled?: boolean
+  enabled?: boolean;
 
   /**
    * Maximum number of requests per interval
    * @default 1 (respects Nominatim's 1 req/sec guideline)
    */
-  limit?: number
+  limit?: number;
 
   /**
    * Time interval in milliseconds
    * @default 1000 (1 second)
    */
-  interval?: number
+  interval?: number;
 
   /**
    * Whether to use strict rate limiting (prevents bursts)
    * @default true
    */
-  strict?: boolean
+  strict?: boolean;
 }
 
 /**
@@ -63,10 +63,10 @@ export interface RateLimitConfig {
  * @internal
  */
 export class RateLimiter {
-  private throttle: ReturnType<typeof pThrottle>
-  private enabled: boolean
-  private requestCount = 0
-  private queuedCount = 0
+  private throttle: ReturnType<typeof pThrottle>;
+  private enabled: boolean;
+  private requestCount = 0;
+  private queuedCount = 0;
 
   /**
    * Creates a new RateLimiter instance
@@ -74,17 +74,17 @@ export class RateLimiter {
    * @param config Rate limiter configuration options
    */
   constructor(config: RateLimitConfig = {}) {
-    this.enabled = config.enabled ?? true
+    this.enabled = config.enabled ?? true;
 
-    const limit = config.limit ?? 1
-    const interval = config.interval ?? 1000
-    const strict = config.strict ?? true
+    const limit = config.limit ?? 1;
+    const interval = config.interval ?? 1000;
+    const strict = config.strict ?? true;
 
     this.throttle = pThrottle({
       limit,
       interval,
-      strict
-    })
+      strict,
+    });
   }
 
   /**
@@ -95,20 +95,20 @@ export class RateLimiter {
    */
   async execute<T>(fn: () => Promise<T>): Promise<T> {
     if (!this.enabled) {
-      return fn()
+      return fn();
     }
 
-    this.queuedCount++
+    this.queuedCount++;
 
     try {
-      const throttledFn = this.throttle(fn)
-      const result = await throttledFn()
+      const throttledFn = this.throttle(fn);
+      const result = await throttledFn();
 
-      this.requestCount++
+      this.requestCount++;
 
-      return result
+      return result;
     } finally {
-      this.queuedCount--
+      this.queuedCount--;
     }
   }
 
@@ -120,16 +120,16 @@ export class RateLimiter {
   getStats(): { requestCount: number; queuedCount: number } {
     return {
       requestCount: this.requestCount,
-      queuedCount: this.queuedCount
-    }
+      queuedCount: this.queuedCount,
+    };
   }
 
   /**
    * Reset the rate limiter statistics
    */
   resetStats(): void {
-    this.requestCount = 0
-    this.queuedCount = 0
+    this.requestCount = 0;
+    this.queuedCount = 0;
   }
 
   /**
@@ -138,7 +138,7 @@ export class RateLimiter {
    * @returns True if rate limiting is enabled
    */
   isEnabled(): boolean {
-    return this.enabled
+    return this.enabled;
   }
 
   /**
@@ -147,10 +147,10 @@ export class RateLimiter {
    * @param enabled Whether to enable rate limiting
    */
   setEnabled(enabled: boolean): void {
-    this.enabled = enabled
+    this.enabled = enabled;
 
     if (!enabled) {
-      this.resetStats()
+      this.resetStats();
     }
   }
 }

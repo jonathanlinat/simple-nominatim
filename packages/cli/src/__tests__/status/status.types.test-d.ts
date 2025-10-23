@@ -22,25 +22,27 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
-import type { StatusFormat } from '@simple-nominatim/core'
+import type { StatusFormat } from "@simple-nominatim/core";
 
-import type { ServiceStatusArgv } from '../../status/status.types'
+import type { ServiceStatusArgv } from "../../status/status.types";
 
 /**
  * Test ServiceStatusArgv interface
  */
 expectTypeOf<ServiceStatusArgv>().toMatchTypeOf<{
-  format: StatusFormat
-}>()
+  format: StatusFormat;
+}>();
 
-expectTypeOf<ServiceStatusArgv>().toHaveProperty('format').toEqualTypeOf<StatusFormat>()
+expectTypeOf<ServiceStatusArgv>()
+  .toHaveProperty("format")
+  .toEqualTypeOf<StatusFormat>();
 
 /**
  * Test complete workflow type safety
  */
 const statusArgs: ServiceStatusArgv = {
-  format: 'json'
-}
-expectTypeOf(statusArgs).toMatchTypeOf<ServiceStatusArgv>()
+  format: "json",
+};
+expectTypeOf(statusArgs).toMatchTypeOf<ServiceStatusArgv>();

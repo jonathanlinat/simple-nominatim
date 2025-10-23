@@ -19,11 +19,11 @@ This is a monorepo packed with bespoke tools crafted to seamlessly integrate wit
 For detailed instructions on how to use the tools, navigate to the `./packages` directory and consult the corresponding **README.md** file associated with each package.
 
 - **Simple Nominatim Core**
-   * GitHub: [README](https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/core#readme)
-   * npm: [@simple-nominatim/core](https://www.npmjs.com/package/@simple-nominatim/core)
+  - GitHub: [README](https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/core#readme)
+  - npm: [@simple-nominatim/core](https://www.npmjs.com/package/@simple-nominatim/core)
 - **Simple Nominatim CLI**
-   * GitHub: [README](https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/cli#readme)
-   * npm: [@simple-nominatim/cli](https://www.npmjs.com/package/@simple-nominatim/cli)
+  - GitHub: [README](https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/cli#readme)
+  - npm: [@simple-nominatim/cli](https://www.npmjs.com/package/@simple-nominatim/cli)
 
 ## How to Contribute
 

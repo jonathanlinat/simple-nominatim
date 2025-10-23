@@ -22,69 +22,95 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from 'vitest'
+import { expectTypeOf } from "vitest";
 
-import type { OutputFormat } from '@simple-nominatim/core'
+import type { OutputFormat } from "@simple-nominatim/core";
 
-import type { FreeFormArgv, StructuredArgv } from '../../search/search.types'
+import type { FreeFormArgv, StructuredArgv } from "../../search/search.types";
 
 /**
  * Test FreeFormArgv interface
  */
 expectTypeOf<FreeFormArgv>().toMatchTypeOf<{
-  email?: string
-  format: OutputFormat
-  limit?: number
-  query: string
-}>()
+  email?: string;
+  format: OutputFormat;
+  limit?: number;
+  query: string;
+}>();
 
-expectTypeOf<FreeFormArgv>().toHaveProperty('format').toEqualTypeOf<OutputFormat>()
-expectTypeOf<FreeFormArgv>().toHaveProperty('query').toEqualTypeOf<string>()
-expectTypeOf<FreeFormArgv>().toHaveProperty('limit').toEqualTypeOf<number | undefined>()
-expectTypeOf<FreeFormArgv>().toHaveProperty('email').toEqualTypeOf<string | undefined>()
+expectTypeOf<FreeFormArgv>()
+  .toHaveProperty("format")
+  .toEqualTypeOf<OutputFormat>();
+expectTypeOf<FreeFormArgv>().toHaveProperty("query").toEqualTypeOf<string>();
+expectTypeOf<FreeFormArgv>()
+  .toHaveProperty("limit")
+  .toEqualTypeOf<number | undefined>();
+expectTypeOf<FreeFormArgv>()
+  .toHaveProperty("email")
+  .toEqualTypeOf<string | undefined>();
 
 /**
  * Test StructuredArgv interface
  */
 expectTypeOf<StructuredArgv>().toMatchTypeOf<{
-  amenity?: string
-  city?: string
-  country?: string
-  county?: string
-  email?: string
-  format: OutputFormat
-  limit?: number
-  postalcode?: string
-  state?: string
-  street?: string
-}>()
+  amenity?: string;
+  city?: string;
+  country?: string;
+  county?: string;
+  email?: string;
+  format: OutputFormat;
+  limit?: number;
+  postalcode?: string;
+  state?: string;
+  street?: string;
+}>();
 
-expectTypeOf<StructuredArgv>().toHaveProperty('format').toEqualTypeOf<OutputFormat>()
-expectTypeOf<StructuredArgv>().toHaveProperty('amenity').toEqualTypeOf<string | undefined>()
-expectTypeOf<StructuredArgv>().toHaveProperty('city').toEqualTypeOf<string | undefined>()
-expectTypeOf<StructuredArgv>().toHaveProperty('country').toEqualTypeOf<string | undefined>()
-expectTypeOf<StructuredArgv>().toHaveProperty('county').toEqualTypeOf<string | undefined>()
-expectTypeOf<StructuredArgv>().toHaveProperty('email').toEqualTypeOf<string | undefined>()
-expectTypeOf<StructuredArgv>().toHaveProperty('limit').toEqualTypeOf<number | undefined>()
-expectTypeOf<StructuredArgv>().toHaveProperty('postalcode').toEqualTypeOf<string | undefined>()
-expectTypeOf<StructuredArgv>().toHaveProperty('state').toEqualTypeOf<string | undefined>()
-expectTypeOf<StructuredArgv>().toHaveProperty('street').toEqualTypeOf<string | undefined>()
+expectTypeOf<StructuredArgv>()
+  .toHaveProperty("format")
+  .toEqualTypeOf<OutputFormat>();
+expectTypeOf<StructuredArgv>()
+  .toHaveProperty("amenity")
+  .toEqualTypeOf<string | undefined>();
+expectTypeOf<StructuredArgv>()
+  .toHaveProperty("city")
+  .toEqualTypeOf<string | undefined>();
+expectTypeOf<StructuredArgv>()
+  .toHaveProperty("country")
+  .toEqualTypeOf<string | undefined>();
+expectTypeOf<StructuredArgv>()
+  .toHaveProperty("county")
+  .toEqualTypeOf<string | undefined>();
+expectTypeOf<StructuredArgv>()
+  .toHaveProperty("email")
+  .toEqualTypeOf<string | undefined>();
+expectTypeOf<StructuredArgv>()
+  .toHaveProperty("limit")
+  .toEqualTypeOf<number | undefined>();
+expectTypeOf<StructuredArgv>()
+  .toHaveProperty("postalcode")
+  .toEqualTypeOf<string | undefined>();
+expectTypeOf<StructuredArgv>()
+  .toHaveProperty("state")
+  .toEqualTypeOf<string | undefined>();
+expectTypeOf<StructuredArgv>()
+  .toHaveProperty("street")
+  .toEqualTypeOf<string | undefined>();
 
 /**
  * Test complete workflow type safety
  */
 const freeFormArgs: FreeFormArgv = {
-  query: 'Paris',
-  format: 'jsonv2',
+  query: "Paris",
+  format: "jsonv2",
   limit: 10,
-  email: 'test@example.com'
-}
-expectTypeOf(freeFormArgs).toMatchTypeOf<FreeFormArgv>()
+  email: "test@example.com",
+};
+expectTypeOf(freeFormArgs).toMatchTypeOf<FreeFormArgv>();
 
 const structuredArgs: StructuredArgv = {
-  country: 'France',
-  city: 'Paris',
-  format: 'geojson',
-  limit: 5
-}
-expectTypeOf(structuredArgs).toMatchTypeOf<StructuredArgv>()
+  country: "France",
+  city: "Paris",
+  format: "geojson",
+  limit: 5,
+};
+expectTypeOf(structuredArgs).toMatchTypeOf<StructuredArgv>();

@@ -6,7 +6,7 @@
 
 This is a library designed to facilitate requests to the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/).
 
-It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo. You can also search for the `@simple-nominatim/core` package on [npm]([https://www.npmjs.com/package/@simple-nominatim/core](https://www.npmjs.com/package/@simple-nominatim/core)).
+It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo. You can also search for the `@simple-nominatim/core` package on [npm](<[https://www.npmjs.com/package/@simple-nominatim/core](https://www.npmjs.com/package/@simple-nominatim/core)>).
 
 > **Disclaimers**
 >
@@ -36,8 +36,8 @@ You can override any of these settings or import the default configurations:
 import {
   DEFAULT_CACHE_CONFIG,
   DEFAULT_RATE_LIMIT_CONFIG,
-  DEFAULT_RETRY_CONFIG
-} from '@simple-nominatim/core'
+  DEFAULT_RETRY_CONFIG,
+} from "@simple-nominatim/core";
 ```
 
 ## Usage
@@ -49,9 +49,12 @@ import {
 Use the `geocodeReverse` method directly in your code:
 
 ```javascript
-import { geocodeReverse } from '@simple-nominatim/core'
+import { geocodeReverse } from "@simple-nominatim/core";
 
-const results = await geocodeReverse({ latitude: '37.4219999', longitude: '-122.0840575' }, { format: 'jsonv2' })
+const results = await geocodeReverse(
+  { latitude: "37.4219999", longitude: "-122.0840575" },
+  { format: "jsonv2" },
+);
 ```
 
 ##### Parameters
@@ -75,9 +78,12 @@ const results = await geocodeReverse({ latitude: '37.4219999', longitude: '-122.
 Use the `freeFormSearch` method directly in your code:
 
 ```javascript
-import { freeFormSearch } from '@simple-nominatim/core'
+import { freeFormSearch } from "@simple-nominatim/core";
 
-const results = await freeFormSearch({ query: '1600 Amphitheatre Parkway, Mountain View, CA, USA' }, { format: 'jsonv2' })
+const results = await freeFormSearch(
+  { query: "1600 Amphitheatre Parkway, Mountain View, CA, USA" },
+  { format: "jsonv2" },
+);
 ```
 
 ##### Parameters
@@ -98,9 +104,12 @@ const results = await freeFormSearch({ query: '1600 Amphitheatre Parkway, Mounta
 Use the `structuredSearch` method directly in your code:
 
 ```javascript
-import { structuredSearch } from '@simple-nominatim/core'
+import { structuredSearch } from "@simple-nominatim/core";
 
-const results = await structuredSearch({ country: 'USA' }, { format: 'jsonv2' })
+const results = await structuredSearch(
+  { country: "USA" },
+  { format: "jsonv2" },
+);
 ```
 
 ##### Parameters
@@ -129,9 +138,9 @@ const results = await structuredSearch({ country: 'USA' }, { format: 'jsonv2' })
 Use the `serviceStatus` method directly in your code:
 
 ```javascript
-import { serviceStatus } from '@simple-nominatim/core'
+import { serviceStatus } from "@simple-nominatim/core";
 
-const results = await serviceStatus({ format: 'json' })
+const results = await serviceStatus({ format: "json" });
 ```
 
 ##### Options
@@ -149,34 +158,34 @@ const results = await serviceStatus({ format: 'json' })
 #### Basic Usage
 
 ```javascript
-import { freeFormSearch } from '@simple-nominatim/core'
+import { freeFormSearch } from "@simple-nominatim/core";
 
 // Caching is enabled by default with recommended settings
 const results = await freeFormSearch(
-  { query: 'Paris, France' },
-  { format: 'json' }
-)
+  { query: "Paris, France" },
+  { format: "json" },
+);
 
 // Override cache settings if needed
 const customResults = await freeFormSearch(
-  { query: 'Paris, France' },
+  { query: "Paris, France" },
   {
-    format: 'json',
+    format: "json",
     cache: {
       ttl: 600000,
-      maxSize: 1000
-    }
-  }
-)
+      maxSize: 1000,
+    },
+  },
+);
 
 // Disable caching if needed
 const uncachedResults = await freeFormSearch(
-  { query: 'Paris, France' },
+  { query: "Paris, France" },
   {
-    format: 'json',
-    cache: { enabled: false }
-  }
-)
+    format: "json",
+    cache: { enabled: false },
+  },
+);
 ```
 
 #### Configuration Options
@@ -192,34 +201,34 @@ const uncachedResults = await freeFormSearch(
 #### Basic Usage
 
 ```javascript
-import { geocodeReverse } from '@simple-nominatim/core'
+import { geocodeReverse } from "@simple-nominatim/core";
 
 // Rate limiting is enabled by default (1 req/sec)
 const results = await geocodeReverse(
-  { latitude: '48.8566', longitude: '2.3522' },
-  { format: 'json' }
-)
+  { latitude: "48.8566", longitude: "2.3522" },
+  { format: "json" },
+);
 
 // Override rate limit settings if needed (e.g., for your own Nominatim instance)
 const customResults = await geocodeReverse(
-  { latitude: '48.8566', longitude: '2.3522' },
+  { latitude: "48.8566", longitude: "2.3522" },
   {
-    format: 'json',
+    format: "json",
     rateLimit: {
       limit: 10,
-      interval: 1000
-    }
-  }
-)
+      interval: 1000,
+    },
+  },
+);
 
 // Disable rate limiting if needed (not recommended for public API)
 const unlimitedResults = await geocodeReverse(
-  { latitude: '48.8566', longitude: '2.3522' },
+  { latitude: "48.8566", longitude: "2.3522" },
   {
-    format: 'json',
-    rateLimit: { enabled: false }
-  }
-)
+    format: "json",
+    rateLimit: { enabled: false },
+  },
+);
 ```
 
 #### Configuration Options
@@ -236,34 +245,34 @@ const unlimitedResults = await geocodeReverse(
 #### Basic Usage
 
 ```javascript
-import { structuredSearch } from '@simple-nominatim/core'
+import { structuredSearch } from "@simple-nominatim/core";
 
 // Retry is enabled by default (3 attempts max)
 const results = await structuredSearch(
-  { country: 'France', city: 'Paris' },
-  { format: 'json' }
-)
+  { country: "France", city: "Paris" },
+  { format: "json" },
+);
 
 // Override retry settings if needed
 const customResults = await structuredSearch(
-  { country: 'France', city: 'Paris' },
+  { country: "France", city: "Paris" },
   {
-    format: 'json',
+    format: "json",
     retry: {
       maxAttempts: 5,
-      initialDelay: 2000
-    }
-  }
-)
+      initialDelay: 2000,
+    },
+  },
+);
 
 // Disable retry if needed
 const noRetryResults = await structuredSearch(
-  { country: 'France', city: 'Paris' },
+  { country: "France", city: "Paris" },
   {
-    format: 'json',
-    retry: { enabled: false }
-  }
-)
+    format: "json",
+    retry: { enabled: false },
+  },
+);
 ```
 
 #### Retry Configuration Options
@@ -287,34 +296,34 @@ All features are **enabled by default** with sensible defaults based on **Nomina
 You can override any of these settings or disable specific features as needed:
 
 ```javascript
-import { freeFormSearch } from '@simple-nominatim/core'
+import { freeFormSearch } from "@simple-nominatim/core";
 
 // Use all defaults (recommended for public Nominatim API)
 const results1 = await freeFormSearch(
-  { query: 'Berlin, Germany' },
-  { format: 'json' }
-)
+  { query: "Berlin, Germany" },
+  { format: "json" },
+);
 
 // Customize specific settings while keeping others at default
 const results2 = await freeFormSearch(
-  { query: 'Berlin, Germany' },
+  { query: "Berlin, Germany" },
   {
-    format: 'json',
+    format: "json",
     cache: { ttl: 600000 },
-    rateLimit: { limit: 2 }
-  }
-)
+    rateLimit: { limit: 2 },
+  },
+);
 
 // Disable all optional features (not recommended)
 const results3 = await freeFormSearch(
-  { query: 'Berlin, Germany' },
+  { query: "Berlin, Germany" },
   {
-    format: 'json',
+    format: "json",
     cache: { enabled: false },
     rateLimit: { enabled: false },
-    retry: { enabled: false }
-  }
-)
+    retry: { enabled: false },
+  },
+);
 ```
 
 ## License

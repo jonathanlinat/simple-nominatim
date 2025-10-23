@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { defineConfig } from 'tsdown'
+import { defineConfig } from "tsdown";
 
 /**
  * Shared tsdown configuration for all packages
@@ -30,12 +30,12 @@ import { defineConfig } from 'tsdown'
  * @returns tsdown configuration object
  */
 export default defineConfig({
-  format: 'esm',
+  format: "esm",
   dts: true,
   clean: true,
-  target: 'node22',
+  target: "node22",
   minify: true,
   sourcemap: true,
   treeshake: true,
-  platform: 'node'
-})
+  platform: "node",
+});

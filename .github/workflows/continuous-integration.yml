@@ -28,3 +28,14 @@ jobs:
       - name: Test the packages
         shell: bash
         run: pnpm packages:test
+  build:
+    name: Build the packages
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout ${{ github.ref }}
+        uses: actions/checkout@v5
+      - uses: ./.github/actions/install-tools-dependencies
+      - name: Build the packages
+        shell: bash
+        run: pnpm packages:build
