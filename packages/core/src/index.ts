@@ -22,9 +22,7 @@
  * SOFTWARE.
  */
 
-export { CacheManager } from './_shared/cacheManager'
 export type { CacheConfig } from './_shared/cacheManager'
-export { RateLimiter } from './_shared/rateLimiter'
 export type { RateLimitConfig } from './_shared/rateLimiter'
 
 export type {
@@ -35,6 +33,12 @@ export type {
   DataFetcherOptions,
   RetryConfig
 } from './_shared/_shared.types'
+
+export {
+  DEFAULT_CACHE_CONFIG,
+  DEFAULT_RATE_LIMIT_CONFIG,
+  DEFAULT_RETRY_CONFIG
+} from './_shared/constants'
 
 export { geocodeReverse } from './reverse/geocode'
 export type { GeocodeReverseParams } from './reverse/reverse.types'

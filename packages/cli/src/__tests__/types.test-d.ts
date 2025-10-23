@@ -23,11 +23,10 @@
  */
 
 import { expectTypeOf } from 'expect-type'
-import type { z } from 'zod'
+
 import type { OutputFormat, StatusFormat } from '@simple-nominatim/core'
-import type { GeocodeReverseArgv } from '../reverse/reverse.types'
-import type { FreeFormArgv, StructuredArgv } from '../search/search.types'
-import type { ServiceStatusArgv } from '../status/status.types'
+
+import { responseParser } from '../_shared/responseParser'
 import {
   outputFormatSchema,
   statusFormatSchema,
@@ -46,7 +45,11 @@ import { geocodeReverseWrapper } from '../reverse/geocode'
 import { freeFormSearchWrapper } from '../search/free-form'
 import { structuredSearchWrapper } from '../search/structured'
 import { serviceStatusWrapper } from '../status/service'
-import { responseParser } from '../_shared/responseParser'
+
+import type { GeocodeReverseArgv } from '../reverse/reverse.types'
+import type { FreeFormArgv, StructuredArgv } from '../search/search.types'
+import type { ServiceStatusArgv } from '../status/status.types'
+import type { z } from 'zod'
 
 /**
  * Test GeocodeReverseArgv interface
@@ -117,32 +120,24 @@ expectTypeOf<ServiceStatusArgv>().toHaveProperty('format').toEqualTypeOf<StatusF
 /**
  * Test Zod validation schemas
  */
-
-// outputFormatSchema should infer to OutputFormat type
 type InferredOutputFormat = z.infer<typeof outputFormatSchema>
 expectTypeOf<InferredOutputFormat>().toEqualTypeOf<OutputFormat>()
 
-// statusFormatSchema should infer to StatusFormat type
 type InferredStatusFormat = z.infer<typeof statusFormatSchema>
 expectTypeOf<InferredStatusFormat>().toEqualTypeOf<StatusFormat>()
 
-// latitudeSchema should infer to string
 type InferredLatitude = z.infer<typeof latitudeSchema>
 expectTypeOf<InferredLatitude>().toEqualTypeOf<string>()
 
-// longitudeSchema should infer to string
 type InferredLongitude = z.infer<typeof longitudeSchema>
 expectTypeOf<InferredLongitude>().toEqualTypeOf<string>()
 
-// emailSchema should infer to string | undefined
 type InferredEmail = z.infer<typeof emailSchema>
 expectTypeOf<InferredEmail>().toEqualTypeOf<string | undefined>()
 
-// limitSchema should infer to number | undefined
 type InferredLimit = z.infer<typeof limitSchema>
 expectTypeOf<InferredLimit>().toEqualTypeOf<number | undefined>()
 
-// freeFormSearchSchema should have correct structure
 type InferredFreeFormSearch = z.infer<typeof freeFormSearchSchema>
 expectTypeOf<InferredFreeFormSearch>().toMatchTypeOf<{
   query: string
@@ -151,7 +146,6 @@ expectTypeOf<InferredFreeFormSearch>().toMatchTypeOf<{
   limit?: number | undefined
 }>()
 
-// structuredSearchSchema should have correct structure
 type InferredStructuredSearch = z.infer<typeof structuredSearchSchema>
 expectTypeOf<InferredStructuredSearch>().toMatchTypeOf<{
   country: string
@@ -166,7 +160,6 @@ expectTypeOf<InferredStructuredSearch>().toMatchTypeOf<{
   street?: string | undefined
 }>()
 
-// reverseGeocodeSchema should have correct structure
 type InferredReverseGeocode = z.infer<typeof reverseGeocodeSchema>
 expectTypeOf<InferredReverseGeocode>().toMatchTypeOf<{
   latitude: string
@@ -175,7 +168,6 @@ expectTypeOf<InferredReverseGeocode>().toMatchTypeOf<{
   email?: string | undefined
 }>()
 
-// serviceStatusSchema should have correct structure
 type InferredServiceStatus = z.infer<typeof serviceStatusSchema>
 expectTypeOf<InferredServiceStatus>().toMatchTypeOf<{
   statusFormat: StatusFormat
@@ -188,7 +180,6 @@ expectTypeOf(safeValidateArgs).toBeFunction()
 expectTypeOf(safeValidateArgs).parameter(0).toMatchTypeOf<z.ZodSchema>()
 expectTypeOf(safeValidateArgs).parameter(1).toBeUnknown()
 
-// Test return type for successful validation
 const validResult = safeValidateArgs(freeFormSearchSchema, {
   query: 'test',
   outputFormat: 'json'
@@ -201,23 +192,18 @@ expectTypeOf(validResult).toEqualTypeOf<
 /**
  * Test wrapper functions signatures
  */
-
-// geocodeReverseWrapper
 expectTypeOf(geocodeReverseWrapper).toBeFunction()
 expectTypeOf(geocodeReverseWrapper).parameter(0).toMatchTypeOf<GeocodeReverseArgv>()
 expectTypeOf(geocodeReverseWrapper).returns.resolves.toBeVoid()
 
-// freeFormSearchWrapper
 expectTypeOf(freeFormSearchWrapper).toBeFunction()
 expectTypeOf(freeFormSearchWrapper).parameter(0).toMatchTypeOf<FreeFormArgv>()
 expectTypeOf(freeFormSearchWrapper).returns.resolves.toBeVoid()
 
-// structuredSearchWrapper
 expectTypeOf(structuredSearchWrapper).toBeFunction()
 expectTypeOf(structuredSearchWrapper).parameter(0).toMatchTypeOf<StructuredArgv>()
 expectTypeOf(structuredSearchWrapper).returns.resolves.toBeVoid()
 
-// serviceStatusWrapper
 expectTypeOf(serviceStatusWrapper).toBeFunction()
 expectTypeOf(serviceStatusWrapper).parameter(0).toMatchTypeOf<ServiceStatusArgv>()
 expectTypeOf(serviceStatusWrapper).returns.resolves.toBeVoid()
@@ -229,7 +215,6 @@ expectTypeOf(responseParser).toBeFunction()
 expectTypeOf(responseParser).parameter(0).toMatchTypeOf<Promise<unknown>>()
 expectTypeOf(responseParser).returns.resolves.toBeVoid()
 
-// Test with specific type
 interface TestResponse {
   data: string
 }
@@ -247,8 +232,6 @@ expectTypeOf(handleValidationError).returns.toBeNever()
 /**
  * Test complete workflow type safety
  */
-
-// Valid GeocodeReverseArgv object
 const reverseArgs: GeocodeReverseArgv = {
   latitude: '48.8584',
   longitude: '2.2945',
@@ -257,7 +240,6 @@ const reverseArgs: GeocodeReverseArgv = {
 }
 expectTypeOf(reverseArgs).toMatchTypeOf<GeocodeReverseArgv>()
 
-// Valid FreeFormArgv object
 const freeFormArgs: FreeFormArgv = {
   query: 'Paris',
   format: 'jsonv2',
@@ -266,7 +248,6 @@ const freeFormArgs: FreeFormArgv = {
 }
 expectTypeOf(freeFormArgs).toMatchTypeOf<FreeFormArgv>()
 
-// Valid StructuredArgv object
 const structuredArgs: StructuredArgv = {
   country: 'France',
   city: 'Paris',
@@ -275,7 +256,6 @@ const structuredArgs: StructuredArgv = {
 }
 expectTypeOf(structuredArgs).toMatchTypeOf<StructuredArgv>()
 
-// Valid ServiceStatusArgv object
 const statusArgs: ServiceStatusArgv = {
   format: 'json'
 }

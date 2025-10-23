@@ -1,7 +1,10 @@
 import js from '@eslint/js'
 import prettier from 'eslint-config-prettier'
+import importPlugin from 'eslint-plugin-import'
 import jsdoc from 'eslint-plugin-jsdoc'
 import jsoncPlugin from 'eslint-plugin-jsonc'
+// @ts-ignore - No type definitions available
+import promisePlugin from 'eslint-plugin-promise'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
@@ -9,23 +12,106 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   prettier,
   {
+    plugins: {
+      import: importPlugin,
+      promise: promisePlugin
+    },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/ban-ts-comment': 'off',
-      '@typescript-eslint/no-require-imports': 'warn'
+      'spaced-comment': [
+        'error',
+        'always',
+        {
+          line: {
+            markers: ['/', '!'],
+            exceptions: []
+          },
+          block: {
+            markers: ['*', '!'],
+            exceptions: ['*'],
+            balanced: true
+          }
+        }
+      ],
+      'no-inline-comments': 'error',
+      'no-warning-comments': [
+        'error',
+        {
+          terms: ['todo', 'fixme', 'hack', 'review', 'xxx'],
+          location: 'anywhere'
+        }
+      ],
+      'import/order': [
+        'error',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+            'type'
+          ],
+          pathGroups: [
+            {
+              pattern: '@simple-nominatim/**',
+              group: 'internal',
+              position: 'before'
+            }
+          ],
+          pathGroupsExcludedImportTypes: ['builtin'],
+          'newlines-between': 'always',
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true
+          }
+        }
+      ],
+      'import/newline-after-import': ['error', { count: 1 }],
+      'import/no-duplicates': 'error',
+      'import/first': 'error',
+      'padding-line-between-statements': [
+        'error',
+        { blankLine: 'always', prev: '*', next: 'return' }
+      ],
+      'promise/prefer-await-to-then': 'error',
+      'promise/prefer-await-to-callbacks': 'warn',
+      'prefer-template': 'error',
+      'max-len': [
+        'warn',
+        {
+          code: 120,
+          tabWidth: 2,
+          ignoreUrls: true,
+          ignoreStrings: true,
+          ignoreTemplateLiterals: true,
+          ignoreRegExpLiterals: true,
+          ignoreComments: true
+        }
+      ],
+      'complexity': ['warn', 25],
+      'max-depth': ['warn', 5],
+      'max-nested-callbacks': ['warn', 3],
+      'max-params': ['warn', 10],
+      'max-statements': ['warn', 30]
+    }
+  },
+  {
+    files: ['eslint.config.ts', 'packages/cli/src/index.ts', '**/build.config.ts', '**/build.config.*.ts'],
+    rules: {
+      'import/no-default-export': 'off'
     }
   },
   {
     ignores: ['**/node_modules/**', '**/dist/**', '**/.turbo/**']
   },
-  // JSDoc/TSDoc configuration
   {
     files: ['**/*.ts', '**/*.mts', '**/*.cts'],
     plugins: {
       jsdoc
     },
     rules: {
-      // Require JSDoc comments on exports
       'jsdoc/require-jsdoc': [
         'error',
         {
@@ -47,7 +133,6 @@ export default tseslint.config(
           enableFixer: false
         }
       ],
-      // Require description in JSDoc
       'jsdoc/require-description': [
         'warn',
         {
@@ -55,7 +140,6 @@ export default tseslint.config(
           exemptedBy: ['type', 'private', 'internal']
         }
       ],
-      // Require @param for function parameters
       'jsdoc/require-param': [
         'error',
         {
@@ -63,7 +147,6 @@ export default tseslint.config(
           checkDestructured: false
         }
       ],
-      // Require @returns for functions with return values
       'jsdoc/require-returns': [
         'error',
         {
@@ -72,35 +155,54 @@ export default tseslint.config(
           forceReturnsWithAsync: false
         }
       ],
-      // Check parameter names match
       'jsdoc/check-param-names': 'error',
-      // Validate tag names (supports TSDoc)
       'jsdoc/check-tag-names': [
         'error',
         {
           definedTags: ['internal', 'constant']
         }
       ],
-      // Require hyphen before param description
       'jsdoc/require-hyphen-before-param-description': ['warn', 'never'],
-      // Check types are properly formatted
-      'jsdoc/check-types': 'off', // TypeScript handles this
-      // Ensure descriptions are complete sentences
+      'jsdoc/check-types': 'off',
       'jsdoc/require-description-complete-sentence': 'off',
-      // No undefined types
-      'jsdoc/no-undefined-types': 'off', // TypeScript handles this
-      // Empty tags
+      'jsdoc/no-undefined-types': 'off',
       'jsdoc/empty-tags': 'error',
-      // Multiline formatting
       'jsdoc/multiline-blocks': [
         'error',
         {
           noSingleLineBlocks: true
         }
-      ]
+      ],
+      '@typescript-eslint/naming-convention': [
+        'error',
+        {
+          selector: ['interface', 'typeAlias', 'class'],
+          format: ['PascalCase']
+        },
+        {
+          selector: ['function', 'variable'],
+          format: ['camelCase'],
+          leadingUnderscore: 'allow'
+        },
+        {
+          selector: 'variable',
+          modifiers: ['const', 'exported'],
+          format: ['UPPER_CASE', 'camelCase']
+        },
+        {
+          selector: 'typeParameter',
+          format: ['PascalCase']
+        },
+        {
+          selector: 'memberLike',
+          modifiers: ['private'],
+          format: ['camelCase'],
+          leadingUnderscore: 'allow'
+        }
+      ],
+      '@typescript-eslint/explicit-module-boundary-types': 'error'
     }
   },
-  // JSON configuration
   ...jsoncPlugin.configs['flat/recommended-with-jsonc'],
   {
     files: ['**/package.json'],

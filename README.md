@@ -42,11 +42,13 @@ To maintain code quality and consistency, this project adopts various linting, f
 - **Changesets**: A tool that manages versioning and changelog generation with a focus on multi-package repositories.
 - **Commitlint**: Enforces a consistent commit convention, which helps in generating changelogs and navigating the history.
 - **ESLint**: Analyzes the JavaScript code for potential errors and deviations from coding standards.
+- **expect-type**: Provides compile-time type testing to ensure TypeScript type correctness.
 - **Lint Staged**: Runs linters on pre-committed code in git. Ensures you're only committing files that meet your linting criteria.
 - **Markdownlint**: Lints the Markdown files to ensure consistent and correct Markdown syntax.
 - **Prettier**: An opinionated code formatter that enforces a consistent style by parsing code and reprinting it.
 - **Simple Git Hooks**: Provides tools to set up Git hooks to automate tasks like running linters before commits.
 - **Turborepo**: A high-performance build system for JavaScript and TypeScript monorepos, optimizing task execution across workspaces.
+- **TypeScript**: Provides static type checking with strict mode enabled for enhanced type safety.
 - **Unbuild**: An unified and simplified JavaScript build system.
 
 It's recommended to familiarize yourself with these tools, their configurations, and the associated NPM scripts to ensure smooth contribution and integration within the project.

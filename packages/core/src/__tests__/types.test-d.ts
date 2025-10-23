@@ -23,13 +23,12 @@
  */
 
 import { expectTypeOf } from 'expect-type'
+
 import {
   freeFormSearch,
   structuredSearch,
   geocodeReverse,
   serviceStatus,
-  CacheManager,
-  RateLimiter,
   type OutputFormat,
   type BaseOptions,
   type SearchOptions,
@@ -63,8 +62,8 @@ expectTypeOf<StatusFormat>().toEqualTypeOf<'text' | 'json'>()
 expectTypeOf<BaseOptions>().toMatchTypeOf<{
   email?: string
   format: OutputFormat
-  cache?: CacheManager
-  rateLimiter?: RateLimiter
+  cache?: CacheConfig
+  rateLimit?: RateLimitConfig
 }>()
 
 /**
@@ -109,8 +108,8 @@ expectTypeOf<GeocodeReverseParams>().toMatchTypeOf<{
  */
 expectTypeOf<StatusOptions>().toMatchTypeOf<{
   format: StatusFormat
-  cache?: CacheManager
-  rateLimiter?: RateLimiter
+  cache?: CacheConfig
+  rateLimit?: RateLimitConfig
 }>()
 
 /**
@@ -149,8 +148,8 @@ expectTypeOf<RetryConfig>().toMatchTypeOf<{
  * Test DataFetcherOptions interface
  */
 expectTypeOf<DataFetcherOptions>().toMatchTypeOf<{
-  cache?: CacheManager
-  rateLimiter?: RateLimiter
+  cache?: CacheConfig
+  rateLimit?: RateLimitConfig
   retry?: RetryConfig
 }>()
 
@@ -214,51 +213,6 @@ interface StatusResponse {
 expectTypeOf(serviceStatus<StatusResponse>).returns.resolves.toEqualTypeOf<StatusResponse>()
 
 /**
- * Test CacheManager class
- */
-expectTypeOf(CacheManager).toBeConstructibleWith({})
-expectTypeOf(CacheManager).toBeConstructibleWith({ enabled: true })
-expectTypeOf(CacheManager).toBeConstructibleWith({ ttl: 600000 })
-expectTypeOf(CacheManager).toBeConstructibleWith({ maxSize: 1000 })
-
-const cache = new CacheManager()
-expectTypeOf(cache.get).toBeFunction()
-expectTypeOf(cache.set).toBeFunction()
-expectTypeOf(cache.has).toBeFunction()
-expectTypeOf(cache.clear).toBeFunction()
-expectTypeOf(cache.getStats).toBeFunction()
-expectTypeOf(cache.isEnabled).toBeFunction()
-expectTypeOf(cache.setEnabled).toBeFunction()
-
-expectTypeOf(cache.getStats()).toMatchTypeOf<{
-  hits: number
-  misses: number
-  hitRate: number
-  size: number
-}>()
-
-/**
- * Test RateLimiter class
- */
-expectTypeOf(RateLimiter).toBeConstructibleWith({})
-expectTypeOf(RateLimiter).toBeConstructibleWith({ enabled: true })
-expectTypeOf(RateLimiter).toBeConstructibleWith({ limit: 2 })
-expectTypeOf(RateLimiter).toBeConstructibleWith({ interval: 2000 })
-expectTypeOf(RateLimiter).toBeConstructibleWith({ strict: false })
-
-const rateLimiter = new RateLimiter()
-expectTypeOf(rateLimiter.execute).toBeFunction()
-expectTypeOf(rateLimiter.getStats).toBeFunction()
-expectTypeOf(rateLimiter.resetStats).toBeFunction()
-expectTypeOf(rateLimiter.isEnabled).toBeFunction()
-expectTypeOf(rateLimiter.setEnabled).toBeFunction()
-
-expectTypeOf(rateLimiter.getStats()).toMatchTypeOf<{
-  requestCount: number
-  queuedCount: number
-}>()
-
-/**
  * Test that optional parameters work correctly
  */
 const result1 = freeFormSearch({ query: 'test' }, { format: 'json' })
@@ -271,19 +225,19 @@ const result3 = freeFormSearch({ query: 'test' }, { format: 'json', limit: 10 })
 expectTypeOf(result3).toEqualTypeOf<Promise<unknown>>()
 
 /**
- * Test cache and rateLimiter integration
+ * Test cache and rateLimit integration
  */
-const result4 = freeFormSearch({ query: 'test' }, { format: 'json', cache: new CacheManager() })
+const result4 = freeFormSearch({  query: 'test' }, { format: 'json', cache: { enabled: true } })
 expectTypeOf(result4).toEqualTypeOf<Promise<unknown>>()
 
 const result5 = freeFormSearch(
   { query: 'test' },
-  { format: 'json', rateLimiter: new RateLimiter() }
+  { format: 'json', rateLimit: { enabled: true } }
 )
 expectTypeOf(result5).toEqualTypeOf<Promise<unknown>>()
 
 const result6 = freeFormSearch(
   { query: 'test' },
-  { format: 'json', cache: new CacheManager(), rateLimiter: new RateLimiter() }
+  { format: 'json', cache: { enabled: true }, rateLimit: { enabled: true } }
 )
 expectTypeOf(result6).toEqualTypeOf<Promise<unknown>>()

@@ -23,8 +23,9 @@
  */
 
 import { dataFetcher } from '../_shared/dataFetcher'
-import type { ReverseOptions } from '../_shared/_shared.types'
+
 import type { GeocodeReverseParams } from './reverse.types'
+import type { ReverseOptions } from '../_shared/_shared.types'
 
 /**
  * Performs reverse geocoding using the Nominatim API
@@ -60,7 +61,7 @@ export const geocodeReverse = async <T = unknown>(
     }
   })
 
-  const { cache, rateLimiter, ...apiOptions } = options
+  const { cache, rateLimit, retry, ...apiOptions } = options
 
   Object.keys(apiOptions).forEach((key) => {
     const value = apiOptions[key as keyof typeof apiOptions]
@@ -72,7 +73,8 @@ export const geocodeReverse = async <T = unknown>(
 
   const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
     cache,
-    rateLimiter
+    rateLimit,
+    retry
   })
 
   return fetchedData

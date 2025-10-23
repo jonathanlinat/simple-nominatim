@@ -44,6 +44,42 @@ export interface FreeFormArgv {
    * Free-form query string
    */
   query: string
+  /**
+   * Disable caching
+   */
+  noCache?: boolean
+  /**
+   * Cache TTL in milliseconds
+   */
+  cacheTtl?: number
+  /**
+   * Cache max size
+   */
+  cacheMaxSize?: number
+  /**
+   * Disable rate limiting
+   */
+  noRateLimit?: boolean
+  /**
+   * Rate limit requests per interval
+   */
+  rateLimit?: number
+  /**
+   * Rate limit interval in milliseconds
+   */
+  rateLimitInterval?: number
+  /**
+   * Disable retry logic
+   */
+  noRetry?: boolean
+  /**
+   * Retry max attempts
+   */
+  retryMaxAttempts?: number
+  /**
+   * Retry initial delay in milliseconds
+   */
+  retryInitialDelay?: number
 }
 
 /**
@@ -90,4 +126,40 @@ export interface StructuredArgv {
    * Street name and number
    */
   street?: string
+  /**
+   * Disable caching
+   */
+  noCache?: boolean
+  /**
+   * Cache TTL in milliseconds
+   */
+  cacheTtl?: number
+  /**
+   * Cache max size
+   */
+  cacheMaxSize?: number
+  /**
+   * Disable rate limiting
+   */
+  noRateLimit?: boolean
+  /**
+   * Rate limit requests per interval
+   */
+  rateLimit?: number
+  /**
+   * Rate limit interval in milliseconds
+   */
+  rateLimitInterval?: number
+  /**
+   * Disable retry logic
+   */
+  noRetry?: boolean
+  /**
+   * Retry max attempts
+   */
+  retryMaxAttempts?: number
+  /**
+   * Retry initial delay in milliseconds
+   */
+  retryInitialDelay?: number
 }

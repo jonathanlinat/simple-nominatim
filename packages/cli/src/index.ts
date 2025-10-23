@@ -24,15 +24,13 @@
  * SOFTWARE.
  */
 
-import yargs from 'yargs/yargs'
 import { hideBin } from 'yargs/helpers'
+import yargs from 'yargs/yargs'
 
-import { freeFormSearchWrapper } from './search/free-form'
-import { geocodeReverseWrapper } from './reverse/geocode'
-import { serviceStatusWrapper } from './status/service'
-import { structuredSearchWrapper } from './search/structured'
 import {
   amenityOption,
+  cacheTtlOption,
+  cacheMaxSizeOption,
   cityOption,
   countryOption,
   countyOption,
@@ -41,13 +39,26 @@ import {
   latitudeOption,
   limitOption,
   longitudeOption,
+  noCacheOption,
+  noRateLimitOption,
+  noRetryOption,
   postalCodeOption,
   queryOption,
+  rateLimitOption,
+  rateLimitIntervalOption,
+  retryMaxAttemptsOption,
+  retryInitialDelayOption,
   stateOption,
   statusFormatOption,
   streetOption
 } from './_shared/yargsOptions'
-;(() =>
+;
+import { geocodeReverseWrapper } from './reverse/geocode'
+import { freeFormSearchWrapper } from './search/free-form'
+import { structuredSearchWrapper } from './search/structured'
+import { serviceStatusWrapper } from './status/service'
+
+(() =>
   yargs(hideBin(process.argv))
     .command(
       'reverse:geocode',
@@ -58,6 +69,15 @@ import {
           .option('format', outputFormatOption)
           .option('latitude', latitudeOption)
           .option('longitude', longitudeOption)
+          .option('no-cache', noCacheOption)
+          .option('cache-ttl', cacheTtlOption)
+          .option('cache-max-size', cacheMaxSizeOption)
+          .option('no-rate-limit', noRateLimitOption)
+          .option('rate-limit', rateLimitOption)
+          .option('rate-limit-interval', rateLimitIntervalOption)
+          .option('no-retry', noRetryOption)
+          .option('retry-max-attempts', retryMaxAttemptsOption)
+          .option('retry-initial-delay', retryInitialDelayOption)
       },
       (argv) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,6 +93,15 @@ import {
           .option('format', outputFormatOption)
           .option('limit', limitOption)
           .option('query', queryOption)
+          .option('no-cache', noCacheOption)
+          .option('cache-ttl', cacheTtlOption)
+          .option('cache-max-size', cacheMaxSizeOption)
+          .option('no-rate-limit', noRateLimitOption)
+          .option('rate-limit', rateLimitOption)
+          .option('rate-limit-interval', rateLimitIntervalOption)
+          .option('no-retry', noRetryOption)
+          .option('retry-max-attempts', retryMaxAttemptsOption)
+          .option('retry-initial-delay', retryInitialDelayOption)
       },
       (argv) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -94,6 +123,15 @@ import {
           .option('postalcode', postalCodeOption)
           .option('state', stateOption)
           .option('street', streetOption)
+          .option('no-cache', noCacheOption)
+          .option('cache-ttl', cacheTtlOption)
+          .option('cache-max-size', cacheMaxSizeOption)
+          .option('no-rate-limit', noRateLimitOption)
+          .option('rate-limit', rateLimitOption)
+          .option('rate-limit-interval', rateLimitIntervalOption)
+          .option('no-retry', noRetryOption)
+          .option('retry-max-attempts', retryMaxAttemptsOption)
+          .option('retry-initial-delay', retryInitialDelayOption)
       },
       (argv) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -104,7 +142,17 @@ import {
       'status:service',
       'Report on the state of the service and database',
       (yargs) => {
-        return yargs.option('format', statusFormatOption)
+        return yargs
+          .option('format', statusFormatOption)
+          .option('no-cache', noCacheOption)
+          .option('cache-ttl', cacheTtlOption)
+          .option('cache-max-size', cacheMaxSizeOption)
+          .option('no-rate-limit', noRateLimitOption)
+          .option('rate-limit', rateLimitOption)
+          .option('rate-limit-interval', rateLimitIntervalOption)
+          .option('no-retry', noRetryOption)
+          .option('retry-max-attempts', retryMaxAttemptsOption)
+          .option('retry-initial-delay', retryInitialDelayOption)
       },
       (argv) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

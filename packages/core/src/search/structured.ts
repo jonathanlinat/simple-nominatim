@@ -23,8 +23,9 @@
  */
 
 import { dataFetcher } from '../_shared/dataFetcher'
-import type { SearchOptions } from '../_shared/_shared.types'
+
 import type { StructuredSearchParams } from './search.types'
+import type { SearchOptions } from '../_shared/_shared.types'
 
 /**
  * Performs a structured search query using the Nominatim API
@@ -57,7 +58,7 @@ export const structuredSearch = async <T = unknown>(
     }
   })
 
-  const { cache, rateLimiter, ...apiOptions } = options
+  const { cache, rateLimit, retry, ...apiOptions } = options
 
   Object.keys(apiOptions).forEach((key) => {
     const value = apiOptions[key as keyof typeof apiOptions]
@@ -69,7 +70,8 @@ export const structuredSearch = async <T = unknown>(
 
   const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
     cache,
-    rateLimiter
+    rateLimit,
+    retry
   })
 
   return fetchedData

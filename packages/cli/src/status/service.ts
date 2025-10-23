@@ -23,7 +23,10 @@
  */
 
 import { serviceStatus } from '@simple-nominatim/core'
-import type { StatusOptions } from '@simple-nominatim/core'
+import type {
+  StatusOptions,
+  RetryConfig
+} from '@simple-nominatim/core'
 
 import { responseParser } from '../_shared/responseParser'
 import {
@@ -31,16 +34,29 @@ import {
   serviceStatusSchema,
   handleValidationError
 } from '../_shared/validation'
+
 import type { ServiceStatusArgv } from './status.types'
 
 /**
  * CLI wrapper for service status functionality
  *
  * This function wraps the core service status functionality for use in the CLI.
- * It transforms CLI arguments into the format expected by the core library,
- * queries the API status, and outputs the results to the console.
+ * It executes the status check and outputs the results to the console in the specified format.
  *
- * @param {ServiceStatusArgv} argv Command-line arguments from Yargs
+ * Supports optional configuration overrides for caching, rate limiting, and retry logic.
+ * When no configuration flags are provided, sensible defaults are applied automatically.
+ *
+ * @param {ServiceStatusArgv} argv Command-line arguments from Yargs containing output format and optional configuration
+ * @param {OutputFormat} argv.format Output format (required)
+ * @param {boolean} [argv.noCache] Disable response caching
+ * @param {number} [argv.cacheTtl] Cache time-to-live in milliseconds
+ * @param {number} [argv.cacheMaxSize] Maximum number of cached entries
+ * @param {boolean} [argv.noRateLimit] Disable rate limiting
+ * @param {number} [argv.rateLimit] Maximum number of requests per interval
+ * @param {number} [argv.rateLimitInterval] Time interval in milliseconds for rate limiting
+ * @param {boolean} [argv.noRetry] Disable retry logic on failures
+ * @param {number} [argv.retryMaxAttempts] Maximum number of retry attempts
+ * @param {number} [argv.retryInitialDelay] Initial delay in milliseconds before first retry
  * @returns {Promise<void>} A promise that resolves when the status check is complete
  *
  * @internal
@@ -48,7 +64,18 @@ import type { ServiceStatusArgv } from './status.types'
 export const serviceStatusWrapper = (
   argv: ServiceStatusArgv
 ): Promise<void> => {
-  const { format } = argv
+  const {
+    format,
+    noCache,
+    cacheTtl,
+    cacheMaxSize,
+    noRateLimit,
+    rateLimit,
+    rateLimitInterval,
+    noRetry,
+    retryMaxAttempts,
+    retryInitialDelay
+  } = argv
 
   const validationResult = safeValidateArgs(serviceStatusSchema, {
     statusFormat: format
@@ -59,6 +86,30 @@ export const serviceStatusWrapper = (
   }
 
   const options: StatusOptions = { format }
+
+  if (noCache !== undefined || cacheTtl !== undefined || cacheMaxSize !== undefined) {
+    options.cache = {
+      ...(noCache && { enabled: false }),
+      ...(cacheTtl !== undefined && { ttl: cacheTtl }),
+      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize })
+    }
+  }
+
+  if (noRateLimit !== undefined || rateLimit !== undefined || rateLimitInterval !== undefined) {
+    options.rateLimit = {
+      ...(noRateLimit && { enabled: false }),
+      ...(rateLimit !== undefined && { limit: rateLimit }),
+      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval })
+    }
+  }
+
+  if (noRetry !== undefined || retryMaxAttempts !== undefined || retryInitialDelay !== undefined) {
+    options.retry = {
+      ...(noRetry && { enabled: false }),
+      ...(retryMaxAttempts !== undefined && { maxAttempts: retryMaxAttempts }),
+      ...(retryInitialDelay !== undefined && { initialDelay: retryInitialDelay })
+    } as RetryConfig
+  }
 
   const response = serviceStatus(options)
   const handledResponse = responseParser(response)
