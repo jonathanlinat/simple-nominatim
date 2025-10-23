@@ -21,10 +21,10 @@
   "license": "MIT",
   "author": "Jonathan Linat (https://github.com/jonathanlinat)",
   "type": "module",
-  "main": "./dist/index.mjs",
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "simple-nominatim": "./dist/index.mjs"
+    "simple-nominatim": "./dist/index.js"
   },
   "files": [
     "dist"
