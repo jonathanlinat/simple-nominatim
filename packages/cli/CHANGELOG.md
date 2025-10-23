@@ -1,5 +1,16 @@
 # @simple-nominatim/cli
 
+## 0.4.0
+
+### Minor Changes
+
+- Improve package configuration and build setup. ([#19](https://github.com/jonathanlinat/simple-nominatim/pull/19))
+
+### Patch Changes
+
+- Updated dependencies [[`3b78be0`](https://github.com/jonathanlinat/simple-nominatim/commit/3b78be084e82f1999722139ccf87b3b7987bf03f)]:
+  - @simple-nominatim/core@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

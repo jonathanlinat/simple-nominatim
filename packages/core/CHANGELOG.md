@@ -1,5 +1,11 @@
 # @simple-nominatim/core
 
+## 0.4.0
+
+### Minor Changes
+
+- Improve package configuration and build setup. ([#19](https://github.com/jonathanlinat/simple-nominatim/pull/19))
+
 ## 0.3.0
 
 ### Minor Changes
