@@ -48,8 +48,8 @@ To maintain code quality and consistency, this project adopts various linting, f
 - **Prettier**: An opinionated code formatter that enforces a consistent style by parsing code and reprinting it.
 - **Simple Git Hooks**: Provides tools to set up Git hooks to automate tasks like running linters before commits.
 - **Turborepo**: A high-performance build system for JavaScript and TypeScript monorepos, optimizing task execution across workspaces.
+- **tsdown**: The elegant bundler for libraries powered by Rolldown, providing blazing fast builds and declaration files.
 - **TypeScript**: Provides static type checking with strict mode enabled for enhanced type safety.
-- **Unbuild**: An unified and simplified JavaScript build system.
 
 It's recommended to familiarize yourself with these tools, their configurations, and the associated NPM scripts to ensure smooth contribution and integration within the project.
 

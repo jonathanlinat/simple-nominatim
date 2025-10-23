@@ -33,7 +33,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "unbuild",
+    "build": "tsdown",
     "prepare": "pnpm build",
     "test:types": "tsc --noEmit --project tsconfig.test.json"
   },
@@ -46,7 +46,6 @@
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
-    "typescript": "^5.9.3",
-    "unbuild": "^3.6.1"
+    "typescript": "^5.9.3"
   }
 }

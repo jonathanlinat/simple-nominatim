@@ -4,6 +4,8 @@
     "build": {
       "dependsOn": ["^build"]
     },
-    "test:types": {}
+    "test:types": {
+      "cache": false
+    }
   }
 }

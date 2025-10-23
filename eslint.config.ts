@@ -1,5 +1,7 @@
 import js from '@eslint/js'
 import prettier from 'eslint-config-prettier'
+// @ts-ignore - No type definitions available
+import eslintComments from 'eslint-plugin-eslint-comments'
 import importPlugin from 'eslint-plugin-import'
 import jsdoc from 'eslint-plugin-jsdoc'
 import jsoncPlugin from 'eslint-plugin-jsonc'
@@ -12,11 +14,18 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   prettier,
   {
+    ignores: ['**/node_modules/**', '**/dist/**', '**/.turbo/**']
+  },
+  {
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
     plugins: {
       import: importPlugin,
-      promise: promisePlugin
+      promise: promisePlugin,
+      'eslint-comments': eslintComments,
+      jsdoc
     },
     rules: {
+      ...eslintComments.configs.recommended.rules,
       '@typescript-eslint/ban-ts-comment': 'off',
       'spaced-comment': [
         'error',
@@ -34,6 +43,15 @@ export default tseslint.config(
         }
       ],
       'no-inline-comments': 'error',
+      'capitalized-comments': [
+        'error',
+        'always',
+        {
+          ignorePattern: 'pragma|ignored|prettier-ignore|webpack\\w+:|c8|type-coverage:|eslint-|@ts-',
+          ignoreInlineComments: true,
+          ignoreConsecutiveComments: true
+        }
+      ],
       'no-warning-comments': [
         'error',
         {
@@ -70,6 +88,7 @@ export default tseslint.config(
       ],
       'import/newline-after-import': ['error', { count: 1 }],
       'import/no-duplicates': 'error',
+      'import/no-default-export': 'error',
       'import/first': 'error',
       'padding-line-between-statements': [
         'error',
@@ -98,19 +117,13 @@ export default tseslint.config(
     }
   },
   {
-    files: ['eslint.config.ts', 'packages/cli/src/index.ts', '**/build.config.ts', '**/build.config.*.ts'],
+    files: ['**/*.ts'],
     rules: {
       'import/no-default-export': 'off'
     }
   },
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/.turbo/**']
-  },
-  {
-    files: ['**/*.ts', '**/*.mts', '**/*.cts'],
-    plugins: {
-      jsdoc
-    },
+    files: ['**/*.ts'],
     rules: {
       'jsdoc/require-jsdoc': [
         'error',
