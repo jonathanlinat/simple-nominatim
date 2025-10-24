@@ -36,7 +36,7 @@ describe("CacheManager", () => {
     cache = new CacheManager();
   });
 
-  describe("Constructor", () => {
+  describe("constructor()", () => {
     it("should create cache with default config", () => {
       expect(cache.isEnabled()).toBe(true);
       expect(cache.getStats().size).toBe(0);
@@ -270,7 +270,7 @@ describe("CacheManager", () => {
     });
   });
 
-  describe("Max size behavior", () => {
+  describe("max size behavior", () => {
     it("should respect max size limit", () => {
       const smallCache = new CacheManager<{ data: string }>({ maxSize: 2 });
 

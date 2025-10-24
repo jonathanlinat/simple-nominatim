@@ -48,7 +48,7 @@ import type { GeocodeReverseArgv } from "./reverse.types";
  * Supports optional configuration overrides for caching, rate limiting, and retry logic.
  * When no configuration flags are provided, sensible defaults are applied automatically.
  *
- * @param {GeocodeReverseArgv} argv Command-line arguments from Yargs containing coordinates and optional configuration
+ * @param {GeocodeReverseArgv} argv Command-line arguments from Commander containing coordinates and optional configuration
  * @param {string} argv.latitude Latitude coordinate (required)
  * @param {string} argv.longitude Longitude coordinate (required)
  * @param {string} [argv.email] Email address for identification when making large numbers of requests

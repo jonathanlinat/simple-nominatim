@@ -11,17 +11,11 @@
     "openstreetmap"
   ],
   "homepage": "https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/cli#readme",
-  "bugs": {
-    "url": "https://github.com/jonathanlinat/simple-nominatim/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jonathanlinat/simple-nominatim.git"
-  },
+  "bugs": "https://github.com/jonathanlinat/simple-nominatim/issues",
+  "repository": "jonathanlinat/simple-nominatim.git",
   "license": "MIT",
   "author": "Jonathan Linat (https://github.com/jonathanlinat)",
   "type": "module",
-  "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
@@ -33,6 +27,7 @@
   "scripts": {
     "build": "tsdown",
     "clean": "rm -rf dist",
+    "lint": "eslint --fix",
     "prepare": "pnpm build",
     "simple-nominatim": "tsx ./src/index.ts",
     "test": "vitest run --typecheck",
@@ -43,12 +38,10 @@
   },
   "dependencies": {
     "@simple-nominatim/core": "workspace:*",
-    "yargs": "^18.0.0",
+    "commander": "^14.0.1",
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@rollup/plugin-terser": "^0.4.4",
-    "@types/yargs": "^17.0.33",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   },
@@ -57,5 +50,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "sideEffects": false
 }

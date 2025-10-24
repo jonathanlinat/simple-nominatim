@@ -11,17 +11,15 @@
     "openstreetmap"
   ],
   "homepage": "https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/core#readme",
-  "bugs": {
-    "url": "https://github.com/jonathanlinat/simple-nominatim/issues"
+  "bugs": "https://github.com/jonathanlinat/simple-nominatim/issues",
+  "publishConfig": {
+    "access": "public"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jonathanlinat/simple-nominatim.git"
-  },
+  "repository": "jonathanlinat/simple-nominatim.git",
   "license": "MIT",
   "author": "Jonathan Linat (https://github.com/jonathanlinat)",
-  "type": "module",
   "sideEffects": false,
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -36,6 +34,7 @@
   "scripts": {
     "build": "tsdown",
     "clean": "rm -rf dist",
+    "lint": "eslint --fix",
     "prepare": "pnpm build",
     "test": "vitest run --typecheck",
     "test:coverage": "vitest run --typecheck --coverage",
@@ -43,15 +42,11 @@
     "test:watch": "vitest --typecheck",
     "typecheck": "tsc --noEmit"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "dependencies": {
     "lru-cache": "^11.2.2",
     "p-throttle": "^8.0.0"
   },
   "devDependencies": {
-    "@rollup/plugin-terser": "^0.4.4",
     "typescript": "^5.9.3"
   },
   "engines": {

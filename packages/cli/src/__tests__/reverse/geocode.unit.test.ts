@@ -93,47 +93,13 @@ describe("geocodeReverseWrapper", () => {
   });
 
   describe("cache options", () => {
-    it("should pass cache options when noCache is set", async () => {
+    it("should pass cache configuration", async () => {
       const argv: GeocodeReverseArgv = {
         latitude: "51.5074",
         longitude: "-0.1278",
         format: "json",
         noCache: true,
-      };
-
-      await geocodeReverseWrapper(argv);
-
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          cache: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass cacheTtl option", async () => {
-      const argv: GeocodeReverseArgv = {
-        latitude: "51.5074",
-        longitude: "-0.1278",
-        format: "json",
         cacheTtl: 10000,
-      };
-
-      await geocodeReverseWrapper(argv);
-
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          cache: expect.objectContaining({ ttl: 10000 }),
-        }),
-      );
-    });
-
-    it("should pass cacheMaxSize option", async () => {
-      const argv: GeocodeReverseArgv = {
-        latitude: "51.5074",
-        longitude: "-0.1278",
-        format: "json",
         cacheMaxSize: 200,
       };
 
@@ -142,54 +108,24 @@ describe("geocodeReverseWrapper", () => {
       expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
-          cache: expect.objectContaining({ maxSize: 200 }),
+          cache: expect.objectContaining({
+            enabled: false,
+            ttl: 10000,
+            maxSize: 200,
+          }),
         }),
       );
     });
   });
 
   describe("rate limit options", () => {
-    it("should pass rate limit options when noRateLimit is set", async () => {
+    it("should pass rate limit configuration", async () => {
       const argv: GeocodeReverseArgv = {
         latitude: "51.5074",
         longitude: "-0.1278",
         format: "json",
         noRateLimit: true,
-      };
-
-      await geocodeReverseWrapper(argv);
-
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass rateLimit option", async () => {
-      const argv: GeocodeReverseArgv = {
-        latitude: "51.5074",
-        longitude: "-0.1278",
-        format: "json",
         rateLimit: 5,
-      };
-
-      await geocodeReverseWrapper(argv);
-
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({ limit: 5 }),
-        }),
-      );
-    });
-
-    it("should pass rateLimitInterval option", async () => {
-      const argv: GeocodeReverseArgv = {
-        latitude: "51.5074",
-        longitude: "-0.1278",
-        format: "json",
         rateLimitInterval: 2000,
       };
 
@@ -198,54 +134,24 @@ describe("geocodeReverseWrapper", () => {
       expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
-          rateLimit: expect.objectContaining({ interval: 2000 }),
+          rateLimit: expect.objectContaining({
+            enabled: false,
+            limit: 5,
+            interval: 2000,
+          }),
         }),
       );
     });
   });
 
   describe("retry options", () => {
-    it("should pass retry options when noRetry is set", async () => {
+    it("should pass retry configuration", async () => {
       const argv: GeocodeReverseArgv = {
         latitude: "51.5074",
         longitude: "-0.1278",
         format: "json",
         noRetry: true,
-      };
-
-      await geocodeReverseWrapper(argv);
-
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          retry: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass retryMaxAttempts option", async () => {
-      const argv: GeocodeReverseArgv = {
-        latitude: "51.5074",
-        longitude: "-0.1278",
-        format: "json",
         retryMaxAttempts: 5,
-      };
-
-      await geocodeReverseWrapper(argv);
-
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          retry: expect.objectContaining({ maxAttempts: 5 }),
-        }),
-      );
-    });
-
-    it("should pass retryInitialDelay option", async () => {
-      const argv: GeocodeReverseArgv = {
-        latitude: "51.5074",
-        longitude: "-0.1278",
-        format: "json",
         retryInitialDelay: 2000,
       };
 
@@ -254,7 +160,11 @@ describe("geocodeReverseWrapper", () => {
       expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
-          retry: expect.objectContaining({ initialDelay: 2000 }),
+          retry: expect.objectContaining({
+            enabled: false,
+            maxAttempts: 5,
+            initialDelay: 2000,
+          }),
         }),
       );
     });
@@ -262,6 +172,10 @@ describe("geocodeReverseWrapper", () => {
 
   describe("error handling", () => {
     it("should handle API errors", async () => {
+      const processExitSpy = vi
+        .spyOn(process, "exit")
+        .mockImplementation(() => undefined as never);
+
       vi.mocked(geocodeReverse).mockRejectedValue(new Error("API Error"));
 
       const argv: GeocodeReverseArgv = {
@@ -273,6 +187,9 @@ describe("geocodeReverseWrapper", () => {
       await geocodeReverseWrapper(argv);
 
       expect(console.error).toHaveBeenCalled();
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+
+      processExitSpy.mockRestore();
     });
 
     it("should handle validation errors", async () => {

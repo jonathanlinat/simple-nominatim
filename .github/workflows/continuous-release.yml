@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Checkout ${{ github.ref }}
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/install-tools-dependencies
-      - name: Proceed to release
-        uses: changesets/action@v1
+      - uses: changesets/action@v1
         with:
           version: pnpm ci:version
           publish: pnpm ci:release

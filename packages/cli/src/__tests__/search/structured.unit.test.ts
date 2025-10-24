@@ -138,12 +138,14 @@ describe("structuredSearchWrapper", () => {
   });
 
   describe("cache options", () => {
-    it("should pass cache options when noCache is set", async () => {
+    it("should pass cache configuration", async () => {
       const argv: StructuredArgv = {
-        country: "Italy",
-        city: "Rome",
+        country: "UK",
+        city: "London",
         format: "json",
         noCache: true,
+        cacheTtl: 6000,
+        cacheMaxSize: 120,
       };
 
       await structuredSearchWrapper(argv);
@@ -151,90 +153,24 @@ describe("structuredSearchWrapper", () => {
       expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
-          cache: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass cacheTtl option", async () => {
-      const argv: StructuredArgv = {
-        country: "Netherlands",
-        city: "Amsterdam",
-        format: "json",
-        cacheTtl: 20000,
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          cache: expect.objectContaining({ ttl: 20000 }),
-        }),
-      );
-    });
-
-    it("should pass cacheMaxSize option", async () => {
-      const argv: StructuredArgv = {
-        country: "Belgium",
-        city: "Brussels",
-        format: "json",
-        cacheMaxSize: 400,
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          cache: expect.objectContaining({ maxSize: 400 }),
+          cache: expect.objectContaining({
+            enabled: false,
+            ttl: 6000,
+            maxSize: 120,
+          }),
         }),
       );
     });
   });
 
   describe("rate limit options", () => {
-    it("should pass rate limit options when noRateLimit is set", async () => {
+    it("should pass rate limit configuration", async () => {
       const argv: StructuredArgv = {
         country: "Austria",
         city: "Vienna",
         format: "json",
         noRateLimit: true,
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass rateLimit option", async () => {
-      const argv: StructuredArgv = {
-        country: "Czech Republic",
-        city: "Prague",
-        format: "json",
         rateLimit: 2,
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({ limit: 2 }),
-        }),
-      );
-    });
-
-    it("should pass rateLimitInterval option", async () => {
-      const argv: StructuredArgv = {
-        country: "Denmark",
-        city: "Copenhagen",
-        format: "json",
         rateLimitInterval: 2500,
       };
 
@@ -243,54 +179,24 @@ describe("structuredSearchWrapper", () => {
       expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
-          rateLimit: expect.objectContaining({ interval: 2500 }),
+          rateLimit: expect.objectContaining({
+            enabled: false,
+            limit: 2,
+            interval: 2500,
+          }),
         }),
       );
     });
   });
 
   describe("retry options", () => {
-    it("should pass retry options when noRetry is set", async () => {
+    it("should pass retry configuration", async () => {
       const argv: StructuredArgv = {
         country: "Sweden",
         city: "Stockholm",
         format: "json",
         noRetry: true,
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          retry: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass retryMaxAttempts option", async () => {
-      const argv: StructuredArgv = {
-        country: "Norway",
-        city: "Oslo",
-        format: "json",
         retryMaxAttempts: 6,
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          retry: expect.objectContaining({ maxAttempts: 6 }),
-        }),
-      );
-    });
-
-    it("should pass retryInitialDelay option", async () => {
-      const argv: StructuredArgv = {
-        country: "Finland",
-        city: "Helsinki",
-        format: "json",
         retryInitialDelay: 1800,
       };
 
@@ -299,7 +205,11 @@ describe("structuredSearchWrapper", () => {
       expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
-          retry: expect.objectContaining({ initialDelay: 1800 }),
+          retry: expect.objectContaining({
+            enabled: false,
+            maxAttempts: 6,
+            initialDelay: 1800,
+          }),
         }),
       );
     });
@@ -307,6 +217,10 @@ describe("structuredSearchWrapper", () => {
 
   describe("error handling", () => {
     it("should handle API errors", async () => {
+      const processExitSpy = vi
+        .spyOn(process, "exit")
+        .mockImplementation(() => undefined as never);
+
       vi.mocked(structuredSearch).mockRejectedValue(new Error("Search failed"));
 
       const argv: StructuredArgv = {
@@ -318,6 +232,9 @@ describe("structuredSearchWrapper", () => {
       await structuredSearchWrapper(argv);
 
       expect(console.error).toHaveBeenCalled();
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+
+      processExitSpy.mockRestore();
     });
 
     it("should handle validation errors", async () => {

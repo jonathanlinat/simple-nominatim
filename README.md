@@ -32,8 +32,8 @@ For detailed instructions on how to use the tools, navigate to the `./packages` 
 Before you can modify the source code and test the application locally, ensure you have the following tools/packages installed:
 
 - **Git**: [Download Git](https://git-scm.com/)
-- **Node.js (v22.17.1)**: [Download Node.js](https://nodejs.org/dist/latest-v22.x/) or use [NVM](https://github.com/nvm-sh/nvm) for version management
-- **pnpm (v10.18.3)**: [Install pnpm](https://pnpm.io/installation#installing-a-specific-version)
+- **Node.js (`22.17.1`)**: [Download Node.js](https://nodejs.org/dist/latest-v22.x/) or use [NVM](https://github.com/nvm-sh/nvm) for version management
+- **pnpm (`10.18.3`)**: [Install pnpm](https://pnpm.io/installation#installing-a-specific-version)
 
 ### Coding Standards & Tools
 
@@ -42,14 +42,14 @@ To maintain code quality and consistency, this project adopts various linting, f
 - **Changesets**: A tool that manages versioning and changelog generation with a focus on multi-package repositories.
 - **Commitlint**: Enforces a consistent commit convention, which helps in generating changelogs and navigating the history.
 - **ESLint**: Analyzes the JavaScript code for potential errors and deviations from coding standards.
-- **expect-type**: Provides compile-time type testing to ensure TypeScript type correctness.
 - **Lint Staged**: Runs linters on pre-committed code in git. Ensures you're only committing files that meet your linting criteria.
 - **Markdownlint**: Lints the Markdown files to ensure consistent and correct Markdown syntax.
 - **Prettier**: An opinionated code formatter that enforces a consistent style by parsing code and reprinting it.
 - **Simple Git Hooks**: Provides tools to set up Git hooks to automate tasks like running linters before commits.
-- **Turborepo**: A high-performance build system for JavaScript and TypeScript monorepos, optimizing task execution across workspaces.
 - **tsdown**: The elegant bundler for libraries powered by Rolldown, providing blazing fast builds and declaration files.
+- **Turborepo**: A high-performance build system for JavaScript and TypeScript monorepos, optimizing task execution across workspaces.
 - **TypeScript**: Provides static type checking with strict mode enabled for enhanced type safety.
+- **Vitest**: A blazing fast unit test framework powered by Vite, providing native ESM support and built-in coverage tools.
 
 It's recommended to familiarize yourself with these tools, their configurations, and the associated NPM scripts to ensure smooth contribution and integration within the project.
 

@@ -107,11 +107,13 @@ describe("freeFormSearchWrapper", () => {
   });
 
   describe("cache options", () => {
-    it("should pass cache options when noCache is set", async () => {
+    it("should pass cache configuration", async () => {
       const argv: FreeFormArgv = {
-        query: "Berlin",
+        query: "London",
         format: "json",
         noCache: true,
+        cacheTtl: 5000,
+        cacheMaxSize: 150,
       };
 
       await freeFormSearchWrapper(argv);
@@ -119,69 +121,24 @@ describe("freeFormSearchWrapper", () => {
       expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
-          cache: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass cacheTtl option", async () => {
-      const argv: FreeFormArgv = {
-        query: "Rome",
-        format: "json",
-        cacheTtl: 15000,
-      };
-
-      await freeFormSearchWrapper(argv);
-
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          cache: expect.objectContaining({ ttl: 15000 }),
-        }),
-      );
-    });
-
-    it("should pass cacheMaxSize option", async () => {
-      const argv: FreeFormArgv = {
-        query: "Madrid",
-        format: "json",
-        cacheMaxSize: 300,
-      };
-
-      await freeFormSearchWrapper(argv);
-
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          cache: expect.objectContaining({ maxSize: 300 }),
+          cache: expect.objectContaining({
+            enabled: false,
+            ttl: 5000,
+            maxSize: 150,
+          }),
         }),
       );
     });
   });
 
   describe("rate limit options", () => {
-    it("should pass rate limit options when noRateLimit is set", async () => {
+    it("should pass rate limit configuration", async () => {
       const argv: FreeFormArgv = {
-        query: "Amsterdam",
+        query: "London",
         format: "json",
         noRateLimit: true,
-      };
-
-      await freeFormSearchWrapper(argv);
-
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass rateLimit option", async () => {
-      const argv: FreeFormArgv = {
-        query: "Brussels",
-        format: "json",
         rateLimit: 3,
+        rateLimitInterval: 1500,
       };
 
       await freeFormSearchWrapper(argv);
@@ -189,68 +146,23 @@ describe("freeFormSearchWrapper", () => {
       expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
-          rateLimit: expect.objectContaining({ limit: 3 }),
-        }),
-      );
-    });
-
-    it("should pass rateLimitInterval option", async () => {
-      const argv: FreeFormArgv = {
-        query: "Vienna",
-        format: "json",
-        rateLimitInterval: 3000,
-      };
-
-      await freeFormSearchWrapper(argv);
-
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({ interval: 3000 }),
+          rateLimit: expect.objectContaining({
+            enabled: false,
+            limit: 3,
+            interval: 1500,
+          }),
         }),
       );
     });
   });
 
   describe("retry options", () => {
-    it("should pass retry options when noRetry is set", async () => {
+    it("should pass retry configuration", async () => {
       const argv: FreeFormArgv = {
-        query: "Prague",
+        query: "London",
         format: "json",
         noRetry: true,
-      };
-
-      await freeFormSearchWrapper(argv);
-
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          retry: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass retryMaxAttempts option", async () => {
-      const argv: FreeFormArgv = {
-        query: "Copenhagen",
-        format: "json",
         retryMaxAttempts: 4,
-      };
-
-      await freeFormSearchWrapper(argv);
-
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          retry: expect.objectContaining({ maxAttempts: 4 }),
-        }),
-      );
-    });
-
-    it("should pass retryInitialDelay option", async () => {
-      const argv: FreeFormArgv = {
-        query: "Stockholm",
-        format: "json",
         retryInitialDelay: 1500,
       };
 
@@ -259,7 +171,11 @@ describe("freeFormSearchWrapper", () => {
       expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
-          retry: expect.objectContaining({ initialDelay: 1500 }),
+          retry: expect.objectContaining({
+            enabled: false,
+            maxAttempts: 4,
+            initialDelay: 1500,
+          }),
         }),
       );
     });
@@ -267,6 +183,10 @@ describe("freeFormSearchWrapper", () => {
 
   describe("error handling", () => {
     it("should handle API errors", async () => {
+      const processExitSpy = vi
+        .spyOn(process, "exit")
+        .mockImplementation(() => undefined as never);
+
       vi.mocked(freeFormSearch).mockRejectedValue(new Error("Search failed"));
 
       const argv: FreeFormArgv = {
@@ -277,6 +197,9 @@ describe("freeFormSearchWrapper", () => {
       await freeFormSearchWrapper(argv);
 
       expect(console.error).toHaveBeenCalled();
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+
+      processExitSpy.mockRestore();
     });
 
     it("should handle validation errors", async () => {

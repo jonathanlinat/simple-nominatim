@@ -39,7 +39,7 @@ describe("RateLimiter", () => {
     vi.useRealTimers();
   });
 
-  describe("constructor", () => {
+  describe("constructor()", () => {
     it("should create with default configuration", () => {
       const defaultLimiter = new RateLimiter();
 

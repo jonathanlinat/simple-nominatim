@@ -82,32 +82,35 @@ describe("serviceStatus", () => {
   });
 
   describe("format options", () => {
-    it("should work with JSON format", async () => {
+    it("should handle different formats correctly", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => mockResponse,
       });
 
-      const result = await serviceStatus({ format: "json" });
-
+      let result = await serviceStatus({ format: "json" });
       expect(result).toEqual(mockResponse);
-    });
 
-    it("should work with text format", async () => {
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      const url = callArgs![0] as string;
+      expect(url).toContain("format=json");
+      expect(url).not.toMatch(/undefined/);
+
+      vi.clearAllMocks();
       const textResponse = "OK";
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         text: async () => textResponse,
       });
 
-      const result = await serviceStatus({ format: "text" });
-
+      result = await serviceStatus({ format: "text" });
       expect(result).toBe(textResponse);
     });
   });
 
   describe("cache options", () => {
-    it("should work with cache disabled", async () => {
+    it("should work with cache configuration", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => mockResponse,
@@ -115,21 +118,7 @@ describe("serviceStatus", () => {
 
       await serviceStatus({
         format: "json",
-        cache: { enabled: false },
-      });
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("should work with custom cache settings", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await serviceStatus({
-        format: "json",
-        cache: { enabled: true, maxSize: 50, ttl: 10000 },
+        cache: { enabled: false, maxSize: 50, ttl: 10000 },
       });
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -137,7 +126,7 @@ describe("serviceStatus", () => {
   });
 
   describe("rate limit options", () => {
-    it("should work with rate limiting disabled", async () => {
+    it("should work with rate limit configuration", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => mockResponse,
@@ -145,21 +134,7 @@ describe("serviceStatus", () => {
 
       await serviceStatus({
         format: "json",
-        rateLimit: { enabled: false },
-      });
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("should work with custom rate limit settings", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await serviceStatus({
-        format: "json",
-        rateLimit: { enabled: true, limit: 5 },
+        rateLimit: { enabled: false, limit: 5 },
       });
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -167,21 +142,7 @@ describe("serviceStatus", () => {
   });
 
   describe("retry options", () => {
-    it("should work with retry disabled", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await serviceStatus({
-        format: "json",
-        retry: { enabled: false },
-      });
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("should retry on failure", async () => {
+    it("should work with retry configuration", async () => {
       let callCount = 0;
       global.fetch = vi.fn().mockImplementation(async () => {
         callCount++;
