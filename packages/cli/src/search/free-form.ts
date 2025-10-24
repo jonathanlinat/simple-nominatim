@@ -48,7 +48,7 @@ import type { FreeFormArgv } from "./search.types";
  * Supports optional configuration overrides for caching, rate limiting, and retry logic.
  * When no configuration flags are provided, sensible defaults are applied automatically.
  *
- * @param {FreeFormArgv} argv Command-line arguments from Yargs
+ * @param {FreeFormArgv} argv Command-line arguments from Commander
  * @param {string} argv.query Free-form query string to search (required)
  * @param {string} [argv.email] Email address for identification when making large numbers of requests
  * @param {OutputFormat} argv.format Output format (required)

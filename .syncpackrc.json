@@ -1,0 +1,37 @@
+{
+  "source": [
+    "package.json",
+    "packages/*/package.json"
+  ],
+  "dependencyTypes": [
+    "prod",
+    "dev",
+    "peer"
+  ],
+  "semverGroups": [
+    {
+      "label": "Use caret ranges for most dependencies",
+      "range": "^",
+      "dependencies": ["**"],
+      "packages": ["**"]
+    }
+  ],
+  "versionGroups": [
+    {
+      "label": "TypeScript should be the same everywhere",
+      "dependencies": ["typescript"],
+      "packages": ["**"]
+    },
+    {
+      "label": "Vitest packages should be the same everywhere",
+      "dependencies": ["vitest", "@vitest/**"],
+      "packages": ["**"]
+    },
+    {
+      "label": "Keep workspace protocol for local packages",
+      "dependencies": ["@simple-nominatim/**"],
+      "dependencyTypes": ["prod"],
+      "pinVersion": "workspace:*"
+    }
+  ]
+}

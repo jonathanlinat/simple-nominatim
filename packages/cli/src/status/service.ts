@@ -43,7 +43,7 @@ import type { ServiceStatusArgv } from "./status.types";
  * Supports optional configuration overrides for caching, rate limiting, and retry logic.
  * When no configuration flags are provided, sensible defaults are applied automatically.
  *
- * @param {ServiceStatusArgv} argv Command-line arguments from Yargs containing output format and optional configuration
+ * @param {ServiceStatusArgv} argv Command-line arguments from Commander containing output format and optional configuration
  * @param {OutputFormat} argv.format Output format (required)
  * @param {boolean} [argv.noCache] Disable response caching
  * @param {number} [argv.cacheTtl] Cache time-to-live in milliseconds

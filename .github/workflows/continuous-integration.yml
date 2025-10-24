@@ -5,37 +5,41 @@ on:
       - main
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
+  security:
+    name: Conduct security audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/install-tools-dependencies
+      - run: pnpm security:audit
+        shell: bash
+        continue-on-error: true
   lint:
     name: Lint the source code
     runs-on: ubuntu-latest
+    needs: security
     steps:
-      - name: Checkout ${{ github.ref }}
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/install-tools-dependencies
-      - name: Lint the packages
+      - run: |
+          pnpm lint:code
+          pnpm lint:markdown
         shell: bash
-        run: |
-          pnpm packages:lint:code
-          pnpm packages:lint:markdown
   test:
     name: Test the source code
     runs-on: ubuntu-latest
     needs: lint
     steps:
-      - name: Checkout ${{ github.ref }}
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/install-tools-dependencies
-      - name: Test the packages
+      - run: pnpm packages:test
         shell: bash
-        run: pnpm packages:test
   build:
     name: Build the packages
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - name: Checkout ${{ github.ref }}
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/install-tools-dependencies
-      - name: Build the packages
+      - run: pnpm packages:build
         shell: bash
-        run: pnpm packages:build

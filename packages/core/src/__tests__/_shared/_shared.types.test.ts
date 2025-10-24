@@ -25,14 +25,14 @@
 import { expectTypeOf } from "vitest";
 
 import type {
-  OutputFormat,
   BaseOptions,
-  SearchOptions,
-  ReverseOptions,
-  DataFetcherOptions,
-  RetryConfig,
   CacheConfig,
+  DataFetcherOptions,
+  OutputFormat,
   RateLimitConfig,
+  ReverseOptions,
+  RetryConfig,
+  SearchOptions,
 } from "../../index";
 
 /**

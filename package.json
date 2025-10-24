@@ -1,16 +1,10 @@
 {
   "name": "simple-nominatim",
   "version": "0.0.0",
-  "private": true,
   "description": "Monorepo for Simple Nominatim packages",
   "homepage": "https://github.com/jonathanlinat/simple-nominatim#readme",
-  "bugs": {
-    "url": "https://github.com/jonathanlinat/simple-nominatim/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jonathanlinat/simple-nominatim.git"
-  },
+  "bugs": "https://github.com/jonathanlinat/simple-nominatim/issues",
+  "repository": "jonathanlinat/simple-nominatim.git",
   "license": "MIT",
   "author": "Jonathan Linat (https://github.com/jonathanlinat)",
   "type": "module",
@@ -18,17 +12,27 @@
     "ci:release": "changeset publish",
     "ci:version": "changeset version",
     "clean": "turbo run clean && rm -rf node_modules",
+    "deps:check": "syncpack lint",
+    "deps:fix": "syncpack fix-mismatches",
+    "deps:format": "syncpack format",
+    "deps:list": "syncpack list",
+    "deps:update": "syncpack update",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "lint:code": "eslint --fix",
+    "lint:markdown": "markdownlint-cli2 --fix 'packages/**/*.md' '#packages/**/node_modules/**/*.md'",
     "packages:build": "turbo run build",
     "packages:build:watch": "turbo run build --watch",
-    "packages:lint:code": "eslint --fix",
-    "packages:lint:markdown": "markdownlint-cli2 --fix 'packages/**/*.md' '#packages/**/node_modules/**/*.md'",
+    "packages:lint": "turbo run lint",
     "packages:test": "turbo run test",
     "packages:test:coverage": "turbo run test:coverage",
+    "packages:test:ui": "turbo run test:ui",
+    "packages:test:watch": "turbo run test:watch",
     "packages:typecheck": "turbo run typecheck",
     "postinstall": "pnpm simple-git-hooks",
-    "prepublishOnly": "pnpm packages:build && pnpm packages:test"
+    "prepublishOnly": "pnpm packages:build && pnpm packages:test",
+    "security:audit": "pnpm audit --audit-level=moderate",
+    "security:audit:fix": "pnpm audit --fix"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",
@@ -38,13 +42,13 @@
     "@eslint/js": "^9.38.0",
     "@svitejs/changesets-changelog-github-compact": "^1.2.0",
     "@types/node": "^24.9.1",
-    "@vitest/coverage-v8": "^4.0.1",
-    "@vitest/ui": "^4.0.1",
+    "@vitest/coverage-v8": "^4.0.3",
+    "@vitest/ui": "^4.0.3",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsdoc": "^61.1.5",
+    "eslint-plugin-jsdoc": "^61.1.7",
     "eslint-plugin-jsonc": "^2.21.0",
     "eslint-plugin-n": "^17.23.1",
     "eslint-plugin-prettier": "^5.5.4",
@@ -54,11 +58,12 @@
     "markdownlint-cli2": "^0.18.1",
     "prettier": "^3.6.2",
     "simple-git-hooks": "^2.13.1",
+    "syncpack": "^13.0.4",
     "tsdown": "^0.15.9",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
-    "vitest": "^4.0.1"
+    "vitest": "^4.0.3"
   },
   "engines": {
     "bun": "please-use-pnpm",
@@ -68,5 +73,6 @@
     "pnpm": "10.18.3",
     "yarn": "please-use-pnpm"
   },
-  "packageManager": "pnpm@10.18.3"
+  "packageManager": "pnpm@10.18.3",
+  "private": true
 }

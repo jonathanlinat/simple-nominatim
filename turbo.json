@@ -18,6 +18,12 @@
       "cache": false,
       "outputs": ["coverage/**"]
     },
+    "test:ui": {
+      "cache": false
+    },
+    "test:watch": {
+      "cache": false
+    },
     "typecheck": {
       "cache": false
     }

@@ -48,7 +48,7 @@ import type { StructuredArgv } from "./search.types";
  * Supports optional configuration overrides for caching, rate limiting, and retry logic.
  * When no configuration flags are provided, sensible defaults are applied automatically.
  *
- * @param {StructuredArgv} argv Command-line arguments from Yargs containing address components and optional configuration
+ * @param {StructuredArgv} argv Command-line arguments from Commander containing address components and optional configuration
  * @param {string} [argv.amenity] Name or type of point of interest (POI)
  * @param {string} [argv.city] City name
  * @param {string} argv.country Country name (required)

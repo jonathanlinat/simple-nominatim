@@ -332,7 +332,6 @@ describe("dataFetcher", () => {
 
       const params = new URLSearchParams({ q: "test" });
 
-      // With retry disabled, should fail immediately
       await expect(
         dataFetcher(endpoint, params, {
           retry: { enabled: false },

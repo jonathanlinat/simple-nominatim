@@ -45,6 +45,34 @@ export async function responseParser<T>(promise: Promise<T>): Promise<void> {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 
-    console.error(`Ups! Something went wrong... ${message}`);
+    if (message.includes("HTTP error! Status: 429")) {
+      console.error(
+        "Rate limit exceeded. Please try again later or reduce request frequency.",
+      );
+    } else if (message.includes("HTTP error! Status: 5")) {
+      console.error(
+        "Nominatim API is currently unavailable. Please try again later.",
+      );
+    } else if (message.includes("HTTP error! Status: 4")) {
+      console.error(
+        "Request failed. Please check your parameters and try again.",
+      );
+    } else if (
+      message.includes("Network") ||
+      message.includes("network") ||
+      message.includes("fetch failed")
+    ) {
+      console.error(
+        "Network connection failed. Please check your internet connection.",
+      );
+    } else if (message.includes("Request failed after all retry attempts")) {
+      console.error(
+        "Request failed after multiple retry attempts. Please try again later.",
+      );
+    } else {
+      console.error(`Error: ${message}`);
+    }
+
+    process.exit(1);
   }
 }

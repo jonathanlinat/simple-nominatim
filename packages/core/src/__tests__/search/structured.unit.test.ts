@@ -24,15 +24,15 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { freeFormSearch } from "../../search/free-form";
+import { structuredSearch } from "../../search/structured";
 
-describe("freeFormSearch", () => {
+describe("structuredSearch", () => {
   const mockResponse = [
     {
       place_id: 123,
-      display_name: "London, UK",
-      lat: "51.5074",
-      lon: "-0.1278",
+      display_name: "10 Downing Street, London, UK",
+      lat: "51.5034",
+      lon: "-0.1276",
     },
   ];
 
@@ -44,14 +44,14 @@ describe("freeFormSearch", () => {
   });
 
   describe("basic functionality", () => {
-    it("should perform free-form search with query", async () => {
+    it("should perform structured search with city", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => mockResponse,
       });
 
-      const result = await freeFormSearch(
-        { query: "London" },
+      const result = await structuredSearch(
+        { city: "London" },
         { format: "json" },
       );
 
@@ -59,19 +59,19 @@ describe("freeFormSearch", () => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
-    it("should construct URL with query parameter", async () => {
+    it("should construct URL with city parameter", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => mockResponse,
       });
 
-      await freeFormSearch({ query: "New York City" }, { format: "json" });
+      await structuredSearch({ city: "New York" }, { format: "json" });
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
       expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
       expect(url).toContain("search?");
-      expect(url).toContain("q=New+York+City");
+      expect(url).toContain("city=New+York");
     });
 
     it("should return array of results", async () => {
@@ -85,8 +85,8 @@ describe("freeFormSearch", () => {
         json: async () => customResponse,
       });
 
-      const result = await freeFormSearch(
-        { query: "test" },
+      const result = await structuredSearch(
+        { city: "Paris" },
         { format: "json" },
       );
 
@@ -95,106 +95,86 @@ describe("freeFormSearch", () => {
     });
   });
 
-  describe("search options", () => {
-    it("should include limit parameter", async () => {
+  describe("structured parameters", () => {
+    it("should include all address components in URL", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => mockResponse,
       });
 
-      await freeFormSearch({ query: "London" }, { format: "json", limit: 5 });
-
-      const callArgs = vi.mocked(global.fetch).mock.calls[0];
-      expect(callArgs).toBeDefined();
-      const url = callArgs![0] as string;
-      expect(url).toContain("limit=5");
-    });
-
-    it("should include addressdetails parameter", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await freeFormSearch(
-        { query: "London" },
-        { format: "json", addressdetails: 1 },
-      );
-
-      const callArgs = vi.mocked(global.fetch).mock.calls[0];
-      expect(callArgs).toBeDefined();
-      const url = callArgs![0] as string;
-      expect(url).toContain("addressdetails=1");
-    });
-
-    it("should include multiple parameters", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await freeFormSearch(
-        { query: "London" },
+      await structuredSearch(
         {
-          format: "json",
-          limit: 10,
-          addressdetails: 1,
-          "accept-language": "en",
+          street: "10 Downing Street",
+          city: "London",
+          county: "Greater London",
+          state: "England",
+          postalcode: "SW1A 2AA",
+          country: "United Kingdom",
         },
+        { format: "json" },
       );
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
       expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
-      expect(url).toContain("format=json");
-      expect(url).toContain("limit=10");
-      expect(url).toContain("addressdetails=1");
-      expect(url).toContain("accept-language=en");
+      expect(url).toContain("street=10+Downing+Street");
+      expect(url).toContain("city=London");
+      expect(url).toContain("county=Greater+London");
+      expect(url).toContain("state=England");
+      expect(url).toContain("postalcode=SW1A+2AA");
+      expect(url).toContain("country=United+Kingdom");
     });
+  });
 
-    it("should omit undefined parameters", async () => {
+  describe("search options", () => {
+    it("should handle optional parameters correctly", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => mockResponse,
       });
 
-      await freeFormSearch(
-        { query: "London" },
-        { format: "json", limit: undefined },
+      await structuredSearch(
+        { city: "London" },
+        { format: "json", limit: 5, addressdetails: 1 },
       );
 
-      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      let callArgs = vi.mocked(global.fetch).mock.calls[0];
       expect(callArgs).toBeDefined();
-      const url = callArgs![0] as string;
-      expect(url).toContain("format=json");
+      let url = callArgs![0] as string;
+      expect(url).toContain("limit=5");
+      expect(url).toContain("addressdetails=1");
+
+      vi.clearAllMocks();
+      await structuredSearch(
+        {
+          city: "Paris",
+          street: undefined,
+          amenity: undefined,
+        },
+        { format: "json", limit: undefined, zoom: undefined },
+      );
+
+      callArgs = vi.mocked(global.fetch).mock.calls[0];
+      expect(callArgs).toBeDefined();
+      url = callArgs![0] as string;
+      expect(url).toContain("city=Paris");
+      expect(url).not.toContain("street=");
+      expect(url).not.toContain("amenity=");
       expect(url).not.toContain("limit=");
+      expect(url).not.toContain("zoom=");
     });
   });
 
   describe("cache options", () => {
-    it("should work with cache disabled", async () => {
+    it("should work with cache configuration", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => mockResponse,
       });
 
-      await freeFormSearch(
-        { query: "London" },
-        { format: "json", cache: { enabled: false } },
-      );
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("should work with custom cache settings", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await freeFormSearch(
-        { query: "London" },
-        { format: "json", cache: { enabled: true, maxSize: 200 } },
+      await structuredSearch(
+        { city: "London" },
+        { format: "json", cache: { enabled: false, maxSize: 200 } },
       );
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -202,29 +182,15 @@ describe("freeFormSearch", () => {
   });
 
   describe("rate limit options", () => {
-    it("should work with rate limiting disabled", async () => {
+    it("should work with rate limit configuration", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => mockResponse,
       });
 
-      await freeFormSearch(
-        { query: "London" },
-        { format: "json", rateLimit: { enabled: false } },
-      );
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("should work with custom rate limit settings", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await freeFormSearch(
-        { query: "London" },
-        { format: "json", rateLimit: { enabled: true, limit: 3 } },
+      await structuredSearch(
+        { city: "London" },
+        { format: "json", rateLimit: { enabled: false, limit: 3 } },
       );
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -232,21 +198,7 @@ describe("freeFormSearch", () => {
   });
 
   describe("retry options", () => {
-    it("should work with retry disabled", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await freeFormSearch(
-        { query: "London" },
-        { format: "json", retry: { enabled: false } },
-      );
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("should retry on failure", async () => {
+    it("should work with retry configuration", async () => {
       let callCount = 0;
       global.fetch = vi.fn().mockImplementation(async () => {
         callCount++;
@@ -257,8 +209,8 @@ describe("freeFormSearch", () => {
         return { ok: true, json: async () => mockResponse };
       });
 
-      const result = await freeFormSearch(
-        { query: "London" },
+      const result = await structuredSearch(
+        { city: "London" },
         {
           format: "json",
           retry: {
@@ -285,8 +237,8 @@ describe("freeFormSearch", () => {
       });
 
       await expect(
-        freeFormSearch(
-          { query: "invalid query" },
+        structuredSearch(
+          { city: "invalid" },
           { format: "json", retry: { enabled: false } },
         ),
       ).rejects.toThrow("HTTP error");
@@ -296,52 +248,11 @@ describe("freeFormSearch", () => {
       global.fetch = vi.fn().mockRejectedValue(new Error("Network failure"));
 
       await expect(
-        freeFormSearch(
-          { query: "London" },
+        structuredSearch(
+          { city: "London" },
           { format: "json", retry: { enabled: false } },
         ),
       ).rejects.toThrow("Network failure");
-    });
-  });
-
-  describe("query variations", () => {
-    it("should handle simple queries", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await freeFormSearch({ query: "Paris" }, { format: "json" });
-
-      const callArgs = vi.mocked(global.fetch).mock.calls[0];
-      expect(callArgs).toBeDefined();
-      const url = callArgs![0] as string;
-      expect(url).toContain("q=Paris");
-    });
-
-    it("should handle multi-word queries", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await freeFormSearch({ query: "New York City" }, { format: "json" });
-
-      const callArgs = vi.mocked(global.fetch).mock.calls[0];
-      expect(callArgs).toBeDefined();
-      const url = callArgs![0] as string;
-      expect(url).toContain("q=New+York+City");
-    });
-
-    it("should handle queries with special characters", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await freeFormSearch({ query: "São Paulo, Brazil" }, { format: "json" });
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -352,8 +263,12 @@ describe("freeFormSearch", () => {
         json: async () => mockResponse,
       });
 
-      const result = await freeFormSearch(
-        { query: "London" },
+      const result = await structuredSearch(
+        {
+          street: "10 Downing Street",
+          city: "London",
+          country: "United Kingdom",
+        },
         {
           format: "json",
           limit: 5,

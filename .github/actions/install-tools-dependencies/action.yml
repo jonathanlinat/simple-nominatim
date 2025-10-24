@@ -1,26 +1,19 @@
-name: Install tools and dependencies of the application
-description: Local action to install tools and dependencies of the application
 runs:
   using: composite
   steps:
-    - name: Install Node 22
-      uses: actions/setup-node@v6
+    - uses: actions/setup-node@v6
       with:
         node-version: 22.17.1
-    - name: Install pnpm 10
-      uses: pnpm/action-setup@v4
+    - uses: pnpm/action-setup@v4
       with:
         version: 10.18.3
         run_install: false
-    - name: Get the pnpm store directory
+    - run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
       shell: bash
-      run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-    - name: Setup pnpm cache
-      uses: actions/cache@v4
+    - uses: actions/cache@v4
       with:
         path: ${{ env.STORE_PATH }}
         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: ${{ runner.os }}-pnpm-store-
-    - name: Install the dependencies
+    - run: pnpm install
       shell: bash
-      run: pnpm install

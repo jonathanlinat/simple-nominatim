@@ -26,15 +26,15 @@ import { expectTypeOf } from "vitest";
 
 import {
   freeFormSearch,
-  structuredSearch,
   geocodeReverse,
   serviceStatus,
+  structuredSearch,
   type FreeFormSearchParams,
-  type StructuredSearchParams,
   type GeocodeReverseParams,
-  type SearchOptions,
   type ReverseOptions,
+  type SearchOptions,
   type StatusOptions,
+  type StructuredSearchParams,
 } from "../index";
 
 /**

@@ -83,54 +83,10 @@ describe("serviceStatusWrapper", () => {
   });
 
   describe("cache options", () => {
-    it("should pass cache options when noCache is set", async () => {
+    it("should pass cache configuration", async () => {
       const argv: ServiceStatusArgv = {
         format: "json",
         noCache: true,
-      };
-
-      await serviceStatusWrapper(argv);
-
-      expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          cache: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass cacheTtl option", async () => {
-      const argv: ServiceStatusArgv = {
-        format: "json",
-        cacheTtl: 5000,
-      };
-
-      await serviceStatusWrapper(argv);
-
-      expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          cache: expect.objectContaining({ ttl: 5000 }),
-        }),
-      );
-    });
-
-    it("should pass cacheMaxSize option", async () => {
-      const argv: ServiceStatusArgv = {
-        format: "json",
-        cacheMaxSize: 50,
-      };
-
-      await serviceStatusWrapper(argv);
-
-      expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          cache: expect.objectContaining({ maxSize: 50 }),
-        }),
-      );
-    });
-
-    it("should combine multiple cache options", async () => {
-      const argv: ServiceStatusArgv = {
-        format: "json",
         cacheTtl: 8000,
         cacheMaxSize: 100,
       };
@@ -140,6 +96,7 @@ describe("serviceStatusWrapper", () => {
       expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
         expect.objectContaining({
           cache: expect.objectContaining({
+            enabled: false,
             ttl: 8000,
             maxSize: 100,
           }),
@@ -149,54 +106,10 @@ describe("serviceStatusWrapper", () => {
   });
 
   describe("rate limit options", () => {
-    it("should pass rate limit options when noRateLimit is set", async () => {
+    it("should pass rate limit configuration", async () => {
       const argv: ServiceStatusArgv = {
         format: "json",
         noRateLimit: true,
-      };
-
-      await serviceStatusWrapper(argv);
-
-      expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass rateLimit option", async () => {
-      const argv: ServiceStatusArgv = {
-        format: "json",
-        rateLimit: 10,
-      };
-
-      await serviceStatusWrapper(argv);
-
-      expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({ limit: 10 }),
-        }),
-      );
-    });
-
-    it("should pass rateLimitInterval option", async () => {
-      const argv: ServiceStatusArgv = {
-        format: "json",
-        rateLimitInterval: 5000,
-      };
-
-      await serviceStatusWrapper(argv);
-
-      expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({ interval: 5000 }),
-        }),
-      );
-    });
-
-    it("should combine multiple rate limit options", async () => {
-      const argv: ServiceStatusArgv = {
-        format: "json",
         rateLimit: 5,
         rateLimitInterval: 3000,
       };
@@ -206,6 +119,7 @@ describe("serviceStatusWrapper", () => {
       expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
         expect.objectContaining({
           rateLimit: expect.objectContaining({
+            enabled: false,
             limit: 5,
             interval: 3000,
           }),
@@ -215,54 +129,10 @@ describe("serviceStatusWrapper", () => {
   });
 
   describe("retry options", () => {
-    it("should pass retry options when noRetry is set", async () => {
+    it("should pass retry configuration", async () => {
       const argv: ServiceStatusArgv = {
         format: "json",
         noRetry: true,
-      };
-
-      await serviceStatusWrapper(argv);
-
-      expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          retry: expect.objectContaining({ enabled: false }),
-        }),
-      );
-    });
-
-    it("should pass retryMaxAttempts option", async () => {
-      const argv: ServiceStatusArgv = {
-        format: "json",
-        retryMaxAttempts: 3,
-      };
-
-      await serviceStatusWrapper(argv);
-
-      expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          retry: expect.objectContaining({ maxAttempts: 3 }),
-        }),
-      );
-    });
-
-    it("should pass retryInitialDelay option", async () => {
-      const argv: ServiceStatusArgv = {
-        format: "json",
-        retryInitialDelay: 1000,
-      };
-
-      await serviceStatusWrapper(argv);
-
-      expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          retry: expect.objectContaining({ initialDelay: 1000 }),
-        }),
-      );
-    });
-
-    it("should combine multiple retry options", async () => {
-      const argv: ServiceStatusArgv = {
-        format: "json",
         retryMaxAttempts: 4,
         retryInitialDelay: 2000,
       };
@@ -272,6 +142,7 @@ describe("serviceStatusWrapper", () => {
       expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
         expect.objectContaining({
           retry: expect.objectContaining({
+            enabled: false,
             maxAttempts: 4,
             initialDelay: 2000,
           }),
@@ -282,6 +153,10 @@ describe("serviceStatusWrapper", () => {
 
   describe("error handling", () => {
     it("should handle API errors", async () => {
+      const processExitSpy = vi
+        .spyOn(process, "exit")
+        .mockImplementation(() => undefined as never);
+
       vi.mocked(serviceStatus).mockRejectedValue(
         new Error("Service unavailable"),
       );
@@ -293,9 +168,16 @@ describe("serviceStatusWrapper", () => {
       await serviceStatusWrapper(argv);
 
       expect(console.error).toHaveBeenCalled();
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+
+      processExitSpy.mockRestore();
     });
 
     it("should handle network errors", async () => {
+      const processExitSpy = vi
+        .spyOn(process, "exit")
+        .mockImplementation(() => undefined as never);
+
       vi.mocked(serviceStatus).mockRejectedValue(new Error("Network error"));
 
       const argv: ServiceStatusArgv = {
@@ -305,6 +187,9 @@ describe("serviceStatusWrapper", () => {
       await serviceStatusWrapper(argv);
 
       expect(console.error).toHaveBeenCalled();
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+
+      processExitSpy.mockRestore();
     });
   });
 

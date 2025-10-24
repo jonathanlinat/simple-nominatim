@@ -33,11 +33,14 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "node",
-    include: ["src/__tests__/**/*.{test,spec}.ts"],
+    include: [
+      "src/__tests__/**/*.unit.test.ts",
+      "src/__tests__/**/*.security.test.ts",
+    ],
     exclude: ["node_modules", "dist", ".turbo"],
     typecheck: {
       enabled: true,
-      include: ["src/__tests__/**/*.test-d.ts"],
+      include: ["src/__tests__/**/*.types.test.ts"],
     },
     coverage: {
       provider: "v8",
@@ -45,8 +48,9 @@ export default defineConfig({
       exclude: [
         "node_modules/",
         "dist/",
-        "**/*.test.ts",
-        "**/*.test-d.ts",
+        "**/*.unit.test.ts",
+        "**/*.security.test.ts",
+        "**/*.types.test.ts",
         "**/__tests__/",
         "**/types.ts",
       ],
