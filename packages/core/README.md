@@ -6,7 +6,7 @@
 
 This is a library designed to facilitate requests to the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/).
 
-It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo. You can also search for the `@simple-nominatim/core` package on [npm](<[https://www.npmjs.com/package/@simple-nominatim/core](https://www.npmjs.com/package/@simple-nominatim/core)>).
+It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo. You can also search for the `@simple-nominatim/core` package on [npm](https://www.npmjs.com/package/@simple-nominatim/core).
 
 > **Disclaimers**
 >
@@ -66,7 +66,7 @@ const results = await geocodeReverse(
 
 ##### Options
 
-- `email`: Specify an appropriate email address when making large numbers of identified request.
+- `email`: Specify an appropriate email address when making large numbers of identified requests.
 - `format`: Define the output format.
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.
@@ -93,7 +93,7 @@ const results = await freeFormSearch(
 
 ##### Options
 
-- `email`: Specify an appropriate email address when making large numbers of identified request.
+- `email`: Specify an appropriate email address when making large numbers of identified requests.
 - `format`: Define the output format.
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.
@@ -125,7 +125,7 @@ const results = await structuredSearch(
 
 ##### Options
 
-- `email`: Specify an appropriate email address when making large numbers of identified request.
+- `email`: Specify an appropriate email address when making large numbers of identified requests.
 - `format`: Define the output format.
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.

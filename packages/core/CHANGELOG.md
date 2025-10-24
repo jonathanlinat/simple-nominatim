@@ -1,5 +1,15 @@
 # @simple-nominatim/core
 
+## 0.4.1
+
+### Patch Changes
+
+- Add comprehensive security test suite with 30 tests protecting against malicious input validation attacks across both packages. ([#21](https://github.com/jonathanlinat/simple-nominatim/pull/21))
+
+- Add syncpack for automated dependency version management and consistency across monorepo packages. ([#21](https://github.com/jonathanlinat/simple-nominatim/pull/21))
+
+- Optimize test suite by consolidating redundant tests while maintaining full coverage. ([#21](https://github.com/jonathanlinat/simple-nominatim/pull/21))
+
 ## 0.4.0
 
 ### Minor Changes

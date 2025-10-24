@@ -1,5 +1,24 @@
 # @simple-nominatim/cli
 
+## 0.5.0
+
+### Minor Changes
+
+- Migrate CLI framework from yargs to Commander.js. ([#21](https://github.com/jonathanlinat/simple-nominatim/pull/21))
+
+- Enhance error handling with user-friendly messages and proper exit codes. ([#21](https://github.com/jonathanlinat/simple-nominatim/pull/21))
+
+### Patch Changes
+
+- Add comprehensive security test suite with 30 tests protecting against malicious input validation attacks across both packages. ([#21](https://github.com/jonathanlinat/simple-nominatim/pull/21))
+
+- Add syncpack for automated dependency version management and consistency across monorepo packages. ([#21](https://github.com/jonathanlinat/simple-nominatim/pull/21))
+
+- Optimize test suite by consolidating redundant tests while maintaining full coverage. ([#21](https://github.com/jonathanlinat/simple-nominatim/pull/21))
+
+- Updated dependencies [[`1860ef6`](https://github.com/jonathanlinat/simple-nominatim/commit/1860ef64b3cc81d2e102239ed0831bf9cab59ebc), [`1860ef6`](https://github.com/jonathanlinat/simple-nominatim/commit/1860ef64b3cc81d2e102239ed0831bf9cab59ebc), [`1860ef6`](https://github.com/jonathanlinat/simple-nominatim/commit/1860ef64b3cc81d2e102239ed0831bf9cab59ebc)]:
+  - @simple-nominatim/core@0.4.1
+
 ## 0.4.0
 
 ### Minor Changes

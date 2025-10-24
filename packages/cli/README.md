@@ -6,7 +6,7 @@
 
 This is a command-line binary built over **Simple Nominatim Core** (`@simple-nominatim/core`) as a terminal interface to make requests to the [Nominatim API](https://nominatim.org/release-docs/develop/api/Overview/).
 
-It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo. You can also search for the `@simple-nominatim/cli` package on [npm](<[https://www.npmjs.com/package/@simple-nominatim/cli](https://www.npmjs.com/package/@simple-nominatim/cli)>).
+It is part of the [Simple Nominatim](https://github.com/jonathanlinat/simple-nominatim/#readme) monorepo. You can also search for the `@simple-nominatim/cli` package on [npm](https://www.npmjs.com/package/@simple-nominatim/cli).
 
 > **Disclaimers**
 >
@@ -51,7 +51,7 @@ simple-nominatim reverse:geocode --latitude '37.4219999' --longitude '-122.08405
 
 ##### Options
 
-- `--email`: Specify an appropriate email address when making large numbers of identified request.
+- `--email`: Specify an appropriate email address when making large numbers of identified requests.
 - `--format`: Define the output format.
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.
@@ -81,7 +81,7 @@ simple-nominatim search:free-form --query '1600 Amphitheatre Parkway, Mountain V
 
 ##### Options
 
-- `--email`: Specify an appropriate email address when making large numbers of identified request.
+- `--email`: Specify an appropriate email address when making large numbers of identified requests.
 - `--format`: Define the output format.
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.
@@ -116,7 +116,7 @@ simple-nominatim search:structured --country 'Canada' --format 'jsonv2'
 
 ##### Options
 
-- `--email`: Specify an appropriate email address when making large numbers of identified request.
+- `--email`: Specify an appropriate email address when making large numbers of identified requests.
 - `--format`: Define the output format.
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.
@@ -162,7 +162,7 @@ Control response caching behavior:
 
 - `--no-cache`: Disable response caching entirely
 - `--cache-ttl <milliseconds>`: Set cache time-to-live in milliseconds (default: 300000 - 5 minutes)
-- `--cache-max-size <number>`: Set maximum number of cached entries (default: 100)
+- `--cache-max-size <number>`: Set maximum number of cached entries (default: 500)
 
 #### Examples
 
@@ -235,7 +235,7 @@ simple-nominatim search:structured --country 'USA' --city 'New York' --format 'j
 
 When no configuration flags are provided, the following defaults are applied:
 
-- **Cache**: Enabled with 5-minute TTL and maximum 100 entries
+- **Cache**: Enabled with 5-minute TTL and maximum 500 entries
 - **Rate Limiting**: 1 request per second
 - **Retry**: Up to 3 attempts with 1-second initial delay
 

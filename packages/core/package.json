@@ -1,27 +1,19 @@
 {
   "name": "@simple-nominatim/core",
-  "version": "0.4.0",
   "description": "A lightweight library to make requests to the Nominatim API from Node programs",
-  "keywords": [
-    "core",
-    "geocoding",
-    "library",
-    "node",
-    "nominatim",
-    "openstreetmap"
-  ],
-  "homepage": "https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/core#readme",
-  "bugs": "https://github.com/jonathanlinat/simple-nominatim/issues",
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": "jonathanlinat/simple-nominatim.git",
-  "license": "MIT",
+  "version": "0.4.1",
   "author": "Jonathan Linat (https://github.com/jonathanlinat)",
-  "sideEffects": false,
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "bugs": "https://github.com/jonathanlinat/simple-nominatim/issues",
+  "dependencies": {
+    "lru-cache": "^11.2.2",
+    "p-throttle": "^8.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.17.1"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -31,6 +23,21 @@
   "files": [
     "dist"
   ],
+  "homepage": "https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/core#readme",
+  "keywords": [
+    "core",
+    "geocoding",
+    "library",
+    "node",
+    "nominatim",
+    "openstreetmap"
+  ],
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "jonathanlinat/simple-nominatim.git",
   "scripts": {
     "build": "tsdown",
     "clean": "rm -rf dist",
@@ -42,14 +49,7 @@
     "test:watch": "vitest --typecheck",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "lru-cache": "^11.2.2",
-    "p-throttle": "^8.0.0"
-  },
-  "devDependencies": {
-    "typescript": "^5.9.3"
-  },
-  "engines": {
-    "node": ">=22.17.1"
-  }
+  "sideEffects": false,
+  "type": "module",
+  "types": "./dist/index.d.ts"
 }

@@ -234,10 +234,7 @@ describe("Input Validation", () => {
 
       for (const { lat, lon } of boundaries) {
         await expect(
-          geocodeReverse(
-            { latitude: lat, longitude: lon },
-            { format: "json" },
-          ),
+          geocodeReverse({ latitude: lat, longitude: lon }, { format: "json" }),
         ).resolves.toBeDefined();
       }
     });
@@ -257,10 +254,7 @@ describe("Input Validation", () => {
 
       for (const { lat, lon } of malformed) {
         await expect(
-          geocodeReverse(
-            { latitude: lat, longitude: lon },
-            { format: "json" },
-          ),
+          geocodeReverse({ latitude: lat, longitude: lon }, { format: "json" }),
         ).resolves.toBeDefined();
       }
     });

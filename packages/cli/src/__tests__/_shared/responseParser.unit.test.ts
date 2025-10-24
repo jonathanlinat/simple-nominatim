@@ -110,7 +110,9 @@ describe("responseParser", () => {
   describe("error handling", () => {
     it("should handle rate limit errors with specific message", async () => {
       await responseParser(
-        Promise.reject(new Error("HTTP error! Status: 429. Text: Too Many Requests")),
+        Promise.reject(
+          new Error("HTTP error! Status: 429. Text: Too Many Requests"),
+        ),
       );
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         "Rate limit exceeded. Please try again later or reduce request frequency.",
@@ -120,7 +122,9 @@ describe("responseParser", () => {
 
     it("should handle 5xx server errors with specific message", async () => {
       await responseParser(
-        Promise.reject(new Error("HTTP error! Status: 500. Text: Internal Server Error")),
+        Promise.reject(
+          new Error("HTTP error! Status: 500. Text: Internal Server Error"),
+        ),
       );
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         "Nominatim API is currently unavailable. Please try again later.",
@@ -130,7 +134,9 @@ describe("responseParser", () => {
       consoleErrorSpy.mockClear();
       processExitSpy.mockClear();
       await responseParser(
-        Promise.reject(new Error("HTTP error! Status: 503. Text: Service Unavailable")),
+        Promise.reject(
+          new Error("HTTP error! Status: 503. Text: Service Unavailable"),
+        ),
       );
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         "Nominatim API is currently unavailable. Please try again later.",
