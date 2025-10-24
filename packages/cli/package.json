@@ -1,41 +1,12 @@
 {
   "name": "@simple-nominatim/cli",
-  "version": "0.4.0",
   "description": "A command-line interface (CLI) tool built on top of the @simple-nominatim/core library to make requests to the Nominatim API from a terminal",
-  "keywords": [
-    "cli",
-    "geocoding",
-    "library",
-    "node",
-    "nominatim",
-    "openstreetmap"
-  ],
-  "homepage": "https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/cli#readme",
-  "bugs": "https://github.com/jonathanlinat/simple-nominatim/issues",
-  "repository": "jonathanlinat/simple-nominatim.git",
-  "license": "MIT",
+  "version": "0.5.0",
   "author": "Jonathan Linat (https://github.com/jonathanlinat)",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "bin": {
     "simple-nominatim": "./dist/index.js"
   },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "tsdown",
-    "clean": "rm -rf dist",
-    "lint": "eslint --fix",
-    "prepare": "pnpm build",
-    "simple-nominatim": "tsx ./src/index.ts",
-    "test": "vitest run --typecheck",
-    "test:coverage": "vitest run --typecheck --coverage",
-    "test:ui": "vitest --typecheck --ui",
-    "test:watch": "vitest --typecheck",
-    "typecheck": "tsc --noEmit"
-  },
+  "bugs": "https://github.com/jonathanlinat/simple-nominatim/issues",
   "dependencies": {
     "@simple-nominatim/core": "workspace:*",
     "commander": "^14.0.1",
@@ -48,8 +19,37 @@
   "engines": {
     "node": ">=22.17.1"
   },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/jonathanlinat/simple-nominatim/tree/main/packages/cli#readme",
+  "keywords": [
+    "cli",
+    "geocoding",
+    "library",
+    "node",
+    "nominatim",
+    "openstreetmap"
+  ],
+  "license": "MIT",
+  "main": "./dist/index.js",
   "publishConfig": {
     "access": "public"
   },
-  "sideEffects": false
+  "repository": "jonathanlinat/simple-nominatim.git",
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rm -rf dist",
+    "lint": "eslint --fix",
+    "prepare": "pnpm build",
+    "simple-nominatim": "tsx ./src/index.ts",
+    "test": "vitest run --typecheck",
+    "test:coverage": "vitest run --typecheck --coverage",
+    "test:ui": "vitest --typecheck --ui",
+    "test:watch": "vitest --typecheck",
+    "typecheck": "tsc --noEmit"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "types": "./dist/index.d.ts"
 }

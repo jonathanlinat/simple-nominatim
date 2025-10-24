@@ -7,6 +7,7 @@ import jsdoc from "eslint-plugin-jsdoc";
 import jsoncPlugin from "eslint-plugin-jsonc";
 // @ts-ignore - No type definitions available
 import promisePlugin from "eslint-plugin-promise";
+import ymlPlugin from "eslint-plugin-yml";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
@@ -218,50 +219,16 @@ export default tseslint.config(
     },
   },
   ...jsoncPlugin.configs["flat/recommended-with-jsonc"],
+  ...ymlPlugin.configs["flat/recommended"],
+  ...ymlPlugin.configs["flat/prettier"],
   {
-    files: ["**/package.json"],
+    files: ["**/*.yaml"],
+    ignores: ["**/pnpm-lock.yaml"],
     rules: {
-      "jsonc/sort-keys": [
-        "error",
-        {
-          pathPattern: "^$",
-          order: [
-            "name",
-            "version",
-            "description",
-            "keywords",
-            "homepage",
-            "bugs",
-            "repository",
-            "license",
-            "author",
-            "type",
-            "main",
-            "module",
-            "types",
-            "bin",
-            "exports",
-            "files",
-            "scripts",
-            "dependencies",
-            "devDependencies",
-            "peerDependencies",
-            "peerDependenciesMeta",
-            "optionalDependencies",
-            "bundledDependencies",
-            "engines",
-            "packageManager",
-          ],
-        },
-        {
-          pathPattern: "^(?:dev|peer|optional|bundled)?[Dd]ependencies$",
-          order: { type: "asc" },
-        },
-        {
-          pathPattern: "^scripts$",
-          order: { type: "asc" },
-        },
-      ],
+      "yml/no-empty-mapping-value": "error",
+      "yml/no-irregular-whitespace": "error",
+      "yml/plain-scalar": "error",
+      "yml/quotes": ["error", { prefer: "double", avoidEscape: true }],
     },
   },
   {

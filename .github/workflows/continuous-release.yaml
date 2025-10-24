@@ -17,7 +17,7 @@ jobs:
           version: pnpm ci:version
           publish: pnpm ci:release
           commit: "chore: new release candidate"
-          title: "New release candidate"
+          title: New release candidate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,4 +1,0 @@
-"packages/**/*.md":
-  - pnpm lint:markdown
-"packages/**/*.ts":
-  - pnpm lint:code

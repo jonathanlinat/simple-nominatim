@@ -69,7 +69,9 @@ describe("Input Validation", () => {
     });
 
     it("should handle injection attempts in email", () => {
-      const result = emailSchema.safeParse("test'; DROP TABLE users--@example.com");
+      const result = emailSchema.safeParse(
+        "test'; DROP TABLE users--@example.com",
+      );
       expect(result.success).toBe(false);
     });
   });
