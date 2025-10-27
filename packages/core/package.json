@@ -1,7 +1,7 @@
 {
   "name": "@simple-nominatim/core",
   "description": "A lightweight library to make requests to the Nominatim API from Node programs",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "author": "Jonathan Linat (https://github.com/jonathanlinat)",
   "bugs": "https://github.com/jonathanlinat/simple-nominatim/issues",
   "dependencies": {

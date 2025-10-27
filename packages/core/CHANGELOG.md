@@ -1,5 +1,11 @@
 # @simple-nominatim/core
 
+## 0.5.0
+
+### Minor Changes
+
+- Comprehensive quality improvements including test optimization, API enhancements, and documentation standardization. ([#23](https://github.com/jonathanlinat/simple-nominatim/pull/23))
+
 ## 0.4.1
 
 ### Patch Changes
