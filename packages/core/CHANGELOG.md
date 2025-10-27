@@ -1,5 +1,11 @@
 # @simple-nominatim/core
 
+## 0.5.1
+
+### Patch Changes
+
+- Add comprehensive ESLint padding-line-between-statements rules for improved code readability. ([#25](https://github.com/jonathanlinat/simple-nominatim/pull/25))
+
 ## 0.5.0
 
 ### Minor Changes
