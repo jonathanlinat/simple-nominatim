@@ -43,7 +43,7 @@ export {
 export { geocodeReverse } from "./reverse/geocode";
 export type { GeocodeReverseParams } from "./reverse/reverse.types";
 
-export { freeFormSearch } from "./search/free-form";
+export { freeFormSearch } from "./search/freeForm";
 export type { FreeFormSearchParams } from "./search/search.types";
 
 export { structuredSearch } from "./search/structured";

@@ -54,4 +54,5 @@ const reverseArgs: GeocodeReverseArgv = {
   format: "json",
   email: "test@example.com",
 };
+
 expectTypeOf(reverseArgs).toEqualTypeOf<GeocodeReverseArgv>();

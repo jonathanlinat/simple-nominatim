@@ -25,12 +25,11 @@
 import { Command } from "commander";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// Mock all wrapper functions and core module
 vi.mock("../reverse/geocode", () => ({
   geocodeReverseWrapper: vi.fn(),
 }));
 
-vi.mock("../search/free-form", () => ({
+vi.mock("../search/freeForm", () => ({
   freeFormSearchWrapper: vi.fn(),
 }));
 
@@ -57,6 +56,7 @@ describe("index", () => {
   describe("Program Configuration", () => {
     it("should create a program with correct name", () => {
       const program = new Command();
+
       program.name("simple-nominatim");
 
       expect(program.name()).toBe("simple-nominatim");
@@ -64,6 +64,7 @@ describe("index", () => {
 
     it("should have correct description", () => {
       const program = new Command();
+
       program.description("CLI tool for interacting with the Nominatim API");
 
       expect(program.description()).toBe(
@@ -84,6 +85,7 @@ describe("index", () => {
   describe("Commands Registration", () => {
     it("should register reverse:geocode command", () => {
       const program = new Command();
+
       program.command("reverse:geocode");
 
       expect(program.commands.length).toBe(1);
@@ -92,6 +94,7 @@ describe("index", () => {
 
     it("should register search:free-form command", () => {
       const program = new Command();
+
       program.command("search:free-form");
 
       expect(program.commands.length).toBe(1);
@@ -100,6 +103,7 @@ describe("index", () => {
 
     it("should register search:structured command", () => {
       const program = new Command();
+
       program.command("search:structured");
 
       expect(program.commands.length).toBe(1);
@@ -108,6 +112,7 @@ describe("index", () => {
 
     it("should register status:service command", () => {
       const program = new Command();
+
       program.command("status:service");
 
       expect(program.commands.length).toBe(1);
@@ -116,6 +121,7 @@ describe("index", () => {
 
     it("should register all four commands", () => {
       const program = new Command();
+
       program.command("reverse:geocode");
       program.command("search:free-form");
       program.command("search:structured");
@@ -211,7 +217,6 @@ describe("index", () => {
     });
 
     it("should have mocked wrapper functions", () => {
-      // Verify mocks are set up correctly
       expect(vi.isMockFunction).toBeDefined();
     });
   });
@@ -225,6 +230,7 @@ describe("index", () => {
 
     it("should handle unknown commands gracefully", () => {
       const program = new Command();
+
       program.exitOverride();
 
       expect(program.commands).toBeDefined();

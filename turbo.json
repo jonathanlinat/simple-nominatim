@@ -7,25 +7,6 @@
     },
     "clean": {
       "cache": false
-    },
-    "lint": {
-      "outputs": []
-    },
-    "test": {
-      "cache": false
-    },
-    "test:coverage": {
-      "cache": false,
-      "outputs": ["coverage/**"]
-    },
-    "test:ui": {
-      "cache": false
-    },
-    "test:watch": {
-      "cache": false
-    },
-    "typecheck": {
-      "cache": false
     }
   }
 }

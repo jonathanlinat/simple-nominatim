@@ -71,8 +71,10 @@ describe("geocodeReverse", () => {
       );
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
+
       expect(url).toContain("reverse?");
       expect(url).toContain("lat=40.7128");
       expect(url).toContain("lon=-74.0060");
@@ -116,8 +118,10 @@ describe("geocodeReverse", () => {
       );
 
       let callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       let url = callArgs![0] as string;
+
       expect(url).toContain("format=json");
       expect(url).toContain("addressdetails=1");
       expect(url).toContain("zoom=18");
@@ -175,8 +179,10 @@ describe("geocodeReverse", () => {
   describe("retry options", () => {
     it("should work with retry configuration", async () => {
       let callCount = 0;
+
       global.fetch = vi.fn().mockImplementation(async () => {
         callCount++;
+
         if (callCount === 1) {
           throw new Error("Network error");
         }
@@ -244,8 +250,10 @@ describe("geocodeReverse", () => {
       );
 
       let callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       let url = callArgs![0] as string;
+
       expect(url).toContain("lat=35.6762");
       expect(url).toContain("lon=139.6503");
 
@@ -305,6 +313,7 @@ describe("geocodeReverse", () => {
       expect(result).toStrictEqual(mockResponse);
       const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
         .calls[0]?.[0] as string;
+
       expect(calledUrl).toContain("lat=51.5074");
       expect(calledUrl).toContain("lon=-0.1278");
       expect(calledUrl).not.toContain("addressdetails");
@@ -325,10 +334,9 @@ describe("geocodeReverse", () => {
       expect(result).toStrictEqual(mockResponse);
       const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
         .calls[0]?.[0] as string;
+
       expect(calledUrl).toContain("reverse?");
-      // Empty lat should not be appended
       expect(calledUrl).not.toContain("lat=");
-      // Empty lon should not be appended
       expect(calledUrl).not.toContain("lon=");
     });
   });

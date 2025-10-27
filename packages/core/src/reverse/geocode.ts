@@ -67,29 +67,27 @@ export const geocodeReverse = async <T = unknown>(
   const { latitude: lat, longitude: lon } = params;
   const parsedParams = { lat, lon };
 
-  Object.keys(parsedParams).forEach((key) => {
+  for (const key of Object.keys(parsedParams)) {
     const value = parsedParams[key as keyof typeof parsedParams];
 
     if (value) {
       urlSearchParams.append(key, value);
     }
-  });
+  }
 
   const { cache, rateLimit, retry, ...apiOptions } = options;
 
-  Object.keys(apiOptions).forEach((key) => {
+  for (const key of Object.keys(apiOptions)) {
     const value = apiOptions[key as keyof typeof apiOptions];
 
     if (value !== undefined) {
       urlSearchParams.append(key, String(value));
     }
-  });
+  }
 
-  const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
+  return await dataFetcher<T>(endpoint, urlSearchParams, {
     cache,
     rateLimit,
     retry,
   });
-
-  return fetchedData;
 };

@@ -72,6 +72,7 @@ describe("validation", () => {
       const result = emailSchema.safeParse(
         "test'; DROP TABLE users--@example.com",
       );
+
       expect(result.success).toBe(false);
     });
   });
@@ -96,6 +97,7 @@ describe("validation", () => {
         query: "",
         outputFormat: "json",
       });
+
       expect(result1.success).toBe(false);
     });
 
@@ -122,6 +124,7 @@ describe("validation", () => {
         city: "London",
         outputFormat: "json",
       });
+
       expect(result.success).toBe(true);
     });
 
@@ -130,11 +133,13 @@ describe("validation", () => {
         country: "UK",
         outputFormat: "json",
       });
+
       expect(resultWithCountry.success).toBe(true);
 
       const resultWithoutCountry = structuredSearchSchema.safeParse({
         outputFormat: "json",
       });
+
       expect(resultWithoutCountry.success).toBe(true);
     });
 
@@ -147,6 +152,7 @@ describe("validation", () => {
       };
 
       const result = structuredSearchSchema.safeParse(maliciousData);
+
       expect(result.success).toBe(true);
     });
   });

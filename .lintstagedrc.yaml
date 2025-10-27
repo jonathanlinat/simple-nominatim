@@ -1,6 +1,2 @@
 "*.{ts,json,yaml,md}":
-  - pnpm format
-"**/*.md":
-  - pnpm lint:markdown
-"**/*.{ts,json,yaml}":
-  - pnpm lint:code
+  - pnpm lint

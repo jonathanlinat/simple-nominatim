@@ -86,7 +86,7 @@ export class CacheManager<T extends object = object> {
    */
   private generateKey(endpoint: string, params: URLSearchParams): string {
     const sortedParams = new URLSearchParams(
-      Array.from(params.entries()).sort(([a], [b]) => a.localeCompare(b)),
+      [...params.entries()].sort(([a], [b]) => a.localeCompare(b)),
     );
 
     return `${endpoint}:${sortedParams.toString()}`;
@@ -105,10 +105,10 @@ export class CacheManager<T extends object = object> {
     const key = this.generateKey(endpoint, params);
     const value = this.cache.get(key);
 
-    if (value !== undefined) {
-      this.hits++;
-    } else {
+    if (value === undefined) {
       this.misses++;
+    } else {
+      this.hits++;
     }
 
     return value;
@@ -125,6 +125,7 @@ export class CacheManager<T extends object = object> {
     if (!this.enabled) return;
 
     const key = this.generateKey(endpoint, params);
+
     this.cache.set(key, value);
   }
 

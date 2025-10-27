@@ -146,6 +146,7 @@ describe("CacheManager", () => {
 
     it("should return false for different params", () => {
       const otherParams = new URLSearchParams({ q: "London" });
+
       cache.set(endpoint, params, testData);
       expect(cache.has(endpoint, otherParams)).toBe(false);
     });
@@ -177,8 +178,8 @@ describe("CacheManager", () => {
 
   describe("getStats()", () => {
     it("should track hits, misses, hit rate, and size correctly", () => {
-      // Initial stats
       let stats = cache.getStats();
+
       expect(stats).toStrictEqual({
         hits: 0,
         misses: 0,
@@ -186,7 +187,6 @@ describe("CacheManager", () => {
         size: 0,
       });
 
-      // Track cache misses
       cache.get(endpoint, params);
       cache.get(endpoint, params);
       stats = cache.getStats();
@@ -194,14 +194,10 @@ describe("CacheManager", () => {
       expect(stats.misses).toBe(2);
       expect(stats.hitRate).toBe(0);
 
-      // Add data and track hits + size
       cache.set(endpoint, params, testData);
       cache.set(endpoint, new URLSearchParams({ q: "London" }), testData);
-      // Hit
       cache.get(endpoint, params);
-      // Hit
       cache.get(endpoint, params);
-      // Miss
       cache.get(endpoint, new URLSearchParams({ q: "unknown" }));
 
       stats = cache.getStats();
@@ -246,6 +242,7 @@ describe("CacheManager", () => {
   describe("TTL behavior", () => {
     it("should respect TTL configuration", () => {
       const shortTtlCache = new CacheManager({ ttl: 1000 });
+
       shortTtlCache.set(endpoint, params, testData);
 
       expect(shortTtlCache.get(endpoint, params)).toStrictEqual(testData);
@@ -253,6 +250,7 @@ describe("CacheManager", () => {
 
     it("should create cache with custom TTL", () => {
       const customTtlCache = new CacheManager({ ttl: 5000 });
+
       customTtlCache.set(endpoint, params, testData);
 
       expect(customTtlCache.get(endpoint, params)).toStrictEqual(testData);

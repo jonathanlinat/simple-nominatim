@@ -39,4 +39,5 @@ expectTypeOf<ServiceStatusArgv>()
 const statusArgs: ServiceStatusArgv = {
   format: "json",
 };
+
 expectTypeOf(statusArgs).toEqualTypeOf<ServiceStatusArgv>();

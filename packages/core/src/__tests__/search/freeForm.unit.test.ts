@@ -24,7 +24,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { freeFormSearch } from "../../search/free-form";
+import { freeFormSearch } from "../../search/freeForm";
 
 describe("freeFormSearch", () => {
   const mockResponse = [
@@ -68,8 +68,10 @@ describe("freeFormSearch", () => {
       await freeFormSearch({ query: "New York City" }, { format: "json" });
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
+
       expect(url).toContain("search?");
       expect(url).toContain("q=New+York+City");
     });
@@ -113,8 +115,10 @@ describe("freeFormSearch", () => {
       );
 
       let callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       let url = callArgs![0] as string;
+
       expect(url).toContain("format=json");
       expect(url).toContain("limit=10");
       expect(url).toContain("addressdetails=1");
@@ -169,8 +173,10 @@ describe("freeFormSearch", () => {
   describe("retry options", () => {
     it("should work with retry configuration", async () => {
       let callCount = 0;
+
       global.fetch = vi.fn().mockImplementation(async () => {
         callCount++;
+
         if (callCount === 1) {
           throw new Error("Network error");
         }
@@ -235,8 +241,10 @@ describe("freeFormSearch", () => {
       await freeFormSearch({ query: "Paris" }, { format: "json" });
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
+
       expect(url).toContain("q=Paris");
     });
 
@@ -249,8 +257,10 @@ describe("freeFormSearch", () => {
       await freeFormSearch({ query: "New York City" }, { format: "json" });
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
+
       expect(url).toContain("q=New+York+City");
     });
 
@@ -308,6 +318,7 @@ describe("freeFormSearch", () => {
       expect(result).toStrictEqual(mockResponse);
       const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
         .calls[0]?.[0] as string;
+
       expect(calledUrl).toContain("q=Paris");
       expect(calledUrl).not.toContain("limit");
       expect(calledUrl).not.toContain("addressdetails");
@@ -324,8 +335,8 @@ describe("freeFormSearch", () => {
       expect(result).toStrictEqual(mockResponse);
       const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
         .calls[0]?.[0] as string;
+
       expect(calledUrl).toContain("search?");
-      // Empty query should not be appended
       expect(calledUrl).not.toContain("q=");
     });
   });

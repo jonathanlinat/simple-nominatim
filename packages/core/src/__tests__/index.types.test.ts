@@ -83,34 +83,40 @@ expectTypeOf(
 ).returns.resolves.toEqualTypeOf<StatusResponse>();
 
 const result1 = freeFormSearch({ query: "test" }, { format: "json" });
+
 expectTypeOf(result1).toEqualTypeOf<Promise<unknown>>();
 
 const result2 = freeFormSearch(
   { query: "test" },
   { format: "json", email: "test@example.com" },
 );
+
 expectTypeOf(result2).toEqualTypeOf<Promise<unknown>>();
 
 const result3 = freeFormSearch(
   { query: "test" },
   { format: "json", limit: 10 },
 );
+
 expectTypeOf(result3).toEqualTypeOf<Promise<unknown>>();
 
 const result4 = freeFormSearch(
   { query: "test" },
   { format: "json", cache: { enabled: true } },
 );
+
 expectTypeOf(result4).toEqualTypeOf<Promise<unknown>>();
 
 const result5 = freeFormSearch(
   { query: "test" },
   { format: "json", rateLimit: { enabled: true } },
 );
+
 expectTypeOf(result5).toEqualTypeOf<Promise<unknown>>();
 
 const result6 = freeFormSearch(
   { query: "test" },
   { format: "json", cache: { enabled: true }, rateLimit: { enabled: true } },
 );
+
 expectTypeOf(result6).toEqualTypeOf<Promise<unknown>>();

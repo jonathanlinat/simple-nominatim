@@ -35,64 +35,72 @@ describe("configBuilders", () => {
     const builders = [
       {
         name: "buildCacheConfig",
-        fn: buildCacheConfig,
+        function_: buildCacheConfig,
         disableFlag: "noCache",
         params: ["cacheTtl", "cacheMaxSize"],
         outputKeys: ["enabled", "ttl", "maxSize"],
       },
       {
         name: "buildRateLimitConfig",
-        fn: buildRateLimitConfig,
+        function_: buildRateLimitConfig,
         disableFlag: "noRateLimit",
         params: ["rateLimit", "rateLimitInterval"],
         outputKeys: ["enabled", "limit", "interval"],
       },
       {
         name: "buildRetryConfig",
-        fn: buildRetryConfig,
+        function_: buildRetryConfig,
         disableFlag: "noRetry",
         params: ["retryMaxAttempts", "retryInitialDelay"],
         outputKeys: ["enabled", "maxAttempts", "initialDelay"],
       },
     ];
 
-    builders.forEach(({ name, fn, disableFlag, params }) => {
+    for (const { name, function_, disableFlag, params } of builders) {
       describe(name, () => {
         it("should return undefined for empty input", () => {
-          expect(fn({})).toBeUndefined();
+          expect(function_({})).toBeUndefined();
         });
 
         it("should set enabled: false when disable flag is true", () => {
-          expect(fn({ [disableFlag]: true })).toStrictEqual({ enabled: false });
+          expect(function_({ [disableFlag]: true })).toStrictEqual({
+            enabled: false,
+          });
         });
 
-        it("should return empty object when disable flag is false", () => {
-          expect(fn({ [disableFlag]: false })).toStrictEqual({});
+        it("should return undefined when disable flag is false", () => {
+          expect(function_({ [disableFlag]: false })).toBeUndefined();
         });
 
         it("should include provided numeric parameters", () => {
           const input = params.reduce(
-            (acc, param, idx) => ({ ...acc, [param]: (idx + 1) * 100 }),
+            (accumulator, param, index) => ({
+              ...accumulator,
+              [param]: (index + 1) * 100,
+            }),
             {},
           );
-          const result = fn(input);
+          const result = function_(input);
+
           expect(result).toBeDefined();
           expect(Object.keys(result!).length).toBe(params.length);
         });
 
         it("should handle zero values", () => {
           const input = params.reduce(
-            (acc, param) => ({ ...acc, [param]: 0 }),
+            (accumulator, param) => ({ ...accumulator, [param]: 0 }),
             {},
           );
-          const result = fn(input);
+          const result = function_(input);
+
           expect(result).toBeDefined();
-          Object.values(result!).forEach((value) => {
+
+          for (const value of Object.values(result!)) {
             expect(value).toBe(0);
-          });
+          }
         });
       });
-    });
+    }
   });
 
   describe("specific parameter mapping", () => {

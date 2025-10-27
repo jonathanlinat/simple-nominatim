@@ -76,19 +76,17 @@ export const serviceStatus = async <T = unknown>(
 
   const { cache, rateLimit, retry, ...apiOptions } = options;
 
-  Object.keys(apiOptions).forEach((key) => {
+  for (const key of Object.keys(apiOptions)) {
     const value = apiOptions[key as keyof typeof apiOptions];
 
     if (value !== undefined) {
       urlSearchParams.append(key, String(value));
     }
-  });
+  }
 
-  const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
+  return await dataFetcher<T>(endpoint, urlSearchParams, {
     cache,
     rateLimit,
     retry,
   });
-
-  return fetchedData;
 };

@@ -104,6 +104,7 @@ const validResult = safeValidateArgs(freeFormSearchSchema, {
   query: "test",
   outputFormat: "json",
 });
+
 expectTypeOf(validResult).toEqualTypeOf<
   | { success: true; data: z.infer<typeof freeFormSearchSchema> }
   | { success: false; error: z.ZodError }

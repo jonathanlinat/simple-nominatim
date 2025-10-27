@@ -41,13 +41,7 @@
   "scripts": {
     "build": "tsdown",
     "clean": "rm -rf dist",
-    "lint": "eslint --fix",
-    "prepare": "pnpm build",
-    "test": "vitest run --typecheck",
-    "test:coverage": "vitest run --typecheck --coverage",
-    "test:ui": "vitest --typecheck --ui",
-    "test:watch": "vitest --typecheck",
-    "typecheck": "tsc --noEmit"
+    "prepare": "pnpm build"
   },
   "sideEffects": false,
   "type": "module",

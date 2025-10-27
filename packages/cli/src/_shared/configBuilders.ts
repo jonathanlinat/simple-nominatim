@@ -74,11 +74,13 @@ export const buildCacheConfig = (argv: CacheArgv): CacheConfig | undefined => {
     return undefined;
   }
 
-  return {
+  const config = {
     ...(noCache && { enabled: false }),
     ...(cacheTtl !== undefined && { ttl: cacheTtl }),
     ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize }),
   };
+
+  return Object.keys(config).length > 0 ? config : undefined;
 };
 
 /**
@@ -102,11 +104,13 @@ export const buildRateLimitConfig = (
     return undefined;
   }
 
-  return {
+  const config = {
     ...(noRateLimit && { enabled: false }),
     ...(rateLimit !== undefined && { limit: rateLimit }),
     ...(rateLimitInterval !== undefined && { interval: rateLimitInterval }),
   };
+
+  return Object.keys(config).length > 0 ? config : undefined;
 };
 
 /**
@@ -128,9 +132,11 @@ export const buildRetryConfig = (argv: RetryArgv): RetryConfig | undefined => {
     return undefined;
   }
 
-  return {
+  const config = {
     ...(noRetry && { enabled: false }),
     ...(retryMaxAttempts !== undefined && { maxAttempts: retryMaxAttempts }),
     ...(retryInitialDelay !== undefined && { initialDelay: retryInitialDelay }),
-  } as RetryConfig;
+  };
+
+  return Object.keys(config).length > 0 ? (config as RetryConfig) : undefined;
 };

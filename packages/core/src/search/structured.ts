@@ -50,29 +50,27 @@ export const structuredSearch = async <T = unknown>(
   const endpoint = "search";
   const urlSearchParams = new URLSearchParams();
 
-  Object.keys(params).forEach((key) => {
+  for (const key of Object.keys(params)) {
     const value = params[key as keyof typeof params];
 
     if (value) {
       urlSearchParams.append(key, value);
     }
-  });
+  }
 
   const { cache, rateLimit, retry, ...apiOptions } = options;
 
-  Object.keys(apiOptions).forEach((key) => {
+  for (const key of Object.keys(apiOptions)) {
     const value = apiOptions[key as keyof typeof apiOptions];
 
     if (value !== undefined) {
       urlSearchParams.append(key, String(value));
     }
-  });
+  }
 
-  const fetchedData = await dataFetcher<T>(endpoint, urlSearchParams, {
+  return await dataFetcher<T>(endpoint, urlSearchParams, {
     cache,
     rateLimit,
     retry,
   });
-
-  return fetchedData;
 };

@@ -22,11 +22,9 @@
  * SOFTWARE.
  */
 
-/* eslint-disable vitest/no-conditional-in-test */
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { freeFormSearch } from "../../search/free-form";
+import { freeFormSearch } from "../../search/freeForm";
 
 describe("freeFormSearch", () => {
   beforeEach(() => {
@@ -87,7 +85,7 @@ describe("freeFormSearch", () => {
       },
     ];
 
-    injectionScenarios.forEach(({ category, payloads }) => {
+    for (const { category, payloads } of injectionScenarios) {
       it(`should handle ${category} attempts in search queries`, async () => {
         mockSuccessfulFetch();
 
@@ -97,7 +95,7 @@ describe("freeFormSearch", () => {
           ).resolves.toBeDefined();
         }
       });
-    });
+    }
 
     it("should handle XSS attempts and prevent script execution", async () => {
       const xssPayloads = [
@@ -116,10 +114,11 @@ describe("freeFormSearch", () => {
           { format: "json" },
         );
 
-        const resultStr = JSON.stringify(result);
-        expect(resultStr).not.toContain("<script>");
-        expect(resultStr).not.toContain("onerror=");
-        expect(resultStr).not.toContain("javascript:");
+        const resultString = JSON.stringify(result);
+
+        expect(resultString).not.toContain("<script>");
+        expect(resultString).not.toContain("onerror=");
+        expect(resultString).not.toContain("javascript:");
       }
     });
   });
@@ -148,7 +147,7 @@ describe("freeFormSearch", () => {
         "القاهرة",
         "±§¶•ªº–≠",
         "\u0000\u0001\u0002",
-        String.fromCharCode(0),
+        String.fromCodePoint(0),
       ];
 
       for (const chars of specialChars) {
@@ -169,18 +168,17 @@ describe("freeFormSearch", () => {
       await freeFormSearch({ query: "test" }, { format: "json" });
 
       const fetchCall = vi.mocked(global.fetch).mock.calls[0];
+
       expect(fetchCall).toBeDefined();
 
-      if (fetchCall) {
-        const headers = (fetchCall[1] as RequestInit)?.headers as Record<
-          string,
-          string
-        >;
+      const headers = (fetchCall?.[1] as RequestInit)?.headers as Record<
+        string,
+        string
+      >;
 
-        expect(headers["User-Agent"]).not.toContain("\r\n");
-        expect(headers["User-Agent"]).not.toContain("\n");
-        expect(headers["User-Agent"]).not.toContain("\r");
-      }
+      expect(headers["User-Agent"]).not.toContain("\r\n");
+      expect(headers["User-Agent"]).not.toContain("\n");
+      expect(headers["User-Agent"]).not.toContain("\r");
     });
   });
 
@@ -213,5 +211,3 @@ describe("freeFormSearch", () => {
     });
   });
 });
-
-/* eslint-enable vitest/no-conditional-in-test */

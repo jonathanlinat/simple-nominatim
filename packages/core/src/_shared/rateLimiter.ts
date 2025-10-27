@@ -90,19 +90,19 @@ export class RateLimiter {
   /**
    * Execute a function with rate limiting
    *
-   * @param fn The function to execute
+   * @param function_ The function to execute
    * @returns A promise that resolves with the function result
    */
-  async execute<T>(fn: () => Promise<T>): Promise<T> {
+  async execute<T>(function_: () => Promise<T>): Promise<T> {
     if (!this.enabled) {
-      return fn();
+      return function_();
     }
 
     this.queuedCount++;
 
     try {
-      const throttledFn = this.throttle(fn);
-      const result = await throttledFn();
+      const throttledFunction = this.throttle(function_);
+      const result = await throttledFunction();
 
       this.requestCount++;
 

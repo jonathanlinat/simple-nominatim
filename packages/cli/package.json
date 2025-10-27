@@ -40,14 +40,8 @@
   "scripts": {
     "build": "tsdown",
     "clean": "rm -rf dist",
-    "lint": "eslint --fix",
     "prepare": "pnpm build",
-    "simple-nominatim": "tsx ./src/index.ts",
-    "test": "vitest run --typecheck",
-    "test:coverage": "vitest run --typecheck --coverage",
-    "test:ui": "vitest --typecheck --ui",
-    "test:watch": "vitest --typecheck",
-    "typecheck": "tsc --noEmit"
+    "simple-nominatim": "tsx ./src/index.ts"
   },
   "sideEffects": false,
   "type": "module",

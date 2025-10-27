@@ -67,6 +67,60 @@ const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
+ * Check if HTTP error should be retried
+ *
+ * @param statusCode HTTP status code
+ * @param attempt Current attempt number
+ * @param retry Retry configuration
+ * @returns True if should retry, false otherwise
+ */
+const shouldRetryHttpError = (
+  statusCode: number,
+  attempt: number,
+  retry: Required<RetryConfig>,
+): boolean =>
+  retry.enabled &&
+  attempt < retry.maxAttempts &&
+  retry.retryableStatusCodes.includes(statusCode);
+
+/**
+ * Check if network error should be retried
+ *
+ * @param error Error object
+ * @param attempt Current attempt number
+ * @param retry Retry configuration
+ * @returns True if should retry, false otherwise
+ */
+const shouldRetryNetworkError = (
+  error: unknown,
+  attempt: number,
+  retry: Required<RetryConfig>,
+): boolean => {
+  const isNetworkError = !error || !(error as { status?: number }).status;
+
+  return retry.enabled && attempt < retry.maxAttempts && isNetworkError;
+};
+
+/**
+ * Parse response based on format
+ *
+ * @param response Fetch response
+ * @param params URL search parameters
+ * @returns Parsed response
+ */
+const parseResponse = async <T>(
+  response: Response,
+  params: URLSearchParams,
+): Promise<T> => {
+  const format = params.get("format");
+  const isTextFormat = format === "text" || format === "xml";
+
+  return isTextFormat
+    ? ((await response.text()) as T)
+    : ((await response.json()) as T);
+};
+
+/**
  * Generic HTTP fetcher for Nominatim API requests
  *
  * This internal function handles all HTTP communication with the Nominatim API.
@@ -135,15 +189,9 @@ export const dataFetcher = async <T = unknown>(
 
         if (!requestResponse.ok) {
           const statusCode = requestResponse.status;
-          const shouldRetry =
-            retry.enabled &&
-            attempt < retry.maxAttempts &&
-            retry.retryableStatusCodes.includes(statusCode);
 
-          if (shouldRetry) {
-            const delay = calculateDelay(attempt, retry);
-
-            await sleep(delay);
+          if (shouldRetryHttpError(statusCode, attempt, retry)) {
+            await sleep(calculateDelay(attempt, retry));
 
             continue;
           }
@@ -153,23 +201,12 @@ export const dataFetcher = async <T = unknown>(
           );
         }
 
-        const parsedRequestResponse =
-          params.get("format") === "text" || params.get("format") === "xml"
-            ? await requestResponse.text()
-            : await requestResponse.json();
-
-        return parsedRequestResponse as T;
+        return await parseResponse<T>(requestResponse, params);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
-        const isNetworkError = !error || !(error as { status?: number }).status;
-        const shouldRetry =
-          retry.enabled && attempt < retry.maxAttempts && isNetworkError;
-
-        if (shouldRetry) {
-          const delay = calculateDelay(attempt, retry);
-
-          await sleep(delay);
+        if (shouldRetryNetworkError(error, attempt, retry)) {
+          await sleep(calculateDelay(attempt, retry));
 
           continue;
         }
@@ -178,7 +215,7 @@ export const dataFetcher = async <T = unknown>(
       }
     }
 
-    throw lastError || new Error("Request failed after all retry attempts");
+    throw lastError ?? new Error("Request failed after all retry attempts");
   };
 
   const response = rateLimiter.isEnabled()
