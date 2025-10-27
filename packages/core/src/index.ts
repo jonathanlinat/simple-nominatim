@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -50,4 +50,11 @@ export { structuredSearch } from "./search/structured";
 export type { StructuredSearchParams } from "./search/search.types";
 
 export { serviceStatus } from "./status/service";
-export type { StatusOptions, StatusFormat } from "./status/status.types";
+export type {
+  StatusOptions,
+  StatusFormat,
+  StatusSuccessResponse,
+  StatusErrorResponse,
+  StatusJsonResponse,
+} from "./status/status.types";
+export { isStatusSuccess } from "./status/status.types";

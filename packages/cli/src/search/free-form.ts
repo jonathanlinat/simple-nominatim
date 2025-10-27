@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -26,9 +26,13 @@ import { freeFormSearch } from "@simple-nominatim/core";
 import type {
   FreeFormSearchParams,
   SearchOptions,
-  RetryConfig,
 } from "@simple-nominatim/core";
 
+import {
+  buildCacheConfig,
+  buildRateLimitConfig,
+  buildRetryConfig,
+} from "../_shared/configBuilders";
 import { responseParser } from "../_shared/responseParser";
 import {
   safeValidateArgs,
@@ -37,6 +41,64 @@ import {
 } from "../_shared/validation";
 
 import type { FreeFormArgv } from "./search.types";
+
+/**
+ * Build API options from command-line arguments
+ * @internal
+ */
+const buildApiOptions = (argv: FreeFormArgv) => {
+  const {
+    email,
+    format,
+    limit,
+    addressdetails,
+    extratags,
+    namedetails,
+    entrances,
+    acceptLanguage,
+    countrycodes,
+    layer,
+    featuretype,
+    excludePlaceIds,
+    viewbox,
+    bounded,
+    polygonGeojson,
+    polygonKml,
+    polygonSvg,
+    polygonText,
+    polygonThreshold,
+    jsonCallback,
+    dedupe,
+    debug,
+  } = argv;
+
+  return {
+    email,
+    format,
+    limit,
+    ...(addressdetails !== undefined && { addressdetails }),
+    ...(extratags !== undefined && { extratags }),
+    ...(namedetails !== undefined && { namedetails }),
+    ...(entrances !== undefined && { entrances }),
+    ...(acceptLanguage && { "accept-language": acceptLanguage }),
+    ...(countrycodes && { countrycodes }),
+    ...(layer && { layer }),
+    ...(featuretype && { featureType: featuretype }),
+    ...(excludePlaceIds && { exclude_place_ids: excludePlaceIds }),
+    ...(viewbox && { viewbox }),
+    ...(bounded !== undefined && { bounded }),
+    ...(polygonGeojson !== undefined && { polygon_geojson: polygonGeojson }),
+    ...(polygonKml !== undefined && { polygon_kml: polygonKml }),
+    ...(polygonSvg !== undefined && { polygon_svg: polygonSvg }),
+    ...(polygonText !== undefined && { polygon_text: polygonText }),
+    ...(polygonThreshold !== undefined && {
+      polygon_threshold: polygonThreshold,
+    }),
+    ...(jsonCallback && { json_callback: jsonCallback }),
+    ...(dedupe !== undefined && { dedupe }),
+    ...(debug !== undefined && { debug }),
+  };
+};
 
 /**
  * CLI wrapper for free-form search functionality
@@ -67,21 +129,7 @@ import type { FreeFormArgv } from "./search.types";
  * @internal
  */
 export const freeFormSearchWrapper = (argv: FreeFormArgv): Promise<void> => {
-  const {
-    email,
-    format,
-    limit,
-    query,
-    noCache,
-    cacheTtl,
-    cacheMaxSize,
-    noRateLimit,
-    rateLimit,
-    rateLimitInterval,
-    noRetry,
-    retryMaxAttempts,
-    retryInitialDelay,
-  } = argv;
+  const { query, email, format, limit } = argv;
 
   const validationResult = safeValidateArgs(freeFormSearchSchema, {
     query,
@@ -95,45 +143,17 @@ export const freeFormSearchWrapper = (argv: FreeFormArgv): Promise<void> => {
   }
 
   const params: FreeFormSearchParams = { query };
-  const options: SearchOptions = { email, format, limit };
+  const apiOptions = buildApiOptions(argv);
+  const cacheConfig = buildCacheConfig(argv);
+  const rateLimitConfig = buildRateLimitConfig(argv);
+  const retryConfig = buildRetryConfig(argv);
 
-  if (
-    noCache !== undefined ||
-    cacheTtl !== undefined ||
-    cacheMaxSize !== undefined
-  ) {
-    options.cache = {
-      ...(noCache && { enabled: false }),
-      ...(cacheTtl !== undefined && { ttl: cacheTtl }),
-      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize }),
-    };
-  }
-
-  if (
-    noRateLimit !== undefined ||
-    rateLimit !== undefined ||
-    rateLimitInterval !== undefined
-  ) {
-    options.rateLimit = {
-      ...(noRateLimit && { enabled: false }),
-      ...(rateLimit !== undefined && { limit: rateLimit }),
-      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval }),
-    };
-  }
-
-  if (
-    noRetry !== undefined ||
-    retryMaxAttempts !== undefined ||
-    retryInitialDelay !== undefined
-  ) {
-    options.retry = {
-      ...(noRetry && { enabled: false }),
-      ...(retryMaxAttempts !== undefined && { maxAttempts: retryMaxAttempts }),
-      ...(retryInitialDelay !== undefined && {
-        initialDelay: retryInitialDelay,
-      }),
-    } as RetryConfig;
-  }
+  const options: SearchOptions = {
+    ...apiOptions,
+    ...(cacheConfig && { cache: cacheConfig }),
+    ...(rateLimitConfig && { rateLimit: rateLimitConfig }),
+    ...(retryConfig && { retry: retryConfig }),
+  };
 
   const response = freeFormSearch(params, options);
   const handledResponse = responseParser(response);

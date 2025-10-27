@@ -55,7 +55,7 @@ describe("structuredSearch", () => {
         { format: "json" },
       );
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
@@ -90,7 +90,7 @@ describe("structuredSearch", () => {
         { format: "json" },
       );
 
-      expect(result).toEqual(customResponse);
+      expect(result).toStrictEqual(customResponse);
       expect(Array.isArray(result)).toBe(true);
     });
   });
@@ -223,7 +223,7 @@ describe("structuredSearch", () => {
         },
       );
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
   });
@@ -279,7 +279,7 @@ describe("structuredSearch", () => {
         },
       );
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });

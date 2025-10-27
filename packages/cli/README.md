@@ -36,7 +36,7 @@ simple-nominatim --help (or -h)
 
 #### Geocode
 
-To reverse geocode a coordinate, utilize the `--latitude` and `--longitude` options:
+Use the `--latitude` and `--longitude` options to reverse geocode a coordinate:
 
 ```bash
 simple-nominatim reverse:geocode --latitude '37.4219999' --longitude '-122.0840575' --format 'jsonv2'
@@ -44,17 +44,23 @@ simple-nominatim reverse:geocode --latitude '37.4219999' --longitude '-122.08405
 
 ##### Parameters
 
-- `--latitude`: Specify the latitude of the coordinate.
+- `--latitude`: The latitude of the coordinate (WGS84 projection, -90 to 90).
   - This is a **required** option.
-- `--longitude`: Specify the longitude of the coordinate.
+- `--longitude`: The longitude of the coordinate (WGS84 projection, -180 to 180).
   - This is a **required** option.
 
 ##### Options
 
-- `--email`: Specify an appropriate email address when making large numbers of identified requests.
-- `--format`: Define the output format.
+- `--email`: An appropriate email address when making large numbers of identified requests.
+- `--format`: The output format (default: `xml` for Reverse API).
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.
+- `--zoom`: Level of detail required (0-18, default: `18`). Examples: `3` (country), `10` (city), `18` (building).
+- `--addressdetails`: Include address breakdown (`0` or `1`, default: `1`).
+- `--layer`: Filter by theme (`address`, `poi`, `railway`, `natural`, `manmade`).
+
+> [!NOTE]
+> The Reverse API returns exactly one result or an error. See [API documentation](https://nominatim.org/release-docs/develop/api/Reverse/) for details.
 
 ##### Help
 
@@ -66,9 +72,15 @@ simple-nominatim reverse:geocode --help (or -h)
 
 ### Search Endpoint
 
+> [!IMPORTANT]
+> Search supports two query modes that **cannot be combined**:
+>
+> - **Free-form**: Single query string (`search:free-form`)
+> - **Structured**: Address components (`search:structured`)
+
 #### Free-form Query
 
-To use a free-form query, utilize the `--query` option:
+Use the `--query` option for a free-form query:
 
 ```bash
 simple-nominatim search:free-form --query '1600 Amphitheatre Parkway, Mountain View, CA, USA' --format 'jsonv2'
@@ -81,11 +93,17 @@ simple-nominatim search:free-form --query '1600 Amphitheatre Parkway, Mountain V
 
 ##### Options
 
-- `--email`: Specify an appropriate email address when making large numbers of identified requests.
-- `--format`: Define the output format.
+- `--email`: An appropriate email address when making large numbers of identified requests.
+- `--format`: The output format (default: `jsonv2` for Search API).
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.
-- `--limit`: Specify the maximum number of returned results. Cannot be more than 40.
+- `--limit`: Maximum number of returned results (1-40, default: `10`).
+- `--addressdetails`: Include address breakdown (`0` or `1`, default: `0`).
+- `--countrycodes`: Limit to specific countries (comma-separated ISO codes, e.g., `us,ca`).
+- `--bounded`: Restrict results to viewbox area (`0` or `1`, requires `--viewbox`).
+- `--viewbox`: Bounding box to focus search (format: `x1,y1,x2,y2`).
+- `--layer`: Filter by theme (`address`, `poi`, `railway`, `natural`, `manmade`).
+- `--feature-type`: Filter address layer (`country`, `state`, `city`, `settlement`).
 
 ##### Help
 
@@ -97,30 +115,37 @@ simple-nominatim search:free-form --help (or -h)
 
 #### Structured Query
 
-For structured queries, you can combine multiple options such as `--amenity`, `--city`, `--country`, `--county`, `--postalcode`, `--state`, and `--street`:
+Combine multiple options such as `--amenity`, `--street`, `--city`, `--county`, `--state`, `--country`, and `--postalcode` for structured queries:
 
 ```bash
-simple-nominatim search:structured --country 'Canada' --format 'jsonv2'
+simple-nominatim search:structured --country 'USA' --city 'Mountain View' --street '1600 Amphitheatre Parkway' --format 'jsonv2'
 ```
 
 ##### Parameters
 
-- `--amenity`: Specify the name or type of point of interest (POI).
-- `--city`: Specify the city name.
-- `--country`: Specify the country name.
-  - This is a **required** option.
-- `--county`: Specify the county name.
-- `--postalcode`: Specify the postal code.
-- `--state`: Specify the state name.
-- `--street`: Specify the house number and street name.
+All parameters are **optional**. Use only the ones relevant to your address:
+
+- `--amenity`: The name or type of point of interest (POI).
+- `--street`: The house number and street name.
+- `--city`: The city name.
+- `--county`: The county name.
+- `--state`: The state name.
+- `--country`: The country name.
+- `--postalcode`: The postal code.
 
 ##### Options
 
-- `--email`: Specify an appropriate email address when making large numbers of identified requests.
-- `--format`: Define the output format.
+- `--email`: An appropriate email address when making large numbers of identified requests.
+- `--format`: The output format (default: `jsonv2` for Search API).
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.
-- `--limit`: Specify the maximum number of returned results. Cannot be more than 40.
+- `--limit`: Maximum number of returned results (1-40, default: `10`).
+- `--addressdetails`: Include address breakdown (`0` or `1`, default: `0`).
+- `--countrycodes`: Limit to specific countries (comma-separated ISO codes, e.g., `us,ca`).
+- `--bounded`: Restrict results to viewbox area (`0` or `1`, requires `--viewbox`).
+- `--viewbox`: Bounding box to focus search (format: `x1,y1,x2,y2`).
+- `--layer`: Filter by theme (`address`, `poi`, `railway`, `natural`, `manmade`).
+- `--feature-type`: Filter address layer (`country`, `state`, `city`, `settlement`).
 
 ##### Help
 
@@ -134,15 +159,22 @@ simple-nominatim search:structured --help (or -h)
 
 #### Service
 
+Check the Nominatim API service health and database status:
+
 ```bash
 simple-nominatim status:service --format 'json'
 ```
 
 ##### Options
 
-- `--format`: Define the output format.
-  - This is a **required** option.
+- `--format`: The output format (default: `text`).
+  - This is an **optional** parameter.
   - Values include `text` and `json`.
+
+##### Response Behavior
+
+- **Text format**: Returns `OK` on success or error message on failure
+- **JSON format**: Always returns status information. Success includes database update timestamp and version details. Errors return status code and message.
 
 ##### Help
 

@@ -59,19 +59,32 @@ const results = await geocodeReverse(
 
 ##### Parameters
 
-- `latitude`: Specify the latitude of the coordinate.
+- `latitude`: Specify the latitude of the coordinate (WGS84 projection, -90 to 90).
   - This is a **required** parameter.
-- `longitude`: Specify the longitude of the coordinate.
+- `longitude`: Specify the longitude of the coordinate (WGS84 projection, -180 to 180).
   - This is a **required** parameter.
 
 ##### Options
 
-- `email`: Specify an appropriate email address when making large numbers of identified requests.
-- `format`: Define the output format.
+- `email`: An appropriate email address when making large numbers of identified requests.
+- `format`: The output format (default: `xml` for Reverse API).
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.
+- `zoom`: Level of detail required for the address (0-18, default: `18`).
+  - `3` = country, `5` = state, `8` = county, `10` = city, `14` = neighbourhood, `18` = building
+- `addressdetails`: Include a breakdown of the address into elements (`0` or `1`, default: `1`).
+- `layer`: Filter results by theme (`address`, `poi`, `railway`, `natural`, `manmade`).
+
+> [!NOTE]
+> The Reverse API returns exactly one result or an error. The result may occasionally be unexpected due to closest-object matching. See [API documentation](https://nominatim.org/release-docs/develop/api/Reverse/) for details.
 
 ### Search Endpoint
+
+> [!IMPORTANT]
+> Search supports two query modes that **cannot be combined**:
+>
+> - **Free-form**: Single query string (use `freeFormSearch`)
+> - **Structured**: Address components (use `structuredSearch`)
 
 #### Free-form Query
 
@@ -93,11 +106,17 @@ const results = await freeFormSearch(
 
 ##### Options
 
-- `email`: Specify an appropriate email address when making large numbers of identified requests.
-- `format`: Define the output format.
+- `email`: An appropriate email address when making large numbers of identified requests.
+- `format`: The output format (default: `jsonv2` for Search API).
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.
-- `limit`: Specify the maximum number of returned results. Cannot be more than 40.
+- `limit`: Maximum number of returned results (1-40, default: `10`). Nominatim may return fewer results if they don't sufficiently match.
+- `addressdetails`: Include a breakdown of the address into elements (`0` or `1`, default: `0`).
+- `countrycodes`: Limit results to specific countries (comma-separated ISO 3166-1alpha2 codes, e.g., `'us,ca'`).
+- `bounded`: Restrict results to viewbox area only when set to `1` (requires `viewbox` parameter).
+- `viewbox`: Bounding box to focus the search (format: `'x1,y1,x2,y2'` where x=longitude, y=latitude).
+- `layer`: Filter results by theme (`address`, `poi`, `railway`, `natural`, `manmade`).
+- `featureType`: Fine-grained address layer filter (`country`, `state`, `city`, `settlement`).
 
 #### Structured Query
 
@@ -107,47 +126,72 @@ Use the `structuredSearch` method directly in your code:
 import { structuredSearch } from "@simple-nominatim/core";
 
 const results = await structuredSearch(
-  { country: "USA" },
+  {
+    country: "USA",
+    city: "Mountain View",
+    street: "1600 Amphitheatre Parkway",
+  },
   { format: "jsonv2" },
 );
 ```
 
 ##### Parameters
 
+All parameters are **optional**. Use only the ones relevant to your address:
+
 - `amenity`: Specify the name or type of point of interest (POI).
-- `city`: Specify the city name.
-- `country`: Specify the country name.
-  - This is a **required** parameter.
-- `county`: Specify the county name.
-- `postalcode`: Specify the postal code.
-- `state`: Specify the state name.
 - `street`: Specify the house number and street name.
+- `city`: Specify the city name.
+- `county`: Specify the county name.
+- `state`: Specify the state name.
+- `country`: Specify the country name.
+- `postalcode`: Specify the postal code.
 
 ##### Options
 
-- `email`: Specify an appropriate email address when making large numbers of identified requests.
-- `format`: Define the output format.
+- `email`: An appropriate email address when making large numbers of identified requests.
+- `format`: The output format (default: `jsonv2` for Search API).
   - This is a **required** option.
   - Values include `xml`, `json`, `jsonv2`, `geojson`, and `geocodejson`.
-- `limit`: Specify the maximum number of returned results. Cannot be more than 40.
+- `limit`: Maximum number of returned results (1-40, default: `10`). Nominatim may return fewer results if they don't sufficiently match.
+- `addressdetails`: Include a breakdown of the address into elements (`0` or `1`, default: `0`).
+- `countrycodes`: Limit results to specific countries (comma-separated ISO 3166-1alpha2 codes, e.g., `'us,ca'`).
+- `bounded`: Restrict results to viewbox area only when set to `1` (requires `viewbox` parameter).
+- `viewbox`: Bounding box to focus the search (format: `'x1,y1,x2,y2'` where x=longitude, y=latitude).
+- `layer`: Filter results by theme (`address`, `poi`, `railway`, `natural`, `manmade`).
+- `featureType`: Fine-grained address layer filter (`country`, `state`, `city`, `settlement`).
 
 ### Status Endpoint
 
 #### Service
 
-Use the `serviceStatus` method directly in your code:
+Use the `serviceStatus` method to check the API service health and database status:
 
 ```javascript
 import { serviceStatus } from "@simple-nominatim/core";
 
-const results = await serviceStatus({ format: "json" });
+const status = await serviceStatus({ format: "json" });
 ```
 
 ##### Options
 
-- `format`: Define the output format.
-  - This is a **required** option.
+- `format`: The output format (default: `text`).
+  - This is an **optional** parameter.
   - Values include `text` and `json`.
+
+##### Response Behavior
+
+- **Text format**: Returns HTTP 200 with `"OK"` on success, HTTP 500 with error message on failure.
+- **JSON format**: Always returns HTTP 200. Success includes `status: 0` with version info and database timestamp. Errors include `status: 700+` with message only.
+
+##### Type-Safe Response Types
+
+The library provides TypeScript interfaces for JSON responses:
+
+- `StatusSuccessResponse`: Successful response with `status: 0` and full details
+- `StatusErrorResponse`: Error response with error code and message
+- `StatusJsonResponse`: Union type for all JSON responses
+- `isStatusSuccess()`: Type guard helper to check if response is successful
 
 ## Advanced Features
 

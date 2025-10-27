@@ -55,7 +55,7 @@ describe("geocodeReverse", () => {
         { format: "json" },
       );
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
@@ -94,7 +94,7 @@ describe("geocodeReverse", () => {
         { format: "json" },
       );
 
-      expect(result).toEqual(customResponse);
+      expect(result).toStrictEqual(customResponse);
     });
   });
 
@@ -198,7 +198,7 @@ describe("geocodeReverse", () => {
         },
       );
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
   });
@@ -282,8 +282,54 @@ describe("geocodeReverse", () => {
         },
       );
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("should handle undefined optional parameters correctly", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await geocodeReverse(
+        { latitude: "51.5074", longitude: "-0.1278" },
+        {
+          format: "json",
+          addressdetails: undefined,
+          zoom: undefined,
+          extratags: undefined,
+        },
+      );
+
+      expect(result).toStrictEqual(mockResponse);
+      const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
+        .calls[0]?.[0] as string;
+      expect(calledUrl).toContain("lat=51.5074");
+      expect(calledUrl).toContain("lon=-0.1278");
+      expect(calledUrl).not.toContain("addressdetails");
+      expect(calledUrl).not.toContain("zoom");
+    });
+
+    it("should handle empty coordinate strings", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await geocodeReverse(
+        { latitude: "", longitude: "" },
+        { format: "json" },
+      );
+
+      expect(result).toStrictEqual(mockResponse);
+      const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
+        .calls[0]?.[0] as string;
+      expect(calledUrl).toContain("reverse?");
+      // Empty lat should not be appended
+      expect(calledUrl).not.toContain("lat=");
+      // Empty lon should not be appended
+      expect(calledUrl).not.toContain("lon=");
     });
   });
 });

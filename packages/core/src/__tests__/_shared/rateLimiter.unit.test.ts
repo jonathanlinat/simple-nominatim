@@ -44,7 +44,7 @@ describe("RateLimiter", () => {
       const defaultLimiter = new RateLimiter();
 
       expect(defaultLimiter.isEnabled()).toBe(true);
-      expect(defaultLimiter.getStats()).toEqual({
+      expect(defaultLimiter.getStats()).toStrictEqual({
         requestCount: 0,
         queuedCount: 0,
       });
@@ -59,7 +59,7 @@ describe("RateLimiter", () => {
       });
 
       expect(customLimiter.isEnabled()).toBe(false);
-      expect(customLimiter.getStats()).toEqual({
+      expect(customLimiter.getStats()).toStrictEqual({
         requestCount: 0,
         queuedCount: 0,
       });
@@ -92,7 +92,7 @@ describe("RateLimiter", () => {
 
       const result = await limiter.execute(fn);
 
-      expect(result).toEqual({ data: "test", status: "ok" });
+      expect(result).toStrictEqual({ data: "test", status: "ok" });
     });
 
     it("should increment request count after execution", async () => {
@@ -169,26 +169,25 @@ describe("RateLimiter", () => {
       try {
         await limiter.execute(fn);
       } catch {
-        // Expected error
+        /* Empty */
       }
 
       expect(limiter.getStats().queuedCount).toBe(0);
     });
   });
 
-  describe("getStats()", () => {
-    it("should return initial stats with zeros", () => {
-      const stats = limiter.getStats();
+  describe("getStats() and resetStats()", () => {
+    it("should track, return, and reset stats correctly", async () => {
+      const fn = async () => "result";
 
-      expect(stats).toEqual({
+      // Initial stats
+      let stats = limiter.getStats();
+      expect(stats).toStrictEqual({
         requestCount: 0,
         queuedCount: 0,
       });
-    });
 
-    it("should track request count", async () => {
-      const fn = async () => "result";
-
+      // Track request count
       const promise1 = limiter.execute(fn);
       await vi.advanceTimersByTimeAsync(500);
       const promise2 = limiter.execute(fn);
@@ -196,47 +195,18 @@ describe("RateLimiter", () => {
       await promise1;
       await promise2;
 
-      const stats = limiter.getStats();
+      stats = limiter.getStats();
       expect(stats.requestCount).toBe(2);
-    });
 
-    it("should return current stats snapshot", () => {
+      // Verify snapshot (not reference)
       const stats1 = limiter.getStats();
       const stats2 = limiter.getStats();
-
-      expect(stats1).toEqual(stats2);
+      expect(stats1).toStrictEqual(stats2);
       expect(stats1).not.toBe(stats2);
-    });
-  });
 
-  describe("resetStats()", () => {
-    it("should reset request count", async () => {
-      const fn = async () => "result";
-      await limiter.execute(fn);
-
+      // Reset stats
       limiter.resetStats();
-
-      expect(limiter.getStats().requestCount).toBe(0);
-    });
-
-    it("should reset queued count", () => {
-      limiter.resetStats();
-
-      expect(limiter.getStats().queuedCount).toBe(0);
-    });
-
-    it("should reset both counters to zero", async () => {
-      const fn = async () => "result";
-      const promise1 = limiter.execute(fn);
-      await vi.advanceTimersByTimeAsync(500);
-      const promise2 = limiter.execute(fn);
-      await vi.advanceTimersByTimeAsync(500);
-      await promise1;
-      await promise2;
-
-      limiter.resetStats();
-
-      expect(limiter.getStats()).toEqual({
+      expect(limiter.getStats()).toStrictEqual({
         requestCount: 0,
         queuedCount: 0,
       });
@@ -286,7 +256,7 @@ describe("RateLimiter", () => {
 
       limiter.setEnabled(false);
 
-      expect(limiter.getStats()).toEqual({
+      expect(limiter.getStats()).toStrictEqual({
         requestCount: 0,
         queuedCount: 0,
       });
@@ -296,7 +266,7 @@ describe("RateLimiter", () => {
       limiter.setEnabled(false);
       limiter.setEnabled(true);
 
-      expect(limiter.getStats()).toEqual({
+      expect(limiter.getStats()).toStrictEqual({
         requestCount: 0,
         queuedCount: 0,
       });

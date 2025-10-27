@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { structuredSearch } from "@simple-nominatim/core";
 
@@ -35,10 +35,13 @@ vi.mock("@simple-nominatim/core", () => ({
 }));
 
 describe("structuredSearchWrapper", () => {
+  let consoleLogSpy: ReturnType<typeof vi.fn>;
+  let consoleErrorSpy: ReturnType<typeof vi.fn>;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(console, "log").mockImplementation(() => {});
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     vi.mocked(structuredSearch).mockResolvedValue([
       {
         place_id: "12345",
@@ -49,249 +52,175 @@ describe("structuredSearchWrapper", () => {
     ]);
   });
 
-  describe("basic functionality", () => {
-    it("should call structuredSearch with correct parameters", async () => {
-      const argv: StructuredArgv = {
-        country: "United Kingdom",
-        format: "json",
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.objectContaining({ country: "United Kingdom" }),
-        expect.objectContaining({ format: "json" }),
-      );
-    });
-
-    it("should handle successful response", async () => {
-      const argv: StructuredArgv = {
-        country: "France",
-        city: "Paris",
-        format: "json",
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(console.log).toHaveBeenCalled();
-    });
-
-    it("should pass all address components", async () => {
-      const argv: StructuredArgv = {
-        country: "UK",
-        city: "London",
-        street: "10 Downing Street",
-        postalcode: "SW1A 2AA",
-        county: "Greater London",
-        state: "England",
-        amenity: "government building",
-        format: "json",
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          country: "UK",
-          city: "London",
-          street: "10 Downing Street",
-          postalcode: "SW1A 2AA",
-          county: "Greater London",
-          state: "England",
-          amenity: "government building",
-        }),
-        expect.any(Object),
-      );
-    });
-
-    it("should pass email parameter when provided", async () => {
-      const argv: StructuredArgv = {
-        country: "Germany",
-        city: "Berlin",
-        format: "json",
-        email: "user@example.com",
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({ email: "user@example.com" }),
-      );
-    });
-
-    it("should pass limit parameter when provided", async () => {
-      const argv: StructuredArgv = {
-        country: "Spain",
-        city: "Madrid",
-        format: "json",
-        limit: 5,
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({ limit: 5 }),
-      );
-    });
+  afterEach(() => {
+    consoleLogSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
   });
 
-  describe("cache options", () => {
-    it("should pass cache configuration", async () => {
+  describe("delegation and parameter mapping", () => {
+    it("should call structuredSearch with address params and options", async () => {
       const argv: StructuredArgv = {
         country: "UK",
         city: "London",
+        street: "Baker Street",
+        postalcode: "NW1",
+        format: "json",
+        email: "test@example.com",
+        limit: 10,
+        addressdetails: 1,
+        extratags: 1,
+        acceptLanguage: "en",
+        countrycodes: "gb",
+        layer: "address",
+      };
+
+      await structuredSearchWrapper(argv);
+
+      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
+        {
+          country: "UK",
+          city: "London",
+          street: "Baker Street",
+          postalcode: "NW1",
+        },
+        expect.objectContaining({
+          email: "test@example.com",
+          format: "json",
+          limit: 10,
+          addressdetails: 1,
+          extratags: 1,
+          "accept-language": "en",
+          countrycodes: "gb",
+          layer: "address",
+        }),
+      );
+    });
+
+    it("should pass config builder results to core function", async () => {
+      const argv: StructuredArgv = {
+        country: "UK",
         format: "json",
         noCache: true,
         cacheTtl: 6000,
-        cacheMaxSize: 120,
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          cache: expect.objectContaining({
-            enabled: false,
-            ttl: 6000,
-            maxSize: 120,
-          }),
-        }),
-      );
-    });
-  });
-
-  describe("rate limit options", () => {
-    it("should pass rate limit configuration", async () => {
-      const argv: StructuredArgv = {
-        country: "Austria",
-        city: "Vienna",
-        format: "json",
         noRateLimit: true,
-        rateLimit: 2,
-        rateLimitInterval: 2500,
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({
-            enabled: false,
-            limit: 2,
-            interval: 2500,
-          }),
-        }),
-      );
-    });
-  });
-
-  describe("retry options", () => {
-    it("should pass retry configuration", async () => {
-      const argv: StructuredArgv = {
-        country: "Sweden",
-        city: "Stockholm",
-        format: "json",
+        rateLimit: 3,
         noRetry: true,
-        retryMaxAttempts: 6,
-        retryInitialDelay: 1800,
+        retryMaxAttempts: 4,
+      };
+
+      await structuredSearchWrapper(argv);
+
+      const callArgs = vi.mocked(structuredSearch).mock.calls[0]?.[1];
+
+      expect(callArgs).toHaveProperty("cache");
+      expect(callArgs).toHaveProperty("rateLimit");
+      expect(callArgs).toHaveProperty("retry");
+    });
+
+    it("should handle all optional search parameters", async () => {
+      const argv: StructuredArgv = {
+        city: "London",
+        format: "json",
+        namedetails: 1,
+        entrances: 1,
+        layer: "address,poi",
+        featuretype: "city",
+        excludePlaceIds: "789,012",
+        viewbox: "-1.0,50.0,1.0,53.0",
+        bounded: 1,
+        polygonGeojson: 1,
+        polygonKml: 1,
+        polygonSvg: 1,
+        polygonText: 1,
+        polygonThreshold: 0.02,
+        jsonCallback: "myCallback",
+        dedupe: 0,
+        debug: 1,
       };
 
       await structuredSearchWrapper(argv);
 
       expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
         expect.objectContaining({
-          retry: expect.objectContaining({
-            enabled: false,
-            maxAttempts: 6,
-            initialDelay: 1800,
-          }),
+          city: "London",
+        }),
+        expect.objectContaining({
+          format: "json",
+          namedetails: 1,
+          entrances: 1,
+          layer: "address,poi",
+          featureType: "city",
+          exclude_place_ids: "789,012",
+          viewbox: "-1.0,50.0,1.0,53.0",
+          bounded: 1,
+          polygon_geojson: 1,
+          polygon_kml: 1,
+          polygon_svg: 1,
+          polygon_text: 1,
+          polygon_threshold: 0.02,
+          json_callback: "myCallback",
+          dedupe: 0,
+          debug: 1,
         }),
       );
     });
   });
 
-  describe("error handling", () => {
-    it("should handle API errors", async () => {
-      const processExitSpy = vi
+  describe("validation", () => {
+    it("should validate input and exit on error", async () => {
+      const mockExit = vi
         .spyOn(process, "exit")
         .mockImplementation(() => undefined as never);
 
-      vi.mocked(structuredSearch).mockRejectedValue(new Error("Search failed"));
-
       const argv: StructuredArgv = {
-        country: "Ireland",
-        city: "Dublin",
+        format: "invalid" as "json",
+      };
+
+      await structuredSearchWrapper(argv);
+
+      expect(mockExit).toHaveBeenCalledWith(1);
+      expect(console.error).toHaveBeenCalled();
+
+      mockExit.mockRestore();
+    });
+  });
+
+  describe("response handling", () => {
+    it("should output successful response to console", async () => {
+      const argv: StructuredArgv = {
+        country: "UK",
+        city: "London",
         format: "json",
       };
 
       await structuredSearchWrapper(argv);
 
-      expect(console.error).toHaveBeenCalled();
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-
-      processExitSpy.mockRestore();
+      expect(console.log).toHaveBeenCalledWith(expect.any(String));
     });
 
-    it("should handle validation errors", async () => {
-      const processExitSpy = vi
+    it("should handle API errors", async () => {
+      const mockExit = vi
         .spyOn(process, "exit")
-        .mockImplementation((() => {
-          throw new Error("process.exit");
-        }) as unknown as typeof process.exit);
+        .mockImplementation(() => undefined as never);
 
-      const argv = {
-        country: "Ireland",
-        city: "Dublin",
-        format: "invalid",
-      } as unknown as StructuredArgv;
+      vi.mocked(structuredSearch).mockRejectedValueOnce(
+        new Error("API Error: Server not available"),
+      );
 
-      try {
-        await structuredSearchWrapper(argv);
-      } catch (error) {
-        expect((error as Error).message).toBe("process.exit");
-      }
-
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-      expect(console.error).toHaveBeenCalled();
-
-      processExitSpy.mockRestore();
-    });
-  });
-
-  describe("output formats", () => {
-    it("should support xml format", async () => {
       const argv: StructuredArgv = {
-        country: "Portugal",
-        city: "Lisbon",
-        format: "xml",
+        country: "UK",
+        city: "London",
+        format: "json",
       };
 
       await structuredSearchWrapper(argv);
 
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({ format: "xml" }),
+      expect(mockExit).toHaveBeenCalledWith(1);
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining("API Error"),
       );
-    });
 
-    it("should support geocodejson format", async () => {
-      const argv: StructuredArgv = {
-        country: "Switzerland",
-        city: "Zurich",
-        format: "geocodejson",
-      };
-
-      await structuredSearchWrapper(argv);
-
-      expect(vi.mocked(structuredSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({ format: "geocodejson" }),
-      );
+      mockExit.mockRestore();
     });
   });
 });

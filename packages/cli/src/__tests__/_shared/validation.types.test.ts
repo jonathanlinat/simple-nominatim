@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -43,9 +43,6 @@ import {
 
 import type { z } from "zod";
 
-/**
- * Test Zod validation schemas
- */
 type InferredOutputFormat = z.infer<typeof outputFormatSchema>;
 expectTypeOf<InferredOutputFormat>().toEqualTypeOf<OutputFormat>();
 
@@ -65,7 +62,7 @@ type InferredLimit = z.infer<typeof limitSchema>;
 expectTypeOf<InferredLimit>().toEqualTypeOf<number | undefined>();
 
 type InferredFreeFormSearch = z.infer<typeof freeFormSearchSchema>;
-expectTypeOf<InferredFreeFormSearch>().toMatchTypeOf<{
+expectTypeOf<InferredFreeFormSearch>().toEqualTypeOf<{
   query: string;
   outputFormat: OutputFormat;
   email?: string | undefined;
@@ -73,8 +70,8 @@ expectTypeOf<InferredFreeFormSearch>().toMatchTypeOf<{
 }>();
 
 type InferredStructuredSearch = z.infer<typeof structuredSearchSchema>;
-expectTypeOf<InferredStructuredSearch>().toMatchTypeOf<{
-  country: string;
+expectTypeOf<InferredStructuredSearch>().toEqualTypeOf<{
+  country?: string | undefined;
   outputFormat: OutputFormat;
   amenity?: string | undefined;
   city?: string | undefined;
@@ -87,7 +84,7 @@ expectTypeOf<InferredStructuredSearch>().toMatchTypeOf<{
 }>();
 
 type InferredReverseGeocode = z.infer<typeof reverseGeocodeSchema>;
-expectTypeOf<InferredReverseGeocode>().toMatchTypeOf<{
+expectTypeOf<InferredReverseGeocode>().toEqualTypeOf<{
   latitude: string;
   longitude: string;
   outputFormat: OutputFormat;
@@ -95,15 +92,12 @@ expectTypeOf<InferredReverseGeocode>().toMatchTypeOf<{
 }>();
 
 type InferredServiceStatus = z.infer<typeof serviceStatusSchema>;
-expectTypeOf<InferredServiceStatus>().toMatchTypeOf<{
+expectTypeOf<InferredServiceStatus>().toEqualTypeOf<{
   statusFormat: StatusFormat;
 }>();
 
-/**
- * Test safeValidateArgs helper function
- */
 expectTypeOf(safeValidateArgs).toBeFunction();
-expectTypeOf(safeValidateArgs).parameter(0).toMatchTypeOf<z.ZodSchema>();
+expectTypeOf(safeValidateArgs).parameter(0).toEqualTypeOf<z.ZodSchema>();
 expectTypeOf(safeValidateArgs).parameter(1).toBeUnknown();
 
 const validResult = safeValidateArgs(freeFormSearchSchema, {
@@ -115,9 +109,6 @@ expectTypeOf(validResult).toEqualTypeOf<
   | { success: false; error: z.ZodError }
 >();
 
-/**
- * Test handleValidationError function
- */
 expectTypeOf(handleValidationError).toBeFunction();
-expectTypeOf(handleValidationError).parameter(0).toMatchTypeOf<z.ZodError>();
+expectTypeOf(handleValidationError).parameter(0).toEqualTypeOf<z.ZodError>();
 expectTypeOf(handleValidationError).returns.toBeNever();

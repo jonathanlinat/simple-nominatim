@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -33,7 +33,7 @@ import {
   structuredSearchSchema,
 } from "../../_shared/validation";
 
-describe("Input Validation", () => {
+describe("validation", () => {
   describe("Coordinate Validation", () => {
     it("should reject out-of-range latitude values", () => {
       expect(() => latitudeSchema.parse("91")).toThrow();
@@ -117,26 +117,25 @@ describe("Input Validation", () => {
   });
 
   describe("Structured Search Validation", () => {
-    it("should require country parameter", () => {
+    it("should accept queries without country parameter", () => {
       const result = structuredSearchSchema.safeParse({
         city: "London",
         outputFormat: "json",
       });
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        const firstIssue = result.error.issues[0];
-        expect(firstIssue).toBeDefined();
-        expect(firstIssue?.path[0]).toBe("country");
-      }
+      expect(result.success).toBe(true);
     });
 
-    it("should reject empty country", () => {
-      expect(() =>
-        structuredSearchSchema.parse({
-          country: "",
-          outputFormat: "json",
-        }),
-      ).toThrow();
+    it("should accept optional country", () => {
+      const resultWithCountry = structuredSearchSchema.safeParse({
+        country: "UK",
+        outputFormat: "json",
+      });
+      expect(resultWithCountry.success).toBe(true);
+
+      const resultWithoutCountry = structuredSearchSchema.safeParse({
+        outputFormat: "json",
+      });
+      expect(resultWithoutCountry.success).toBe(true);
     });
 
     it("should handle injection attempts in address fields", () => {

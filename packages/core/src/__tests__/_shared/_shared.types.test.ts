@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -35,16 +35,10 @@ import type {
   SearchOptions,
 } from "../../index";
 
-/**
- * Test OutputFormat type
- */
 expectTypeOf<OutputFormat>().toEqualTypeOf<
   "xml" | "json" | "jsonv2" | "geojson" | "geocodejson"
 >();
 
-/**
- * Test BaseOptions interface
- */
 expectTypeOf<BaseOptions>().toMatchTypeOf<{
   email?: string;
   format: OutputFormat;
@@ -52,21 +46,13 @@ expectTypeOf<BaseOptions>().toMatchTypeOf<{
   rateLimit?: RateLimitConfig;
 }>();
 
-/**
- * Test SearchOptions extends BaseOptions
- */
 expectTypeOf<SearchOptions>().toMatchTypeOf<BaseOptions>();
 expectTypeOf<SearchOptions>().toMatchTypeOf<{ limit?: number }>();
 
-/**
- * Test ReverseOptions is alias of BaseOptions
- */
-expectTypeOf<ReverseOptions>().toEqualTypeOf<BaseOptions>();
+expectTypeOf<ReverseOptions>().toMatchTypeOf<BaseOptions>();
+expectTypeOf<ReverseOptions>().toMatchTypeOf<{ zoom?: number }>();
 
-/**
- * Test RetryConfig interface
- */
-expectTypeOf<RetryConfig>().toMatchTypeOf<{
+expectTypeOf<RetryConfig>().toEqualTypeOf<{
   enabled?: boolean;
   maxAttempts?: number;
   initialDelay?: number;
@@ -76,10 +62,7 @@ expectTypeOf<RetryConfig>().toMatchTypeOf<{
   retryableStatusCodes?: number[];
 }>();
 
-/**
- * Test DataFetcherOptions interface
- */
-expectTypeOf<DataFetcherOptions>().toMatchTypeOf<{
+expectTypeOf<DataFetcherOptions>().toEqualTypeOf<{
   cache?: CacheConfig;
   rateLimit?: RateLimitConfig;
   retry?: RetryConfig;
