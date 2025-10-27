@@ -47,14 +47,6 @@ import type { ReverseOptions } from "../_shared/_shared.types";
  *
  * @throws {Error} If the request fails or coordinates are in an unsupported area
  *
- * @example
- * ```typescript
- * const result = await geocodeReverse(
- *   { latitude: '52.5487', longitude: '-1.8160' },
- *   { format: 'jsonv2', zoom: 18 }
- * );
- * ```
- *
  * @see {@link https://nominatim.org/release-docs/develop/api/Reverse/ | Nominatim Reverse Geocoding API Documentation}
  */
 export const geocodeReverse = async <T = unknown>(
