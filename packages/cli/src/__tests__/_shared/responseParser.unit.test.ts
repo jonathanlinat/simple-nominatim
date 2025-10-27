@@ -108,122 +108,98 @@ describe("responseParser", () => {
   });
 
   describe("error handling", () => {
-    it("should handle rate limit errors with specific message", async () => {
-      await responseParser(
-        Promise.reject(
-          new Error("HTTP error! Status: 429. Text: Too Many Requests"),
+    const errorScenarios = [
+      {
+        name: "rate limit errors",
+        error: new Error("HTTP error! Status: 429. Text: Too Many Requests"),
+        expectedMessage:
+          "Rate limit exceeded. Please try again later or reduce request frequency.",
+      },
+      {
+        name: "500 server errors",
+        error: new Error(
+          "HTTP error! Status: 500. Text: Internal Server Error",
         ),
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Rate limit exceeded. Please try again later or reduce request frequency.",
-      );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-    });
+        expectedMessage:
+          "Nominatim API is currently unavailable. Please try again later.",
+      },
+      {
+        name: "503 server errors",
+        error: new Error("HTTP error! Status: 503. Text: Service Unavailable"),
+        expectedMessage:
+          "Nominatim API is currently unavailable. Please try again later.",
+      },
+      {
+        name: "400 client errors",
+        error: new Error("HTTP error! Status: 400. Text: Bad Request"),
+        expectedMessage:
+          "Request failed. Please check your parameters and try again.",
+      },
+      {
+        name: "404 client errors",
+        error: new Error("HTTP error! Status: 404. Text: Not Found"),
+        expectedMessage:
+          "Request failed. Please check your parameters and try again.",
+      },
+      {
+        name: "network failures",
+        error: new Error("Network failure"),
+        expectedMessage:
+          "Network connection failed. Please check your internet connection.",
+      },
+      {
+        name: "network timeouts",
+        error: new Error("network timeout"),
+        expectedMessage:
+          "Network connection failed. Please check your internet connection.",
+      },
+      {
+        name: "fetch failures",
+        error: new Error("fetch failed"),
+        expectedMessage:
+          "Network connection failed. Please check your internet connection.",
+      },
+      {
+        name: "retry exhaustion",
+        error: new Error("Request failed after all retry attempts"),
+        expectedMessage:
+          "Request failed after multiple retry attempts. Please try again later.",
+      },
+    ];
 
-    it("should handle 5xx server errors with specific message", async () => {
-      await responseParser(
-        Promise.reject(
-          new Error("HTTP error! Status: 500. Text: Internal Server Error"),
-        ),
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Nominatim API is currently unavailable. Please try again later.",
-      );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-
-      consoleErrorSpy.mockClear();
-      processExitSpy.mockClear();
-      await responseParser(
-        Promise.reject(
-          new Error("HTTP error! Status: 503. Text: Service Unavailable"),
-        ),
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Nominatim API is currently unavailable. Please try again later.",
-      );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-    });
-
-    it("should handle 4xx client errors with specific message", async () => {
-      await responseParser(
-        Promise.reject(new Error("HTTP error! Status: 400. Text: Bad Request")),
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Request failed. Please check your parameters and try again.",
-      );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-
-      consoleErrorSpy.mockClear();
-      processExitSpy.mockClear();
-      await responseParser(
-        Promise.reject(new Error("HTTP error! Status: 404. Text: Not Found")),
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Request failed. Please check your parameters and try again.",
-      );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-    });
-
-    it("should handle network errors with specific message", async () => {
-      await responseParser(Promise.reject(new Error("Network failure")));
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Network connection failed. Please check your internet connection.",
-      );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-
-      consoleErrorSpy.mockClear();
-      processExitSpy.mockClear();
-      await responseParser(Promise.reject(new Error("network timeout")));
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Network connection failed. Please check your internet connection.",
-      );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-
-      consoleErrorSpy.mockClear();
-      processExitSpy.mockClear();
-      await responseParser(Promise.reject(new Error("fetch failed")));
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Network connection failed. Please check your internet connection.",
-      );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-    });
-
-    it("should handle retry exhaustion errors with specific message", async () => {
-      await responseParser(
-        Promise.reject(new Error("Request failed after all retry attempts")),
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Request failed after multiple retry attempts. Please try again later.",
-      );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
+    errorScenarios.forEach(({ name, error, expectedMessage }) => {
+      it(`should handle ${name} with specific message`, async () => {
+        await responseParser(Promise.reject(error));
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expectedMessage);
+        expect(processExitSpy).toHaveBeenCalledWith(1);
+      });
     });
 
     it("should handle generic errors with error message", async () => {
-      await responseParser(Promise.reject(new Error("Generic error")));
-      expect(consoleErrorSpy).toHaveBeenCalledWith("Error: Generic error");
-      expect(processExitSpy).toHaveBeenCalledWith(1);
+      const errorCases = [
+        { input: new Error("Generic error"), expected: "Error: Generic error" },
+        {
+          input: "String error message",
+          expected: "Error: String error message",
+        },
+        { input: 404, expected: "Error: 404" },
+        {
+          input: { message: "Custom error", code: "ERR_CUSTOM" },
+          expected: null,
+        },
+      ];
 
-      consoleErrorSpy.mockClear();
-      processExitSpy.mockClear();
-      await responseParser(Promise.reject("String error message"));
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Error: String error message",
-      );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-
-      consoleErrorSpy.mockClear();
-      processExitSpy.mockClear();
-      await responseParser(Promise.reject(404));
-      expect(consoleErrorSpy).toHaveBeenCalledWith("Error: 404");
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-
-      consoleErrorSpy.mockClear();
-      processExitSpy.mockClear();
-      await responseParser(
-        Promise.reject({ message: "Custom error", code: "ERR_CUSTOM" }),
-      );
-      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-      expect(processExitSpy).toHaveBeenCalledWith(1);
+      for (const { input, expected } of errorCases) {
+        await responseParser(Promise.reject(input));
+        if (expected) {
+          expect(consoleErrorSpy).toHaveBeenCalledWith(expected);
+        } else {
+          expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+        }
+        expect(processExitSpy).toHaveBeenCalledWith(1);
+        consoleErrorSpy.mockClear();
+        processExitSpy.mockClear();
+      }
     });
 
     it("should not log to stdout on error", async () => {

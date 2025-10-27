@@ -22,38 +22,36 @@
  * SOFTWARE.
  */
 
-import { defineConfig } from "vitest/config";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-/**
- * Shared Vitest configuration for all packages
- *
- * @returns Vitest configuration object
- */
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: "node",
-    include: [
-      "src/__tests__/**/*.unit.test.ts",
-      "src/__tests__/**/*.security.test.ts",
-    ],
-    exclude: ["node_modules", "dist", ".turbo"],
-    typecheck: {
-      enabled: true,
-      include: ["src/__tests__/**/*.types.test.ts"],
-    },
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "json", "html"],
-      exclude: [
-        "node_modules/",
-        "dist/",
-        "**/*.unit.test.ts",
-        "**/*.security.test.ts",
-        "**/*.types.test.ts",
-        "**/__tests__/",
-        "**/types.ts",
-      ],
-    },
-  },
+import { structuredSearch } from "../../search/structured";
+
+describe("structuredSearch", () => {
+  beforeEach(() => {
+    global.fetch = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe("injection attack prevention", () => {
+    it("should handle SQL injection in structured search fields", async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => [],
+      } as Response);
+
+      await expect(
+        structuredSearch(
+          {
+            street: "'; DROP TABLE streets; --",
+            city: "1' OR '1'='1",
+            country: "admin'--",
+          },
+          { format: "json" },
+        ),
+      ).resolves.toBeDefined();
+    });
+  });
 });

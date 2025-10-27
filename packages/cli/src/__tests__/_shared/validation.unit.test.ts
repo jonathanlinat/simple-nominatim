@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+/* eslint-disable vitest/no-conditional-in-test */
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
@@ -40,7 +42,7 @@ import {
   structuredSearchSchema,
 } from "../../_shared/validation";
 
-describe("Validation Schemas", () => {
+describe("validation", () => {
   describe("outputFormatSchema", () => {
     it("should validate output formats", () => {
       expect(outputFormatSchema.parse("xml")).toBe("xml");
@@ -133,7 +135,7 @@ describe("Validation Schemas", () => {
         email: "user@example.com",
         limit: 10,
       };
-      expect(freeFormSearchSchema.parse(validData)).toEqual(validData);
+      expect(freeFormSearchSchema.parse(validData)).toStrictEqual(validData);
 
       const minimalData = { query: "Paris", outputFormat: "json" };
       const result = freeFormSearchSchema.parse(minimalData);
@@ -160,17 +162,15 @@ describe("Validation Schemas", () => {
         email: "user@example.com",
         limit: 5,
       };
-      expect(structuredSearchSchema.parse(validData)).toEqual(validData);
+      expect(structuredSearchSchema.parse(validData)).toStrictEqual(validData);
 
       const minimalData = { country: "UK", outputFormat: "json" };
       expect(structuredSearchSchema.parse(minimalData).country).toBe("UK");
 
-      expect(() =>
-        structuredSearchSchema.parse({ country: "", outputFormat: "json" }),
-      ).toThrow("Country is required");
-      expect(() =>
-        structuredSearchSchema.parse({ outputFormat: "json" }),
-      ).toThrow();
+      const dataWithoutCountry = { outputFormat: "json" };
+      expect(structuredSearchSchema.parse(dataWithoutCountry)).toStrictEqual(
+        dataWithoutCountry,
+      );
     });
   });
 
@@ -182,7 +182,7 @@ describe("Validation Schemas", () => {
         outputFormat: "json",
         email: "user@example.com",
       };
-      expect(reverseGeocodeSchema.parse(validData)).toEqual(validData);
+      expect(reverseGeocodeSchema.parse(validData)).toStrictEqual(validData);
 
       const minimalData = {
         latitude: "40.7128",
@@ -217,10 +217,8 @@ describe("Validation Schemas", () => {
       ).toThrow();
     });
   });
-});
 
-describe("Validation Helpers", () => {
-  describe("safeValidateArgs()", () => {
+  describe("safeValidateArgs", () => {
     it("should return success for valid data", () => {
       const schema = z.object({ name: z.string() });
       const data = { name: "test" };
@@ -229,7 +227,7 @@ describe("Validation Helpers", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data).toEqual(data);
+        expect(result.data).toStrictEqual(data);
       }
     });
 
@@ -263,7 +261,7 @@ describe("Validation Helpers", () => {
     });
   });
 
-  describe("handleValidationError()", () => {
+  describe("handleValidationError", () => {
     let consoleErrorSpy: ReturnType<typeof vi.fn>;
     let processExitSpy: ReturnType<typeof vi.fn>;
 
@@ -325,3 +323,5 @@ describe("Validation Helpers", () => {
     });
   });
 });
+
+/* eslint-enable vitest/no-conditional-in-test */

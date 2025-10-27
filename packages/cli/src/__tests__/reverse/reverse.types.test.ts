@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -28,9 +28,6 @@ import type { OutputFormat } from "@simple-nominatim/core";
 
 import type { GeocodeReverseArgv } from "../../reverse/reverse.types";
 
-/**
- * Test GeocodeReverseArgv interface
- */
 expectTypeOf<GeocodeReverseArgv>().toMatchTypeOf<{
   email?: string;
   format: OutputFormat;
@@ -51,13 +48,10 @@ expectTypeOf<GeocodeReverseArgv>()
   .toHaveProperty("email")
   .toEqualTypeOf<string | undefined>();
 
-/**
- * Test complete workflow type safety
- */
 const reverseArgs: GeocodeReverseArgv = {
   latitude: "48.8584",
   longitude: "2.2945",
   format: "json",
   email: "test@example.com",
 };
-expectTypeOf(reverseArgs).toMatchTypeOf<GeocodeReverseArgv>();
+expectTypeOf(reverseArgs).toEqualTypeOf<GeocodeReverseArgv>();

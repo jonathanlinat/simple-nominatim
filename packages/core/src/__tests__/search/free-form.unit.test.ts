@@ -55,7 +55,7 @@ describe("freeFormSearch", () => {
         { format: "json" },
       );
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
@@ -90,7 +90,7 @@ describe("freeFormSearch", () => {
         { format: "json" },
       );
 
-      expect(result).toEqual(customResponse);
+      expect(result).toStrictEqual(customResponse);
       expect(Array.isArray(result)).toBe(true);
     });
   });
@@ -192,7 +192,7 @@ describe("freeFormSearch", () => {
         },
       );
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
   });
@@ -285,8 +285,48 @@ describe("freeFormSearch", () => {
         },
       );
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("should handle undefined optional parameters correctly", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await freeFormSearch(
+        { query: "Paris" },
+        {
+          format: "json",
+          limit: undefined,
+          addressdetails: undefined,
+          extratags: undefined,
+        },
+      );
+
+      expect(result).toStrictEqual(mockResponse);
+      const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
+        .calls[0]?.[0] as string;
+      expect(calledUrl).toContain("q=Paris");
+      expect(calledUrl).not.toContain("limit");
+      expect(calledUrl).not.toContain("addressdetails");
+    });
+
+    it("should handle empty query string", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await freeFormSearch({ query: "" }, { format: "json" });
+
+      expect(result).toStrictEqual(mockResponse);
+      const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
+        .calls[0]?.[0] as string;
+      expect(calledUrl).toContain("search?");
+      // Empty query should not be appended
+      expect(calledUrl).not.toContain("q=");
     });
   });
 });

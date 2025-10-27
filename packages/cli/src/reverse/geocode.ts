@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -26,9 +26,13 @@ import { geocodeReverse } from "@simple-nominatim/core";
 import type {
   GeocodeReverseParams,
   ReverseOptions,
-  RetryConfig,
 } from "@simple-nominatim/core";
 
+import {
+  buildCacheConfig,
+  buildRateLimitConfig,
+  buildRetryConfig,
+} from "../_shared/configBuilders";
 import { responseParser } from "../_shared/responseParser";
 import {
   safeValidateArgs,
@@ -37,6 +41,50 @@ import {
 } from "../_shared/validation";
 
 import type { GeocodeReverseArgv } from "./reverse.types";
+
+/**
+ * Build API options from command-line arguments
+ * @internal
+ */
+const buildApiOptions = (argv: GeocodeReverseArgv) => {
+  const {
+    email,
+    format,
+    addressdetails,
+    extratags,
+    namedetails,
+    entrances,
+    acceptLanguage,
+    zoom,
+    layer,
+    polygonGeojson,
+    polygonKml,
+    polygonSvg,
+    polygonText,
+    polygonThreshold,
+    debug,
+  } = argv;
+
+  return {
+    email,
+    format,
+    ...(addressdetails !== undefined && { addressdetails }),
+    ...(extratags !== undefined && { extratags }),
+    ...(namedetails !== undefined && { namedetails }),
+    ...(entrances !== undefined && { entrances }),
+    ...(acceptLanguage && { "accept-language": acceptLanguage }),
+    ...(zoom !== undefined && { zoom }),
+    ...(layer && { layer }),
+    ...(polygonGeojson !== undefined && { polygon_geojson: polygonGeojson }),
+    ...(polygonKml !== undefined && { polygon_kml: polygonKml }),
+    ...(polygonSvg !== undefined && { polygon_svg: polygonSvg }),
+    ...(polygonText !== undefined && { polygon_text: polygonText }),
+    ...(polygonThreshold !== undefined && {
+      polygon_threshold: polygonThreshold,
+    }),
+    ...(debug !== undefined && { debug }),
+  };
+};
 
 /**
  * CLI wrapper for reverse geocoding functionality
@@ -53,6 +101,20 @@ import type { GeocodeReverseArgv } from "./reverse.types";
  * @param {string} argv.longitude Longitude coordinate (required)
  * @param {string} [argv.email] Email address for identification when making large numbers of requests
  * @param {OutputFormat} argv.format Output format (required)
+ * @param {0|1} [argv.addressdetails] Include a breakdown of the address into elements
+ * @param {0|1} [argv.extratags] Include additional information available in the database
+ * @param {0|1} [argv.namedetails] Include a full list of names for the result
+ * @param {0|1} [argv.entrances] Include the tagged entrances in the result
+ * @param {string} [argv.acceptLanguage] Preferred language order for showing results
+ * @param {number} [argv.zoom] Level of detail required for the address (0-18)
+ * @param {string} [argv.layer] Select places by themes (comma-separated list)
+ * @param {0|1} [argv.polygonGeojson] Include full geometry in GeoJSON format
+ * @param {0|1} [argv.polygonKml] Include full geometry in KML format
+ * @param {0|1} [argv.polygonSvg] Include full geometry in SVG format
+ * @param {0|1} [argv.polygonText] Include full geometry in WKT format
+ * @param {number} [argv.polygonThreshold] Tolerance in degrees for simplified geometry output
+ * @param {string} [argv.jsonCallback] JSONP callback function name
+ * @param {0|1} [argv.debug] Output assorted developer debug information
  * @param {boolean} [argv.noCache] Disable response caching
  * @param {number} [argv.cacheTtl] Cache time-to-live in milliseconds
  * @param {number} [argv.cacheMaxSize] Maximum number of cached entries
@@ -69,21 +131,7 @@ import type { GeocodeReverseArgv } from "./reverse.types";
 export const geocodeReverseWrapper = (
   argv: GeocodeReverseArgv,
 ): Promise<void> => {
-  const {
-    email,
-    format,
-    latitude,
-    longitude,
-    noCache,
-    cacheTtl,
-    cacheMaxSize,
-    noRateLimit,
-    rateLimit,
-    rateLimitInterval,
-    noRetry,
-    retryMaxAttempts,
-    retryInitialDelay,
-  } = argv;
+  const { latitude, longitude, email, format } = argv;
 
   const validationResult = safeValidateArgs(reverseGeocodeSchema, {
     latitude,
@@ -97,45 +145,17 @@ export const geocodeReverseWrapper = (
   }
 
   const params: GeocodeReverseParams = { latitude, longitude };
-  const options: ReverseOptions = { email, format };
+  const apiOptions = buildApiOptions(argv);
+  const cacheConfig = buildCacheConfig(argv);
+  const rateLimitConfig = buildRateLimitConfig(argv);
+  const retryConfig = buildRetryConfig(argv);
 
-  if (
-    noCache !== undefined ||
-    cacheTtl !== undefined ||
-    cacheMaxSize !== undefined
-  ) {
-    options.cache = {
-      ...(noCache && { enabled: false }),
-      ...(cacheTtl !== undefined && { ttl: cacheTtl }),
-      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize }),
-    };
-  }
-
-  if (
-    noRateLimit !== undefined ||
-    rateLimit !== undefined ||
-    rateLimitInterval !== undefined
-  ) {
-    options.rateLimit = {
-      ...(noRateLimit && { enabled: false }),
-      ...(rateLimit !== undefined && { limit: rateLimit }),
-      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval }),
-    };
-  }
-
-  if (
-    noRetry !== undefined ||
-    retryMaxAttempts !== undefined ||
-    retryInitialDelay !== undefined
-  ) {
-    options.retry = {
-      ...(noRetry && { enabled: false }),
-      ...(retryMaxAttempts !== undefined && { maxAttempts: retryMaxAttempts }),
-      ...(retryInitialDelay !== undefined && {
-        initialDelay: retryInitialDelay,
-      }),
-    } as RetryConfig;
-  }
+  const options: ReverseOptions = {
+    ...apiOptions,
+    ...(cacheConfig && { cache: cacheConfig }),
+    ...(rateLimitConfig && { rateLimit: rateLimitConfig }),
+    ...(retryConfig && { retry: retryConfig }),
+  };
 
   const response = geocodeReverse(params, options);
   const handledResponse = responseParser(response);

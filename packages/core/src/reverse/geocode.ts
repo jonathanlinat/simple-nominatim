@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -31,15 +31,29 @@ import type { ReverseOptions } from "../_shared/_shared.types";
  * Performs reverse geocoding using the Nominatim API
  *
  * This function converts geographic coordinates (latitude and longitude) into a
- * human-readable address. It queries the Nominatim API to find the nearest
- * address or place for the given coordinates.
+ * human-readable address by finding the closest suitable OSM object.
+ *
+ * Important notes:
+ * - Returns exactly one result or throws an error
+ * - Coordinates in areas without OSM data coverage will cause an error
+ * - The result may occasionally be unexpected due to closest-object matching
+ * - Default format is 'xml' (unlike Search API which defaults to 'jsonv2')
+ * - Default addressdetails is 1 (unlike Search API which defaults to 0)
  *
  * @template T - The expected response type (defaults to unknown)
- * @param {GeocodeReverseParams} params The coordinates to reverse geocode (latitude and longitude)
- * @param {ReverseOptions} options Configuration options for the reverse geocoding request
+ * @param {GeocodeReverseParams} params The coordinates to reverse geocode
+ * @param {ReverseOptions} options Configuration options for the request
  * @returns {Promise<T>} A promise that resolves to the reverse geocoding result
  *
- * @throws {Error} If the HTTP request fails or returns a non-2xx status code
+ * @throws {Error} If the request fails or coordinates are in an unsupported area
+ *
+ * @example
+ * ```typescript
+ * const result = await geocodeReverse(
+ *   { latitude: '52.5487', longitude: '-1.8160' },
+ *   { format: 'jsonv2', zoom: 18 }
+ * );
+ * ```
  *
  * @see {@link https://nominatim.org/release-docs/develop/api/Reverse/ | Nominatim Reverse Geocoding API Documentation}
  */

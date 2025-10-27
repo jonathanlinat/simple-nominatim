@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -33,27 +33,24 @@ import type { GeocodeReverseArgv } from "../reverse/reverse.types";
 import type { FreeFormArgv, StructuredArgv } from "../search/search.types";
 import type { ServiceStatusArgv } from "../status/status.types";
 
-/**
- * Test wrapper functions signatures
- */
 expectTypeOf(geocodeReverseWrapper).toBeFunction();
 expectTypeOf(geocodeReverseWrapper)
   .parameter(0)
-  .toMatchTypeOf<GeocodeReverseArgv>();
+  .toEqualTypeOf<GeocodeReverseArgv>();
 expectTypeOf(geocodeReverseWrapper).returns.resolves.toBeVoid();
 
 expectTypeOf(freeFormSearchWrapper).toBeFunction();
-expectTypeOf(freeFormSearchWrapper).parameter(0).toMatchTypeOf<FreeFormArgv>();
+expectTypeOf(freeFormSearchWrapper).parameter(0).toEqualTypeOf<FreeFormArgv>();
 expectTypeOf(freeFormSearchWrapper).returns.resolves.toBeVoid();
 
 expectTypeOf(structuredSearchWrapper).toBeFunction();
 expectTypeOf(structuredSearchWrapper)
   .parameter(0)
-  .toMatchTypeOf<StructuredArgv>();
+  .toEqualTypeOf<StructuredArgv>();
 expectTypeOf(structuredSearchWrapper).returns.resolves.toBeVoid();
 
 expectTypeOf(serviceStatusWrapper).toBeFunction();
 expectTypeOf(serviceStatusWrapper)
   .parameter(0)
-  .toMatchTypeOf<ServiceStatusArgv>();
+  .toEqualTypeOf<ServiceStatusArgv>();
 expectTypeOf(serviceStatusWrapper).returns.resolves.toBeVoid();

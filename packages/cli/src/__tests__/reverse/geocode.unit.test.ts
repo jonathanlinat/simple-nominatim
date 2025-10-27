@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { geocodeReverse } from "@simple-nominatim/core";
 
@@ -35,10 +35,13 @@ vi.mock("@simple-nominatim/core", () => ({
 }));
 
 describe("geocodeReverseWrapper", () => {
+  let consoleLogSpy: ReturnType<typeof vi.fn>;
+  let consoleErrorSpy: ReturnType<typeof vi.fn>;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(console, "log").mockImplementation(() => {});
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     vi.mocked(geocodeReverse).mockResolvedValue({
       place_id: "12345",
       lat: "51.5074",
@@ -47,112 +50,72 @@ describe("geocodeReverseWrapper", () => {
     });
   });
 
-  describe("basic functionality", () => {
-    it("should call geocodeReverse with correct parameters", async () => {
-      const argv: GeocodeReverseArgv = {
-        latitude: "51.5074",
-        longitude: "-0.1278",
-        format: "json",
-      };
-
-      await geocodeReverseWrapper(argv);
-
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        { latitude: "51.5074", longitude: "-0.1278" },
-        expect.objectContaining({ format: "json" }),
-      );
-    });
-
-    it("should handle successful response", async () => {
-      const argv: GeocodeReverseArgv = {
-        latitude: "40.7128",
-        longitude: "-74.0060",
-        format: "json",
-      };
-
-      await geocodeReverseWrapper(argv);
-
-      expect(console.log).toHaveBeenCalled();
-    });
-
-    it("should pass email parameter when provided", async () => {
-      const argv: GeocodeReverseArgv = {
-        latitude: "51.5074",
-        longitude: "-0.1278",
-        format: "json",
-        email: "user@example.com",
-      };
-
-      await geocodeReverseWrapper(argv);
-
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        { latitude: "51.5074", longitude: "-0.1278" },
-        expect.objectContaining({ email: "user@example.com" }),
-      );
-    });
+  afterEach(() => {
+    consoleLogSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
   });
 
-  describe("cache options", () => {
-    it("should pass cache configuration", async () => {
+  describe("delegation and parameter mapping", () => {
+    it("should call geocodeReverse with coordinates and options", async () => {
+      const argv: GeocodeReverseArgv = {
+        latitude: "51.5074",
+        longitude: "-0.1278",
+        format: "json",
+        email: "test@example.com",
+        addressdetails: 1,
+        extratags: 1,
+        namedetails: 1,
+        acceptLanguage: "en",
+        zoom: 18,
+      };
+
+      await geocodeReverseWrapper(argv);
+
+      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
+        {
+          latitude: "51.5074",
+          longitude: "-0.1278",
+        },
+        expect.objectContaining({
+          email: "test@example.com",
+          format: "json",
+          addressdetails: 1,
+          extratags: 1,
+          namedetails: 1,
+          "accept-language": "en",
+          zoom: 18,
+        }),
+      );
+    });
+
+    it("should pass config builder results to core function", async () => {
       const argv: GeocodeReverseArgv = {
         latitude: "51.5074",
         longitude: "-0.1278",
         format: "json",
         noCache: true,
         cacheTtl: 10000,
-        cacheMaxSize: 200,
-      };
-
-      await geocodeReverseWrapper(argv);
-
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          cache: expect.objectContaining({
-            enabled: false,
-            ttl: 10000,
-            maxSize: 200,
-          }),
-        }),
-      );
-    });
-  });
-
-  describe("rate limit options", () => {
-    it("should pass rate limit configuration", async () => {
-      const argv: GeocodeReverseArgv = {
-        latitude: "51.5074",
-        longitude: "-0.1278",
-        format: "json",
         noRateLimit: true,
-        rateLimit: 5,
-        rateLimitInterval: 2000,
+        rateLimit: 1,
+        noRetry: true,
+        retryMaxAttempts: 3,
       };
 
       await geocodeReverseWrapper(argv);
 
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({
-            enabled: false,
-            limit: 5,
-            interval: 2000,
-          }),
-        }),
-      );
-    });
-  });
+      const callArgs = vi.mocked(geocodeReverse).mock.calls[0]?.[1];
 
-  describe("retry options", () => {
-    it("should pass retry configuration", async () => {
+      expect(callArgs).toHaveProperty("cache");
+      expect(callArgs).toHaveProperty("rateLimit");
+      expect(callArgs).toHaveProperty("retry");
+    });
+
+    it("should handle entrances parameter", async () => {
       const argv: GeocodeReverseArgv = {
         latitude: "51.5074",
         longitude: "-0.1278",
         format: "json",
-        noRetry: true,
-        retryMaxAttempts: 5,
-        retryInitialDelay: 2000,
+        entrances: 1,
       };
 
       await geocodeReverseWrapper(argv);
@@ -160,93 +123,131 @@ describe("geocodeReverseWrapper", () => {
       expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({
-          retry: expect.objectContaining({
-            enabled: false,
-            maxAttempts: 5,
-            initialDelay: 2000,
-          }),
+          entrances: 1,
+        }),
+      );
+    });
+
+    it("should handle layer parameter", async () => {
+      const argv: GeocodeReverseArgv = {
+        latitude: "51.5074",
+        longitude: "-0.1278",
+        format: "json",
+        layer: "address,poi",
+      };
+
+      await geocodeReverseWrapper(argv);
+
+      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          layer: "address,poi",
+        }),
+      );
+    });
+
+    it("should handle polygon options", async () => {
+      const argv: GeocodeReverseArgv = {
+        latitude: "51.5074",
+        longitude: "-0.1278",
+        format: "json",
+        polygonGeojson: 1,
+        polygonKml: 1,
+        polygonSvg: 1,
+        polygonText: 1,
+        polygonThreshold: 0.5,
+      };
+
+      await geocodeReverseWrapper(argv);
+
+      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          polygon_geojson: 1,
+          polygon_kml: 1,
+          polygon_svg: 1,
+          polygon_text: 1,
+          polygon_threshold: 0.5,
+        }),
+      );
+    });
+
+    it("should handle debug parameter", async () => {
+      const argv: GeocodeReverseArgv = {
+        latitude: "51.5074",
+        longitude: "-0.1278",
+        format: "json",
+        debug: 1,
+      };
+
+      await geocodeReverseWrapper(argv);
+
+      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          debug: 1,
         }),
       );
     });
   });
 
-  describe("error handling", () => {
-    it("should handle API errors", async () => {
-      const processExitSpy = vi
+  describe("validation", () => {
+    it("should validate input and exit on error", async () => {
+      const mockExit = vi
         .spyOn(process, "exit")
         .mockImplementation(() => undefined as never);
 
-      vi.mocked(geocodeReverse).mockRejectedValue(new Error("API Error"));
-
       const argv: GeocodeReverseArgv = {
-        latitude: "51.5074",
+        latitude: "invalid",
         longitude: "-0.1278",
         format: "json",
       };
 
       await geocodeReverseWrapper(argv);
 
-      expect(console.error).toHaveBeenCalled();
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-
-      processExitSpy.mockRestore();
-    });
-
-    it("should handle validation errors", async () => {
-      const processExitSpy = vi
-        .spyOn(process, "exit")
-        .mockImplementation((() => {
-          throw new Error("process.exit");
-        }) as unknown as typeof process.exit);
-
-      const argv: GeocodeReverseArgv = {
-        latitude: "999",
-        longitude: "-0.1278",
-        format: "json",
-      };
-
-      try {
-        await geocodeReverseWrapper(argv);
-      } catch (error) {
-        expect((error as Error).message).toBe("process.exit");
-      }
-
-      expect(processExitSpy).toHaveBeenCalledWith(1);
+      expect(mockExit).toHaveBeenCalledWith(1);
       expect(console.error).toHaveBeenCalled();
 
-      processExitSpy.mockRestore();
+      mockExit.mockRestore();
     });
   });
 
-  describe("output formats", () => {
-    it("should support xml format", async () => {
+  describe("response handling", () => {
+    it("should output successful response to console", async () => {
       const argv: GeocodeReverseArgv = {
         latitude: "51.5074",
         longitude: "-0.1278",
-        format: "xml",
+        format: "json",
       };
 
       await geocodeReverseWrapper(argv);
 
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({ format: "xml" }),
-      );
+      expect(console.log).toHaveBeenCalledWith(expect.any(String));
     });
 
-    it("should support jsonv2 format", async () => {
+    it("should handle API errors", async () => {
+      const mockExit = vi
+        .spyOn(process, "exit")
+        .mockImplementation(() => undefined as never);
+
+      vi.mocked(geocodeReverse).mockRejectedValueOnce(
+        new Error("API Error: Server not available"),
+      );
+
       const argv: GeocodeReverseArgv = {
         latitude: "51.5074",
         longitude: "-0.1278",
-        format: "jsonv2",
+        format: "json",
       };
 
       await geocodeReverseWrapper(argv);
 
-      expect(vi.mocked(geocodeReverse)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({ format: "jsonv2" }),
+      expect(mockExit).toHaveBeenCalledWith(1);
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining("API Error"),
       );
+
+      mockExit.mockRestore();
     });
   });
 });

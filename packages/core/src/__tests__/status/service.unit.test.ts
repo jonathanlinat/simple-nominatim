@@ -26,6 +26,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { serviceStatus } from "../../status/service";
 
+import type { StatusOptions } from "../../status/status.types";
+
 describe("serviceStatus", () => {
   const mockResponse = {
     status: 0,
@@ -50,7 +52,7 @@ describe("serviceStatus", () => {
 
       const result = await serviceStatus({ format: "json" });
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
@@ -89,7 +91,7 @@ describe("serviceStatus", () => {
       });
 
       let result = await serviceStatus({ format: "json" });
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
       expect(callArgs).toBeDefined();
@@ -164,7 +166,7 @@ describe("serviceStatus", () => {
         rateLimit: { enabled: false },
       });
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
   });
@@ -211,7 +213,7 @@ describe("serviceStatus", () => {
 
       const result = await serviceStatus({ format: "json" });
 
-      expect(result).toEqual(okResponse);
+      expect(result).toStrictEqual(okResponse);
     });
 
     it("should handle status with data timestamp", async () => {
@@ -228,7 +230,7 @@ describe("serviceStatus", () => {
 
       const result = await serviceStatus({ format: "json" });
 
-      expect(result).toEqual(timestampResponse);
+      expect(result).toStrictEqual(timestampResponse);
     });
 
     it("should handle status with version info", async () => {
@@ -246,7 +248,7 @@ describe("serviceStatus", () => {
 
       const result = await serviceStatus({ format: "json" });
 
-      expect(result).toEqual(versionResponse);
+      expect(result).toStrictEqual(versionResponse);
     });
   });
 
@@ -264,7 +266,7 @@ describe("serviceStatus", () => {
         retry: { enabled: true },
       });
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
@@ -276,7 +278,44 @@ describe("serviceStatus", () => {
 
       const result = await serviceStatus({ format: "json" });
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toStrictEqual(mockResponse);
+    });
+
+    it("should handle undefined optional parameters correctly", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ status: "OK" }),
+      });
+
+      const result = await serviceStatus({
+        format: "json",
+        cache: undefined,
+        rateLimit: undefined,
+      });
+
+      expect(result).toStrictEqual({ status: "OK" });
+      const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
+        .calls[0]?.[0] as string;
+      expect(calledUrl).toContain("format=json");
+    });
+
+    it("should skip undefined custom parameters in URL", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ status: "OK" }),
+      });
+
+      const result = await serviceStatus({
+        format: "json",
+        // This should be skipped
+        customParam: undefined,
+      } as StatusOptions & { customParam?: undefined });
+
+      expect(result).toStrictEqual({ status: "OK" });
+      const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
+        .calls[0]?.[0] as string;
+      expect(calledUrl).toContain("format=json");
+      expect(calledUrl).not.toContain("customParam");
     });
   });
 });

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { freeFormSearch } from "@simple-nominatim/core";
 
@@ -35,10 +35,13 @@ vi.mock("@simple-nominatim/core", () => ({
 }));
 
 describe("freeFormSearchWrapper", () => {
+  let consoleLogSpy: ReturnType<typeof vi.fn>;
+  let consoleErrorSpy: ReturnType<typeof vi.fn>;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(console, "log").mockImplementation(() => {});
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     vi.mocked(freeFormSearch).mockResolvedValue([
       {
         place_id: "12345",
@@ -49,211 +52,170 @@ describe("freeFormSearchWrapper", () => {
     ]);
   });
 
-  describe("basic functionality", () => {
-    it("should call freeFormSearch with correct parameters", async () => {
+  afterEach(() => {
+    consoleLogSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
+  });
+
+  describe("delegation and parameter mapping", () => {
+    it("should call freeFormSearch with query params and options", async () => {
       const argv: FreeFormArgv = {
         query: "London",
         format: "json",
+        email: "test@example.com",
+        limit: 10,
+        addressdetails: 1,
+        extratags: 1,
+        acceptLanguage: "en",
+        countrycodes: "gb",
+        layer: "address",
+        viewbox: "-0.5,51.3,0.5,51.7",
+        bounded: 1,
       };
 
       await freeFormSearchWrapper(argv);
 
       expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
         { query: "London" },
-        expect.objectContaining({ format: "json" }),
+        expect.objectContaining({
+          email: "test@example.com",
+          format: "json",
+          limit: 10,
+          addressdetails: 1,
+          extratags: 1,
+          "accept-language": "en",
+          countrycodes: "gb",
+          layer: "address",
+          viewbox: "-0.5,51.3,0.5,51.7",
+          bounded: 1,
+        }),
       );
     });
 
-    it("should handle successful response", async () => {
-      const argv: FreeFormArgv = {
-        query: "Paris, France",
-        format: "json",
-      };
-
-      await freeFormSearchWrapper(argv);
-
-      expect(console.log).toHaveBeenCalled();
-    });
-
-    it("should pass email parameter when provided", async () => {
-      const argv: FreeFormArgv = {
-        query: "New York",
-        format: "json",
-        email: "user@example.com",
-      };
-
-      await freeFormSearchWrapper(argv);
-
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({ email: "user@example.com" }),
-      );
-    });
-
-    it("should pass limit parameter when provided", async () => {
-      const argv: FreeFormArgv = {
-        query: "Tokyo",
-        format: "json",
-        limit: 10,
-      };
-
-      await freeFormSearchWrapper(argv);
-
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({ limit: 10 }),
-      );
-    });
-  });
-
-  describe("cache options", () => {
-    it("should pass cache configuration", async () => {
+    it("should pass config builder results to core function", async () => {
       const argv: FreeFormArgv = {
         query: "London",
         format: "json",
         noCache: true,
         cacheTtl: 5000,
-        cacheMaxSize: 150,
-      };
-
-      await freeFormSearchWrapper(argv);
-
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          cache: expect.objectContaining({
-            enabled: false,
-            ttl: 5000,
-            maxSize: 150,
-          }),
-        }),
-      );
-    });
-  });
-
-  describe("rate limit options", () => {
-    it("should pass rate limit configuration", async () => {
-      const argv: FreeFormArgv = {
-        query: "London",
-        format: "json",
         noRateLimit: true,
-        rateLimit: 3,
-        rateLimitInterval: 1500,
+        rateLimit: 2,
+        noRetry: true,
+        retryMaxAttempts: 5,
       };
 
       await freeFormSearchWrapper(argv);
 
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({
-          rateLimit: expect.objectContaining({
-            enabled: false,
-            limit: 3,
-            interval: 1500,
-          }),
-        }),
-      );
-    });
-  });
+      const callArgs = vi.mocked(freeFormSearch).mock.calls[0]?.[1];
 
-  describe("retry options", () => {
-    it("should pass retry configuration", async () => {
+      expect(callArgs).toHaveProperty("cache");
+      expect(callArgs).toHaveProperty("rateLimit");
+      expect(callArgs).toHaveProperty("retry");
+    });
+
+    it("should handle all optional search parameters", async () => {
       const argv: FreeFormArgv = {
         query: "London",
         format: "json",
-        noRetry: true,
-        retryMaxAttempts: 4,
-        retryInitialDelay: 1500,
+        namedetails: 1,
+        entrances: 1,
+        layer: "address,poi",
+        featuretype: "city",
+        excludePlaceIds: "123,456",
+        viewbox: "-0.5,51.0,0.5,52.0",
+        bounded: 1,
+        polygonGeojson: 1,
+        polygonKml: 1,
+        polygonSvg: 1,
+        polygonText: 1,
+        polygonThreshold: 0.01,
+        jsonCallback: "callback",
+        dedupe: 0,
+        debug: 1,
       };
 
       await freeFormSearchWrapper(argv);
 
       expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
         expect.objectContaining({
-          retry: expect.objectContaining({
-            enabled: false,
-            maxAttempts: 4,
-            initialDelay: 1500,
-          }),
+          query: "London",
+        }),
+        expect.objectContaining({
+          format: "json",
+          namedetails: 1,
+          entrances: 1,
+          layer: "address,poi",
+          featureType: "city",
+          exclude_place_ids: "123,456",
+          viewbox: "-0.5,51.0,0.5,52.0",
+          bounded: 1,
+          polygon_geojson: 1,
+          polygon_kml: 1,
+          polygon_svg: 1,
+          polygon_text: 1,
+          polygon_threshold: 0.01,
+          json_callback: "callback",
+          dedupe: 0,
+          debug: 1,
         }),
       );
     });
   });
 
-  describe("error handling", () => {
-    it("should handle API errors", async () => {
-      const processExitSpy = vi
+  describe("validation", () => {
+    it("should validate input and exit on error", async () => {
+      const mockExit = vi
         .spyOn(process, "exit")
         .mockImplementation(() => undefined as never);
 
-      vi.mocked(freeFormSearch).mockRejectedValue(new Error("Search failed"));
-
       const argv: FreeFormArgv = {
-        query: "Oslo",
+        query: "",
         format: "json",
       };
 
       await freeFormSearchWrapper(argv);
 
-      expect(console.error).toHaveBeenCalled();
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-
-      processExitSpy.mockRestore();
-    });
-
-    it("should handle validation errors", async () => {
-      const processExitSpy = vi
-        .spyOn(process, "exit")
-        .mockImplementation((() => {
-          throw new Error("process.exit");
-        }) as unknown as typeof process.exit);
-
-      const argv = {
-        query: "Oslo",
-        format: "invalid",
-      } as unknown as FreeFormArgv;
-
-      try {
-        await freeFormSearchWrapper(argv);
-      } catch (error) {
-        expect((error as Error).message).toBe("process.exit");
-      }
-
-      expect(processExitSpy).toHaveBeenCalledWith(1);
+      expect(mockExit).toHaveBeenCalledWith(1);
       expect(console.error).toHaveBeenCalled();
 
-      processExitSpy.mockRestore();
+      mockExit.mockRestore();
     });
   });
 
-  describe("output formats", () => {
-    it("should support xml format", async () => {
+  describe("response handling", () => {
+    it("should output successful response to console", async () => {
       const argv: FreeFormArgv = {
-        query: "Helsinki",
-        format: "xml",
+        query: "London",
+        format: "json",
       };
 
       await freeFormSearchWrapper(argv);
 
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({ format: "xml" }),
-      );
+      expect(console.log).toHaveBeenCalledWith(expect.any(String));
     });
 
-    it("should support geojson format", async () => {
+    it("should handle API errors", async () => {
+      const mockExit = vi
+        .spyOn(process, "exit")
+        .mockImplementation(() => undefined as never);
+
+      vi.mocked(freeFormSearch).mockRejectedValueOnce(
+        new Error("API Error: Server not available"),
+      );
+
       const argv: FreeFormArgv = {
-        query: "Dublin",
-        format: "geojson",
+        query: "London",
+        format: "json",
       };
 
       await freeFormSearchWrapper(argv);
 
-      expect(vi.mocked(freeFormSearch)).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.objectContaining({ format: "geojson" }),
+      expect(mockExit).toHaveBeenCalledWith(1);
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining("API Error"),
       );
+
+      mockExit.mockRestore();
     });
   });
 });

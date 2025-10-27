@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -27,20 +27,34 @@ import { expectTypeOf } from "vitest";
 import type {
   StatusOptions,
   StatusFormat,
+  StatusSuccessResponse,
+  StatusErrorResponse,
+  StatusJsonResponse,
   CacheConfig,
   RateLimitConfig,
 } from "../../index";
 
-/**
- * Test StatusFormat type
- */
 expectTypeOf<StatusFormat>().toEqualTypeOf<"text" | "json">();
 
-/**
- * Test StatusOptions interface
- */
 expectTypeOf<StatusOptions>().toMatchTypeOf<{
-  format: StatusFormat;
+  format?: StatusFormat;
   cache?: CacheConfig;
   rateLimit?: RateLimitConfig;
 }>();
+
+expectTypeOf<StatusSuccessResponse>().toMatchTypeOf<{
+  status: 0;
+  message: "OK";
+  data_updated: string;
+  software_version: string;
+  database_version: string;
+}>();
+
+expectTypeOf<StatusErrorResponse>().toMatchTypeOf<{
+  status: number;
+  message: string;
+}>();
+
+expectTypeOf<StatusJsonResponse>().toEqualTypeOf<
+  StatusSuccessResponse | StatusErrorResponse
+>();

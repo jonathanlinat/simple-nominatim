@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -65,14 +65,20 @@ describe("CacheManager", () => {
     });
   });
 
-  describe("get() and set()", () => {
-    it("should return undefined when cache is empty", () => {
-      expect(cache.get(endpoint, params)).toBeUndefined();
-    });
+  describe("get()", () => {
+    it.each([
+      ["empty cache", new CacheManager()],
+      ["disabled cache", new CacheManager({ enabled: false })],
+    ] as const)(
+      "should return undefined when %s",
+      (_description, cacheInstance) => {
+        expect(cacheInstance.get(endpoint, params)).toBeUndefined();
+      },
+    );
 
     it("should store and retrieve cached values", () => {
       cache.set(endpoint, params, testData);
-      expect(cache.get(endpoint, params)).toEqual(testData);
+      expect(cache.get(endpoint, params)).toStrictEqual(testData);
     });
 
     it("should return undefined when caching is disabled", () => {
@@ -96,8 +102,8 @@ describe("CacheManager", () => {
       cache.set(endpoint1, params, data1);
       cache.set(endpoint2, params, data2);
 
-      expect(cache.get(endpoint1, params)).toEqual(data1);
-      expect(cache.get(endpoint2, params)).toEqual(data2);
+      expect(cache.get(endpoint1, params)).toStrictEqual(data1);
+      expect(cache.get(endpoint2, params)).toStrictEqual(data2);
     });
 
     it("should handle different params separately", () => {
@@ -109,8 +115,8 @@ describe("CacheManager", () => {
       cache.set(endpoint, params1, data1);
       cache.set(endpoint, params2, data2);
 
-      expect(cache.get(endpoint, params1)).toEqual(data1);
-      expect(cache.get(endpoint, params2)).toEqual(data2);
+      expect(cache.get(endpoint, params1)).toStrictEqual(data1);
+      expect(cache.get(endpoint, params2)).toStrictEqual(data2);
     });
 
     it("should generate same key for params in different order", () => {
@@ -118,7 +124,7 @@ describe("CacheManager", () => {
       const params2 = new URLSearchParams({ format: "json", q: "Paris" });
 
       cache.set(endpoint, params1, testData);
-      expect(cache.get(endpoint, params2)).toEqual(testData);
+      expect(cache.get(endpoint, params2)).toStrictEqual(testData);
     });
   });
 
@@ -170,56 +176,39 @@ describe("CacheManager", () => {
   });
 
   describe("getStats()", () => {
-    it("should return initial stats", () => {
-      const stats = cache.getStats();
+    it("should track hits, misses, hit rate, and size correctly", () => {
+      // Initial stats
+      let stats = cache.getStats();
+      expect(stats).toStrictEqual({
+        hits: 0,
+        misses: 0,
+        hitRate: 0,
+        size: 0,
+      });
 
-      expect(stats.hits).toBe(0);
-      expect(stats.misses).toBe(0);
-      expect(stats.hitRate).toBe(0);
-      expect(stats.size).toBe(0);
-    });
-
-    it("should track cache hits", () => {
-      cache.set(endpoint, params, testData);
+      // Track cache misses
       cache.get(endpoint, params);
       cache.get(endpoint, params);
-
-      const stats = cache.getStats();
-
-      expect(stats.hits).toBe(2);
-      expect(stats.misses).toBe(0);
-      expect(stats.hitRate).toBe(1);
-    });
-
-    it("should track cache misses", () => {
-      cache.get(endpoint, params);
-      cache.get(endpoint, params);
-
-      const stats = cache.getStats();
-
+      stats = cache.getStats();
       expect(stats.hits).toBe(0);
       expect(stats.misses).toBe(2);
       expect(stats.hitRate).toBe(0);
-    });
 
-    it("should calculate hit rate correctly", () => {
-      cache.set(endpoint, params, testData);
-      cache.get(endpoint, params);
-      cache.get(endpoint, new URLSearchParams({ q: "unknown" }));
-      cache.get(endpoint, new URLSearchParams({ q: "another" }));
-
-      const stats = cache.getStats();
-
-      expect(stats.hits).toBe(1);
-      expect(stats.misses).toBe(2);
-      expect(stats.hitRate).toBe(0.33);
-    });
-
-    it("should track cache size", () => {
+      // Add data and track hits + size
       cache.set(endpoint, params, testData);
       cache.set(endpoint, new URLSearchParams({ q: "London" }), testData);
+      // Hit
+      cache.get(endpoint, params);
+      // Hit
+      cache.get(endpoint, params);
+      // Miss
+      cache.get(endpoint, new URLSearchParams({ q: "unknown" }));
 
-      expect(cache.getStats().size).toBe(2);
+      stats = cache.getStats();
+      expect(stats.hits).toBe(2);
+      expect(stats.misses).toBe(3);
+      expect(stats.hitRate).toBe(0.4);
+      expect(stats.size).toBe(2);
     });
   });
 
@@ -259,14 +248,14 @@ describe("CacheManager", () => {
       const shortTtlCache = new CacheManager({ ttl: 1000 });
       shortTtlCache.set(endpoint, params, testData);
 
-      expect(shortTtlCache.get(endpoint, params)).toEqual(testData);
+      expect(shortTtlCache.get(endpoint, params)).toStrictEqual(testData);
     });
 
     it("should create cache with custom TTL", () => {
       const customTtlCache = new CacheManager({ ttl: 5000 });
       customTtlCache.set(endpoint, params, testData);
 
-      expect(customTtlCache.get(endpoint, params)).toEqual(testData);
+      expect(customTtlCache.get(endpoint, params)).toStrictEqual(testData);
     });
   });
 

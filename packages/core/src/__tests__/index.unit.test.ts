@@ -26,7 +26,7 @@ import { describe, expect, it } from "vitest";
 
 import * as coreExports from "../index";
 
-describe("Core Package Exports", () => {
+describe("index", () => {
   describe("functions", () => {
     it("should export geocodeReverse function", () => {
       expect(coreExports.geocodeReverse).toBeDefined();
@@ -131,9 +131,9 @@ describe("Core Package Exports", () => {
       expect(coreExports.DEFAULT_RETRY_CONFIG.maxDelay).toBe(10000);
       expect(coreExports.DEFAULT_RETRY_CONFIG.backoffMultiplier).toBe(2);
       expect(coreExports.DEFAULT_RETRY_CONFIG.useJitter).toBe(true);
-      expect(coreExports.DEFAULT_RETRY_CONFIG.retryableStatusCodes).toEqual([
-        408, 429, 500, 502, 503, 504,
-      ]);
+      expect(
+        coreExports.DEFAULT_RETRY_CONFIG.retryableStatusCodes,
+      ).toStrictEqual([408, 429, 500, 502, 503, 504]);
     });
   });
 });

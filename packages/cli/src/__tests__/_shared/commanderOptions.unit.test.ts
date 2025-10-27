@@ -63,7 +63,7 @@ describe("commanderOptions", () => {
 
       expect(countryOption).toBeInstanceOf(Option);
       expect(countryOption.flags).toBe("--country <country>");
-      expect(countryOption.mandatory).toBe(true);
+      expect(countryOption.mandatory).toBe(false);
 
       expect(countyOption.flags).toBe("--county <county>");
       expect(postalCodeOption.flags).toBe("--postal-code <postalCode>");
@@ -91,7 +91,7 @@ describe("commanderOptions", () => {
       expect(outputFormatOption).toBeInstanceOf(Option);
       expect(outputFormatOption.flags).toBe("-f, --format <format>");
       expect(outputFormatOption.mandatory).toBe(true);
-      expect(outputFormatOption.argChoices).toEqual([
+      expect(outputFormatOption.argChoices).toStrictEqual([
         "xml",
         "json",
         "jsonv2",
@@ -102,7 +102,7 @@ describe("commanderOptions", () => {
       expect(statusFormatOption).toBeInstanceOf(Option);
       expect(statusFormatOption.flags).toBe("-f, --format <format>");
       expect(statusFormatOption.mandatory).toBe(true);
-      expect(statusFormatOption.argChoices).toEqual(["text", "json"]);
+      expect(statusFormatOption.argChoices).toStrictEqual(["text", "json"]);
     });
   });
 
@@ -171,7 +171,6 @@ describe("commanderOptions", () => {
   describe("option consistency", () => {
     it("should have all required options marked as mandatory", () => {
       const requiredOptions = [
-        countryOption,
         outputFormatOption,
         latitudeOption,
         longitudeOption,

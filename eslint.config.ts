@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import vitest from "@vitest/eslint-plugin";
 import prettier from "eslint-config-prettier";
 // @ts-ignore - No type definitions available
 import eslintComments from "eslint-plugin-eslint-comments";
@@ -232,10 +233,58 @@ export default tseslint.config(
     },
   },
   {
-    files: ["**/__tests__/**/*.ts"],
+    files: [
+      "**/__tests__/**/*.ts",
+      "**/__tests__/**/*.test.ts",
+      "**/*.test.ts",
+      "**/*.spec.ts",
+    ],
+    plugins: {
+      vitest,
+    },
+    languageOptions: {
+      parserOptions: {
+        project: true,
+      },
+    },
     rules: {
-      "max-nested-callbacks": ["warn", 5],
+      ...vitest.configs.recommended.rules,
+      "vitest/consistent-test-it": [
+        "error",
+        { fn: "it", withinDescribe: "it" },
+      ],
+      "vitest/no-focused-tests": "warn",
+      "vitest/no-disabled-tests": "warn",
+      "vitest/prefer-hooks-on-top": "error",
+      "vitest/valid-title": [
+        "error",
+        {
+          mustMatch: {
+            it: ["^should "],
+          },
+        },
+      ],
+      "vitest/prefer-to-be": "error",
+      "vitest/expect-expect": "error",
+      "vitest/no-duplicate-hooks": "error",
+      "vitest/prefer-strict-equal": "warn",
+      "vitest/no-conditional-in-test": "warn",
+      "vitest/max-nested-describe": ["error", { max: 4 }],
+      "max-nested-callbacks": ["warn", 6],
       "jsdoc/require-jsdoc": "off",
+      "no-warning-comments": "off",
+    },
+    settings: {
+      vitest: {
+        typecheck: true,
+      },
+    },
+  },
+  {
+    files: ["**/*.types.test.ts"],
+    rules: {
+      "vitest/valid-expect": "off",
+      "vitest/expect-expect": "off",
     },
   },
 );

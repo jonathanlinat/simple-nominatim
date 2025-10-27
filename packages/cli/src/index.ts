@@ -6,7 +6,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -27,20 +27,38 @@
 import { Command } from "commander";
 
 import {
+  acceptLanguageOption,
+  addressDetailsOption,
   amenityOption,
+  boundedOption,
   cacheTtlOption,
   cacheMaxSizeOption,
   cityOption,
+  countryCodesOption,
   countryOption,
   countyOption,
+  debugOption,
+  dedupeOption,
   emailOption,
+  entrancesOption,
+  excludePlaceIdsOption,
+  extraTagsOption,
+  featureTypeOption,
+  jsonCallbackOption,
+  layerOption,
   outputFormatOption,
   latitudeOption,
   limitOption,
   longitudeOption,
+  nameDetailsOption,
   noCacheOption,
   noRateLimitOption,
   noRetryOption,
+  polygonGeojsonOption,
+  polygonKmlOption,
+  polygonSvgOption,
+  polygonTextOption,
+  polygonThresholdOption,
   postalCodeOption,
   queryOption,
   rateLimitOption,
@@ -50,6 +68,8 @@ import {
   stateOption,
   statusFormatOption,
   streetOption,
+  viewboxOption,
+  zoomOption,
 } from "./_shared/commanderOptions";
 import { geocodeReverseWrapper } from "./reverse/geocode";
 import { freeFormSearchWrapper } from "./search/free-form";
@@ -74,6 +94,20 @@ program
   .addOption(outputFormatOption)
   .addOption(latitudeOption)
   .addOption(longitudeOption)
+  .addOption(addressDetailsOption)
+  .addOption(extraTagsOption)
+  .addOption(nameDetailsOption)
+  .addOption(entrancesOption)
+  .addOption(acceptLanguageOption)
+  .addOption(zoomOption)
+  .addOption(layerOption)
+  .addOption(polygonGeojsonOption)
+  .addOption(polygonKmlOption)
+  .addOption(polygonSvgOption)
+  .addOption(polygonTextOption)
+  .addOption(polygonThresholdOption)
+  .addOption(jsonCallbackOption)
+  .addOption(debugOption)
   .addOption(noCacheOption)
   .addOption(cacheTtlOption)
   .addOption(cacheMaxSizeOption)
@@ -92,6 +126,25 @@ program
   .addOption(outputFormatOption)
   .addOption(limitOption)
   .addOption(queryOption)
+  .addOption(addressDetailsOption)
+  .addOption(extraTagsOption)
+  .addOption(nameDetailsOption)
+  .addOption(entrancesOption)
+  .addOption(acceptLanguageOption)
+  .addOption(countryCodesOption)
+  .addOption(layerOption)
+  .addOption(featureTypeOption)
+  .addOption(excludePlaceIdsOption)
+  .addOption(viewboxOption)
+  .addOption(boundedOption)
+  .addOption(polygonGeojsonOption)
+  .addOption(polygonKmlOption)
+  .addOption(polygonSvgOption)
+  .addOption(polygonTextOption)
+  .addOption(polygonThresholdOption)
+  .addOption(jsonCallbackOption)
+  .addOption(dedupeOption)
+  .addOption(debugOption)
   .addOption(noCacheOption)
   .addOption(cacheTtlOption)
   .addOption(cacheMaxSizeOption)
@@ -116,6 +169,25 @@ program
   .addOption(postalCodeOption)
   .addOption(stateOption)
   .addOption(streetOption)
+  .addOption(addressDetailsOption)
+  .addOption(extraTagsOption)
+  .addOption(nameDetailsOption)
+  .addOption(entrancesOption)
+  .addOption(acceptLanguageOption)
+  .addOption(countryCodesOption)
+  .addOption(layerOption)
+  .addOption(featureTypeOption)
+  .addOption(excludePlaceIdsOption)
+  .addOption(viewboxOption)
+  .addOption(boundedOption)
+  .addOption(polygonGeojsonOption)
+  .addOption(polygonKmlOption)
+  .addOption(polygonSvgOption)
+  .addOption(polygonTextOption)
+  .addOption(polygonThresholdOption)
+  .addOption(jsonCallbackOption)
+  .addOption(dedupeOption)
+  .addOption(debugOption)
   .addOption(noCacheOption)
   .addOption(cacheTtlOption)
   .addOption(cacheMaxSizeOption)

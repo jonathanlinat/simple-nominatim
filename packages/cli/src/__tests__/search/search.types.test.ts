@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -28,9 +28,6 @@ import type { OutputFormat } from "@simple-nominatim/core";
 
 import type { FreeFormArgv, StructuredArgv } from "../../search/search.types";
 
-/**
- * Test FreeFormArgv interface
- */
 expectTypeOf<FreeFormArgv>().toMatchTypeOf<{
   email?: string;
   format: OutputFormat;
@@ -49,9 +46,6 @@ expectTypeOf<FreeFormArgv>()
   .toHaveProperty("email")
   .toEqualTypeOf<string | undefined>();
 
-/**
- * Test StructuredArgv interface
- */
 expectTypeOf<StructuredArgv>().toMatchTypeOf<{
   amenity?: string;
   city?: string;
@@ -96,16 +90,13 @@ expectTypeOf<StructuredArgv>()
   .toHaveProperty("street")
   .toEqualTypeOf<string | undefined>();
 
-/**
- * Test complete workflow type safety
- */
 const freeFormArgs: FreeFormArgv = {
   query: "Paris",
   format: "jsonv2",
   limit: 10,
   email: "test@example.com",
 };
-expectTypeOf(freeFormArgs).toMatchTypeOf<FreeFormArgv>();
+expectTypeOf(freeFormArgs).toEqualTypeOf<FreeFormArgv>();
 
 const structuredArgs: StructuredArgv = {
   country: "France",
@@ -113,4 +104,4 @@ const structuredArgs: StructuredArgv = {
   format: "geojson",
   limit: 5,
 };
-expectTypeOf(structuredArgs).toMatchTypeOf<StructuredArgv>();
+expectTypeOf(structuredArgs).toEqualTypeOf<StructuredArgv>();

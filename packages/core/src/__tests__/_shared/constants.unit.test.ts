@@ -4,7 +4,7 @@
  * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software:"), to deal
+ * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -32,7 +32,7 @@ import {
   FETCHER_USER_AGENT,
 } from "../../_shared/constants";
 
-describe("Constants", () => {
+describe("constants", () => {
   describe("FETCHER_BASE_URL", () => {
     it("should be a valid OSM Nominatim URL", () => {
       expect(FETCHER_BASE_URL).toBe("https://nominatim.openstreetmap.org");
@@ -73,7 +73,7 @@ describe("Constants", () => {
       expect(DEFAULT_RETRY_CONFIG.maxDelay).toBe(10000);
       expect(DEFAULT_RETRY_CONFIG.backoffMultiplier).toBe(2);
       expect(DEFAULT_RETRY_CONFIG.useJitter).toBe(true);
-      expect(DEFAULT_RETRY_CONFIG.retryableStatusCodes).toEqual([
+      expect(DEFAULT_RETRY_CONFIG.retryableStatusCodes).toStrictEqual([
         408, 429, 500, 502, 503, 504,
       ]);
     });
