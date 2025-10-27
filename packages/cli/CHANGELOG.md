@@ -1,5 +1,16 @@
 # @simple-nominatim/cli
 
+## 0.6.1
+
+### Patch Changes
+
+- Add comprehensive ESLint padding-line-between-statements rules for improved code readability. ([#25](https://github.com/jonathanlinat/simple-nominatim/pull/25))
+
+- Fix rate limit argument parsing in CLI commands. ([#25](https://github.com/jonathanlinat/simple-nominatim/pull/25))
+
+- Updated dependencies [[`e3781fd`](https://github.com/jonathanlinat/simple-nominatim/commit/e3781fd5f07ae6d65d4a6f0ab1908443427fd9e8)]:
+  - @simple-nominatim/core@0.5.1
+
 ## 0.6.0
 
 ### Minor Changes
