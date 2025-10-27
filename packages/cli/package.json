@@ -1,7 +1,7 @@
 {
   "name": "@simple-nominatim/cli",
   "description": "A command-line interface (CLI) tool built on top of the @simple-nominatim/core library to make requests to the Nominatim API from a terminal",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "author": "Jonathan Linat (https://github.com/jonathanlinat)",
   "bin": {
     "simple-nominatim": "./dist/index.js"

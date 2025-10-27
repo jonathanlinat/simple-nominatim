@@ -1,5 +1,11 @@
 # @simple-nominatim/core
 
+## 0.5.2
+
+### Patch Changes
+
+- Improve JSDoc documentation and config builder implementations. ([#27](https://github.com/jonathanlinat/simple-nominatim/pull/27))
+
 ## 0.5.1
 
 ### Patch Changes

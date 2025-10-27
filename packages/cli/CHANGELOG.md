@@ -1,5 +1,14 @@
 # @simple-nominatim/cli
 
+## 0.6.2
+
+### Patch Changes
+
+- Improve JSDoc documentation and config builder implementations. ([#27](https://github.com/jonathanlinat/simple-nominatim/pull/27))
+
+- Updated dependencies [[`da3c646`](https://github.com/jonathanlinat/simple-nominatim/commit/da3c646174c70675ab408f70323c5b28a70bfe0b)]:
+  - @simple-nominatim/core@0.5.2
+
 ## 0.6.1
 
 ### Patch Changes
