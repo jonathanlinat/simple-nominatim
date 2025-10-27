@@ -138,7 +138,7 @@ describe("commanderOptions", () => {
       expect(noRateLimitOption.flags).toBe("--no-rate-limit");
 
       expect(rateLimitOption).toBeInstanceOf(Option);
-      expect(rateLimitOption.flags).toBe("--rate-limit <rateLimit>");
+      expect(rateLimitOption.flags).toBe("--rate-limit <limit>");
       expect(typeof rateLimitOption.parseArg).toBe("function");
 
       expect(rateLimitIntervalOption).toBeInstanceOf(Option);
@@ -178,9 +178,9 @@ describe("commanderOptions", () => {
         statusFormatOption,
       ];
 
-      requiredOptions.forEach((option) => {
+      for (const option of requiredOptions) {
         expect(option.mandatory).toBe(true);
-      });
+      }
     });
 
     it("should have all boolean flags using --no- prefix", () => {
@@ -207,15 +207,15 @@ describe("commanderOptions", () => {
         retryInitialDelayOption,
       ];
 
-      numericOptions.forEach((option) => {
+      for (const option of numericOptions) {
         expect(typeof option.parseArg).toBe("function");
 
         if (option.parseArg) {
-          expect(option.parseArg("42", undefined)).toBe(42);
-          expect(option.parseArg("0", undefined)).toBe(0);
-          expect(option.parseArg("100", undefined)).toBe(100);
+          expect(option.parseArg("42")).toBe(42);
+          expect(option.parseArg("0")).toBe(0);
+          expect(option.parseArg("100")).toBe(100);
         }
-      });
+      }
     });
 
     it("should have short flags for frequently used options", () => {

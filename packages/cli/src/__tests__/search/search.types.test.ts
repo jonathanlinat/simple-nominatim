@@ -96,6 +96,7 @@ const freeFormArgs: FreeFormArgv = {
   limit: 10,
   email: "test@example.com",
 };
+
 expectTypeOf(freeFormArgs).toEqualTypeOf<FreeFormArgv>();
 
 const structuredArgs: StructuredArgv = {
@@ -104,4 +105,5 @@ const structuredArgs: StructuredArgv = {
   format: "geojson",
   limit: 5,
 };
+
 expectTypeOf(structuredArgs).toEqualTypeOf<StructuredArgv>();

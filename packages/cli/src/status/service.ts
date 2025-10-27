@@ -23,8 +23,13 @@
  */
 
 import { serviceStatus } from "@simple-nominatim/core";
-import type { StatusOptions, RetryConfig } from "@simple-nominatim/core";
+import type { StatusOptions } from "@simple-nominatim/core";
 
+import {
+  buildCacheConfig,
+  buildRateLimitConfig,
+  buildRetryConfig,
+} from "../_shared/configBuilders";
 import { responseParser } from "../_shared/responseParser";
 import {
   safeValidateArgs,
@@ -33,6 +38,18 @@ import {
 } from "../_shared/validation";
 
 import type { ServiceStatusArgv } from "./status.types";
+
+/**
+ * Build API options from command-line arguments
+ * @internal
+ */
+const buildApiOptions = (argv: ServiceStatusArgv) => {
+  const { format } = argv;
+
+  return {
+    format,
+  };
+};
 
 /**
  * CLI wrapper for service status functionality
@@ -44,7 +61,7 @@ import type { ServiceStatusArgv } from "./status.types";
  * When no configuration flags are provided, sensible defaults are applied automatically.
  *
  * @param {ServiceStatusArgv} argv Command-line arguments from Commander containing output format and optional configuration
- * @param {OutputFormat} argv.format Output format (required)
+ * @param {StatusFormat} argv.format Output format (required)
  * @param {boolean} [argv.noCache] Disable response caching
  * @param {number} [argv.cacheTtl] Cache time-to-live in milliseconds
  * @param {number} [argv.cacheMaxSize] Maximum number of cached entries
@@ -61,18 +78,7 @@ import type { ServiceStatusArgv } from "./status.types";
 export const serviceStatusWrapper = (
   argv: ServiceStatusArgv,
 ): Promise<void> => {
-  const {
-    format,
-    noCache,
-    cacheTtl,
-    cacheMaxSize,
-    noRateLimit,
-    rateLimit,
-    rateLimitInterval,
-    noRetry,
-    retryMaxAttempts,
-    retryInitialDelay,
-  } = argv;
+  const { format } = argv;
 
   const validationResult = safeValidateArgs(serviceStatusSchema, {
     statusFormat: format,
@@ -82,48 +88,19 @@ export const serviceStatusWrapper = (
     handleValidationError(validationResult.error);
   }
 
-  const options: StatusOptions = { format };
+  const apiOptions = buildApiOptions(argv);
+  const cacheConfig = buildCacheConfig(argv);
+  const rateLimitConfig = buildRateLimitConfig(argv);
+  const retryConfig = buildRetryConfig(argv);
 
-  if (
-    noCache !== undefined ||
-    cacheTtl !== undefined ||
-    cacheMaxSize !== undefined
-  ) {
-    options.cache = {
-      ...(noCache && { enabled: false }),
-      ...(cacheTtl !== undefined && { ttl: cacheTtl }),
-      ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize }),
-    };
-  }
-
-  if (
-    noRateLimit !== undefined ||
-    rateLimit !== undefined ||
-    rateLimitInterval !== undefined
-  ) {
-    options.rateLimit = {
-      ...(noRateLimit && { enabled: false }),
-      ...(rateLimit !== undefined && { limit: rateLimit }),
-      ...(rateLimitInterval !== undefined && { interval: rateLimitInterval }),
-    };
-  }
-
-  if (
-    noRetry !== undefined ||
-    retryMaxAttempts !== undefined ||
-    retryInitialDelay !== undefined
-  ) {
-    options.retry = {
-      ...(noRetry && { enabled: false }),
-      ...(retryMaxAttempts !== undefined && { maxAttempts: retryMaxAttempts }),
-      ...(retryInitialDelay !== undefined && {
-        initialDelay: retryInitialDelay,
-      }),
-    } as RetryConfig;
-  }
+  const options: StatusOptions = {
+    ...apiOptions,
+    ...(cacheConfig && { cache: cacheConfig }),
+    ...(rateLimitConfig && { rateLimit: rateLimitConfig }),
+    ...(retryConfig && { retry: retryConfig }),
+  };
 
   const response = serviceStatus(options);
-  const handledResponse = responseParser(response);
 
-  return handledResponse;
+  return responseParser(response);
 };

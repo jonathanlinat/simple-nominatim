@@ -20,5 +20,14 @@
     "strict": true,
     "target": "ES2022"
   },
-  "exclude": ["node_modules", "dist", ".turbo"]
+  "exclude": ["node_modules", "dist", ".turbo", "**/coverage/**"],
+  "include": ["*.ts"],
+  "references": [
+    {
+      "path": "./packages/core"
+    },
+    {
+      "path": "./packages/cli"
+    }
+  ]
 }

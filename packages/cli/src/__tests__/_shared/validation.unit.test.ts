@@ -22,8 +22,6 @@
  * SOFTWARE.
  */
 
-/* eslint-disable vitest/no-conditional-in-test */
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
@@ -106,7 +104,7 @@ describe("validation", () => {
       expect(emailSchema.parse("test.user@domain.co.uk")).toBe(
         "test.user@domain.co.uk",
       );
-      expect(emailSchema.parse(undefined)).toBeUndefined();
+      expect(emailSchema.parse()).toBeUndefined();
 
       expect(() => emailSchema.parse("invalid")).toThrow("valid email");
       expect(() => emailSchema.parse("user@")).toThrow("valid email");
@@ -118,7 +116,7 @@ describe("validation", () => {
       expect(limitSchema.parse(1)).toBe(1);
       expect(limitSchema.parse(10)).toBe(10);
       expect(limitSchema.parse(40)).toBe(40);
-      expect(limitSchema.parse(undefined)).toBeUndefined();
+      expect(limitSchema.parse()).toBeUndefined();
 
       expect(() => limitSchema.parse(0)).toThrow("at least 1");
       expect(() => limitSchema.parse(41)).toThrow("cannot exceed 40");
@@ -135,10 +133,12 @@ describe("validation", () => {
         email: "user@example.com",
         limit: 10,
       };
+
       expect(freeFormSearchSchema.parse(validData)).toStrictEqual(validData);
 
       const minimalData = { query: "Paris", outputFormat: "json" };
       const result = freeFormSearchSchema.parse(minimalData);
+
       expect(result.query).toBe("Paris");
       expect(result.outputFormat).toBe("json");
 
@@ -162,12 +162,15 @@ describe("validation", () => {
         email: "user@example.com",
         limit: 5,
       };
+
       expect(structuredSearchSchema.parse(validData)).toStrictEqual(validData);
 
       const minimalData = { country: "UK", outputFormat: "json" };
+
       expect(structuredSearchSchema.parse(minimalData).country).toBe("UK");
 
       const dataWithoutCountry = { outputFormat: "json" };
+
       expect(structuredSearchSchema.parse(dataWithoutCountry)).toStrictEqual(
         dataWithoutCountry,
       );
@@ -182,6 +185,7 @@ describe("validation", () => {
         outputFormat: "json",
         email: "user@example.com",
       };
+
       expect(reverseGeocodeSchema.parse(validData)).toStrictEqual(validData);
 
       const minimalData = {
@@ -190,6 +194,7 @@ describe("validation", () => {
         outputFormat: "json",
       };
       const result = reverseGeocodeSchema.parse(minimalData);
+
       expect(result.latitude).toBe("40.7128");
       expect(result.longitude).toBe("-74.0060");
 
@@ -226,9 +231,7 @@ describe("validation", () => {
       const result = safeValidateArgs(schema, data);
 
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toStrictEqual(data);
-      }
+      expect(result.success && result.data).toStrictEqual(data);
     });
 
     it("should return error for invalid data", () => {
@@ -238,9 +241,7 @@ describe("validation", () => {
       const result = safeValidateArgs(schema, data);
 
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBeInstanceOf(z.ZodError);
-      }
+      expect(!result.success && result.error).toBeInstanceOf(z.ZodError);
     });
 
     it("should work with complex schemas", () => {
@@ -281,25 +282,27 @@ describe("validation", () => {
       const schema = z.object({ name: z.string() });
       const result = schema.safeParse({ name: 123 });
 
-      if (!result.success) {
-        expect(() => handleValidationError(result.error)).toThrow(
-          "process.exit called",
-        );
-        expect(consoleErrorSpy).toHaveBeenCalledWith("Validation error:");
-        expect(consoleErrorSpy).toHaveBeenCalled();
-      }
+      expect(result.success).toBe(false);
+      expect(() =>
+        handleValidationError(
+          (result as { success: false; error: z.ZodError }).error,
+        ),
+      ).toThrow("process.exit called");
+      expect(consoleErrorSpy).toHaveBeenCalledWith("Validation error:");
+      expect(consoleErrorSpy).toHaveBeenCalled();
     });
 
     it("should exit process with code 1", () => {
       const schema = z.object({ name: z.string() });
       const result = schema.safeParse({ name: 123 });
 
-      if (!result.success) {
-        expect(() => handleValidationError(result.error)).toThrow(
-          "process.exit called",
-        );
-        expect(processExitSpy).toHaveBeenCalledWith(1);
-      }
+      expect(result.success).toBe(false);
+      expect(() =>
+        handleValidationError(
+          (result as { success: false; error: z.ZodError }).error,
+        ),
+      ).toThrow("process.exit called");
+      expect(processExitSpy).toHaveBeenCalledWith(1);
     });
 
     it("should format multiple errors", () => {
@@ -314,14 +317,13 @@ describe("validation", () => {
         email: "not-an-email",
       });
 
-      if (!result.success) {
-        expect(() => handleValidationError(result.error)).toThrow(
-          "process.exit called",
-        );
-        expect(consoleErrorSpy.mock.calls.length).toBeGreaterThan(1);
-      }
+      expect(result.success).toBe(false);
+      expect(() =>
+        handleValidationError(
+          (result as { success: false; error: z.ZodError }).error,
+        ),
+      ).toThrow("process.exit called");
+      expect(consoleErrorSpy.mock.calls.length).toBeGreaterThan(1);
     });
   });
 });
-
-/* eslint-enable vitest/no-conditional-in-test */

@@ -80,62 +80,68 @@ describe("RateLimiter", () => {
 
   describe("execute()", () => {
     it("should execute a function successfully", async () => {
-      const fn = async () => "test result";
+      const function_ = async () => "test result";
 
-      const result = await limiter.execute(fn);
+      const result = await limiter.execute(function_);
 
       expect(result).toBe("test result");
     });
 
     it("should execute function returning object", async () => {
-      const fn = async () => ({ data: "test", status: "ok" });
+      const function_ = async () => ({ data: "test", status: "ok" });
 
-      const result = await limiter.execute(fn);
+      const result = await limiter.execute(function_);
 
       expect(result).toStrictEqual({ data: "test", status: "ok" });
     });
 
     it("should increment request count after execution", async () => {
-      const fn = async () => "result";
+      const function_ = async () => "result";
 
-      await limiter.execute(fn);
+      await limiter.execute(function_);
 
       expect(limiter.getStats().requestCount).toBe(1);
     });
 
     it("should increment queued count during execution", async () => {
-      const fn = async () => {
+      const function_ = async () => {
         const stats = limiter.getStats();
+
         expect(stats.queuedCount).toBeGreaterThan(0);
 
         return "result";
       };
 
-      await limiter.execute(fn);
+      await limiter.execute(function_);
     });
 
     it("should decrement queued count after execution", async () => {
-      const fn = async () => "result";
+      const function_ = async () => "result";
 
-      await limiter.execute(fn);
+      await limiter.execute(function_);
 
       expect(limiter.getStats().queuedCount).toBe(0);
     });
 
     it("should execute multiple functions sequentially", async () => {
       const results: string[] = [];
-      const fn1 = async () => {
+      const function1 = async () => {
         results.push("first");
 
         return "first";
       };
-      const fn2 = async () => {
+
+      const function2 = async () => {
         results.push("second");
 
         return "second";
       };
 
-      const promise = Promise.all([limiter.execute(fn1), limiter.execute(fn2)]);
+      const promise = Promise.all([
+        limiter.execute(function1),
+        limiter.execute(function2),
+      ]);
+
       await vi.advanceTimersByTimeAsync(1000);
       await promise;
 
@@ -145,29 +151,29 @@ describe("RateLimiter", () => {
 
     it("should bypass rate limiting when disabled", async () => {
       limiter.setEnabled(false);
-      const fn = async () => "result";
+      const function_ = async () => "result";
 
-      const result = await limiter.execute(fn);
+      const result = await limiter.execute(function_);
 
       expect(result).toBe("result");
       expect(limiter.getStats().requestCount).toBe(0);
     });
 
     it("should handle errors in executed function", async () => {
-      const fn = async () => {
+      const function_ = async () => {
         throw new Error("Test error");
       };
 
-      await expect(limiter.execute(fn)).rejects.toThrow("Test error");
+      await expect(limiter.execute(function_)).rejects.toThrow("Test error");
     });
 
     it("should decrement queued count even on error", async () => {
-      const fn = async () => {
+      const function_ = async () => {
         throw new Error("Test error");
       };
 
       try {
-        await limiter.execute(fn);
+        await limiter.execute(function_);
       } catch {
         /* Empty */
       }
@@ -178,19 +184,20 @@ describe("RateLimiter", () => {
 
   describe("getStats() and resetStats()", () => {
     it("should track, return, and reset stats correctly", async () => {
-      const fn = async () => "result";
+      const function_ = async () => "result";
 
-      // Initial stats
       let stats = limiter.getStats();
+
       expect(stats).toStrictEqual({
         requestCount: 0,
         queuedCount: 0,
       });
 
-      // Track request count
-      const promise1 = limiter.execute(fn);
+      const promise1 = limiter.execute(function_);
+
       await vi.advanceTimersByTimeAsync(500);
-      const promise2 = limiter.execute(fn);
+      const promise2 = limiter.execute(function_);
+
       await vi.advanceTimersByTimeAsync(500);
       await promise1;
       await promise2;
@@ -198,13 +205,12 @@ describe("RateLimiter", () => {
       stats = limiter.getStats();
       expect(stats.requestCount).toBe(2);
 
-      // Verify snapshot (not reference)
       const stats1 = limiter.getStats();
       const stats2 = limiter.getStats();
+
       expect(stats1).toStrictEqual(stats2);
       expect(stats1).not.toBe(stats2);
 
-      // Reset stats
       limiter.resetStats();
       expect(limiter.getStats()).toStrictEqual({
         requestCount: 0,
@@ -251,8 +257,9 @@ describe("RateLimiter", () => {
     });
 
     it("should reset stats when disabling", async () => {
-      const fn = async () => "result";
-      await limiter.execute(fn);
+      const function_ = async () => "result";
+
+      await limiter.execute(function_);
 
       limiter.setEnabled(false);
 
@@ -276,21 +283,24 @@ describe("RateLimiter", () => {
   describe("rate limiting behavior", () => {
     it("should respect configured limit", async () => {
       const customLimiter = new RateLimiter({ limit: 2, interval: 100 });
-      const fn = async () => "result";
+      const function_ = async () => "result";
 
-      await Promise.all([customLimiter.execute(fn), customLimiter.execute(fn)]);
+      await Promise.all([
+        customLimiter.execute(function_),
+        customLimiter.execute(function_),
+      ]);
 
       expect(customLimiter.getStats().requestCount).toBe(2);
     });
 
     it("should work with different interval settings", async () => {
       const fastLimiter = new RateLimiter({ limit: 10, interval: 50 });
-      const fn = async () => "result";
+      const function_ = async () => "result";
 
       const results = await Promise.all([
-        fastLimiter.execute(fn),
-        fastLimiter.execute(fn),
-        fastLimiter.execute(fn),
+        fastLimiter.execute(function_),
+        fastLimiter.execute(function_),
+        fastLimiter.execute(function_),
       ]);
 
       expect(results).toHaveLength(3);
@@ -303,9 +313,9 @@ describe("RateLimiter", () => {
         interval: 100,
         strict: false,
       });
-      const fn = async () => "result";
+      const function_ = async () => "result";
 
-      await nonStrictLimiter.execute(fn);
+      await nonStrictLimiter.execute(function_);
 
       expect(nonStrictLimiter.getStats().requestCount).toBe(1);
     });

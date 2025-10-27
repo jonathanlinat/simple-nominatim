@@ -43,62 +43,63 @@ import {
 import type { FreeFormArgv } from "./search.types";
 
 /**
+ * Build boolean options for API request
+ * @internal
+ */
+const buildBooleanOptions = (argv: FreeFormArgv) => ({
+  ...(argv.addressdetails !== undefined && {
+    addressdetails: argv.addressdetails,
+  }),
+  ...(argv.extratags !== undefined && { extratags: argv.extratags }),
+  ...(argv.namedetails !== undefined && { namedetails: argv.namedetails }),
+  ...(argv.entrances !== undefined && { entrances: argv.entrances }),
+  ...(argv.bounded !== undefined && { bounded: argv.bounded }),
+  ...(argv.dedupe !== undefined && { dedupe: argv.dedupe }),
+  ...(argv.debug !== undefined && { debug: argv.debug }),
+});
+
+/**
+ * Build polygon options for API request
+ * @internal
+ */
+const buildPolygonOptions = (argv: FreeFormArgv) => ({
+  ...(argv.polygonGeojson !== undefined && {
+    polygon_geojson: argv.polygonGeojson,
+  }),
+  ...(argv.polygonKml !== undefined && { polygon_kml: argv.polygonKml }),
+  ...(argv.polygonSvg !== undefined && { polygon_svg: argv.polygonSvg }),
+  ...(argv.polygonText !== undefined && { polygon_text: argv.polygonText }),
+  ...(argv.polygonThreshold !== undefined && {
+    polygon_threshold: argv.polygonThreshold,
+  }),
+});
+
+/**
+ * Build string options for API request
+ * @internal
+ */
+const buildStringOptions = (argv: FreeFormArgv) => ({
+  ...(argv.acceptLanguage && { "accept-language": argv.acceptLanguage }),
+  ...(argv.countrycodes && { countrycodes: argv.countrycodes }),
+  ...(argv.layer && { layer: argv.layer }),
+  ...(argv.featuretype && { featureType: argv.featuretype }),
+  ...(argv.excludePlaceIds && { exclude_place_ids: argv.excludePlaceIds }),
+  ...(argv.viewbox && { viewbox: argv.viewbox }),
+  ...(argv.jsonCallback && { json_callback: argv.jsonCallback }),
+});
+
+/**
  * Build API options from command-line arguments
  * @internal
  */
-const buildApiOptions = (argv: FreeFormArgv) => {
-  const {
-    email,
-    format,
-    limit,
-    addressdetails,
-    extratags,
-    namedetails,
-    entrances,
-    acceptLanguage,
-    countrycodes,
-    layer,
-    featuretype,
-    excludePlaceIds,
-    viewbox,
-    bounded,
-    polygonGeojson,
-    polygonKml,
-    polygonSvg,
-    polygonText,
-    polygonThreshold,
-    jsonCallback,
-    dedupe,
-    debug,
-  } = argv;
-
-  return {
-    email,
-    format,
-    limit,
-    ...(addressdetails !== undefined && { addressdetails }),
-    ...(extratags !== undefined && { extratags }),
-    ...(namedetails !== undefined && { namedetails }),
-    ...(entrances !== undefined && { entrances }),
-    ...(acceptLanguage && { "accept-language": acceptLanguage }),
-    ...(countrycodes && { countrycodes }),
-    ...(layer && { layer }),
-    ...(featuretype && { featureType: featuretype }),
-    ...(excludePlaceIds && { exclude_place_ids: excludePlaceIds }),
-    ...(viewbox && { viewbox }),
-    ...(bounded !== undefined && { bounded }),
-    ...(polygonGeojson !== undefined && { polygon_geojson: polygonGeojson }),
-    ...(polygonKml !== undefined && { polygon_kml: polygonKml }),
-    ...(polygonSvg !== undefined && { polygon_svg: polygonSvg }),
-    ...(polygonText !== undefined && { polygon_text: polygonText }),
-    ...(polygonThreshold !== undefined && {
-      polygon_threshold: polygonThreshold,
-    }),
-    ...(jsonCallback && { json_callback: jsonCallback }),
-    ...(dedupe !== undefined && { dedupe }),
-    ...(debug !== undefined && { debug }),
-  };
-};
+const buildApiOptions = (argv: FreeFormArgv) => ({
+  email: argv.email,
+  format: argv.format,
+  limit: argv.limit,
+  ...buildBooleanOptions(argv),
+  ...buildPolygonOptions(argv),
+  ...buildStringOptions(argv),
+});
 
 /**
  * CLI wrapper for free-form search functionality
@@ -156,7 +157,6 @@ export const freeFormSearchWrapper = (argv: FreeFormArgv): Promise<void> => {
   };
 
   const response = freeFormSearch(params, options);
-  const handledResponse = responseParser(response);
 
-  return handledResponse;
+  return responseParser(response);
 };

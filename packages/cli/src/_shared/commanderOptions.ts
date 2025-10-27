@@ -101,7 +101,7 @@ export const latitudeOption = new Option(
 export const limitOption = new Option(
   "--limit <limit>",
   "Specify the maximum number of returned results. Cannot be more than 40.",
-).argParser(parseInt);
+).argParser(Number.parseInt);
 
 /**
  * Commander option for longitude parameter
@@ -183,7 +183,7 @@ export const noCacheOption = new Option(
 export const cacheTtlOption = new Option(
   "--cache-ttl <cacheTtl>",
   "Cache time-to-live in milliseconds",
-).argParser(parseInt);
+).argParser(Number.parseInt);
 
 /**
  * Commander option for cache max size
@@ -193,7 +193,7 @@ export const cacheTtlOption = new Option(
 export const cacheMaxSizeOption = new Option(
   "--cache-max-size <cacheMaxSize>",
   "Maximum number of cached entries",
-).argParser(parseInt);
+).argParser(Number.parseInt);
 
 /**
  * Commander option to disable rate limiting
@@ -211,9 +211,9 @@ export const noRateLimitOption = new Option(
  * Specifies maximum number of requests per interval
  */
 export const rateLimitOption = new Option(
-  "--rate-limit <rateLimit>",
+  "--rate-limit <limit>",
   "Maximum number of requests per interval",
-).argParser(parseInt);
+).argParser((value) => Number.parseInt(value, 10));
 
 /**
  * Commander option for rate limit interval
@@ -223,7 +223,7 @@ export const rateLimitOption = new Option(
 export const rateLimitIntervalOption = new Option(
   "--rate-limit-interval <rateLimitInterval>",
   "Time interval in milliseconds for rate limiting",
-).argParser(parseInt);
+).argParser(Number.parseInt);
 
 /**
  * Commander option to disable retry logic
@@ -243,7 +243,7 @@ export const noRetryOption = new Option(
 export const retryMaxAttemptsOption = new Option(
   "--retry-max-attempts <retryMaxAttempts>",
   "Maximum number of retry attempts",
-).argParser(parseInt);
+).argParser(Number.parseInt);
 
 /**
  * Commander option for retry initial delay
@@ -253,7 +253,7 @@ export const retryMaxAttemptsOption = new Option(
 export const retryInitialDelayOption = new Option(
   "--retry-initial-delay <retryInitialDelay>",
   "Initial delay in milliseconds before first retry",
-).argParser(parseInt);
+).argParser(Number.parseInt);
 
 /**
  * Commander option for addressdetails parameter
@@ -265,7 +265,7 @@ export const addressDetailsOption = new Option(
   "Include a breakdown of the address into elements (0 or 1).",
 )
   .choices(["0", "1"])
-  .argParser(parseInt);
+  .argParser(Number.parseInt);
 
 /**
  * Commander option for extratags parameter
@@ -277,7 +277,7 @@ export const extraTagsOption = new Option(
   "Include additional information available in the database (0 or 1).",
 )
   .choices(["0", "1"])
-  .argParser(parseInt);
+  .argParser(Number.parseInt);
 
 /**
  * Commander option for namedetails parameter
@@ -289,7 +289,7 @@ export const nameDetailsOption = new Option(
   "Include a full list of names for the result (0 or 1).",
 )
   .choices(["0", "1"])
-  .argParser(parseInt);
+  .argParser(Number.parseInt);
 
 /**
  * Commander option for entrances parameter
@@ -301,7 +301,7 @@ export const entrancesOption = new Option(
   "Include the tagged entrances in the result (0 or 1).",
 )
   .choices(["0", "1"])
-  .argParser(parseInt);
+  .argParser(Number.parseInt);
 
 /**
  * Commander option for accept-language parameter
@@ -373,7 +373,7 @@ export const boundedOption = new Option(
   "Restrict results to viewbox area only (0 or 1).",
 )
   .choices(["0", "1"])
-  .argParser(parseInt);
+  .argParser(Number.parseInt);
 
 /**
  * Commander option for polygon_geojson parameter
@@ -385,7 +385,7 @@ export const polygonGeojsonOption = new Option(
   "Include full geometry in GeoJSON format (0 or 1).",
 )
   .choices(["0", "1"])
-  .argParser(parseInt);
+  .argParser(Number.parseInt);
 
 /**
  * Commander option for polygon_kml parameter
@@ -397,7 +397,7 @@ export const polygonKmlOption = new Option(
   "Include full geometry in KML format (0 or 1).",
 )
   .choices(["0", "1"])
-  .argParser(parseInt);
+  .argParser(Number.parseInt);
 
 /**
  * Commander option for polygon_svg parameter
@@ -409,7 +409,7 @@ export const polygonSvgOption = new Option(
   "Include full geometry in SVG format (0 or 1).",
 )
   .choices(["0", "1"])
-  .argParser(parseInt);
+  .argParser(Number.parseInt);
 
 /**
  * Commander option for polygon_text parameter
@@ -421,7 +421,7 @@ export const polygonTextOption = new Option(
   "Include full geometry in WKT format (0 or 1).",
 )
   .choices(["0", "1"])
-  .argParser(parseInt);
+  .argParser(Number.parseInt);
 
 /**
  * Commander option for polygon_threshold parameter
@@ -431,7 +431,7 @@ export const polygonTextOption = new Option(
 export const polygonThresholdOption = new Option(
   "--polygon-threshold <polygonThreshold>",
   "Tolerance in degrees for simplified geometry output.",
-).argParser(parseFloat);
+).argParser(Number.parseFloat);
 
 /**
  * Commander option for json_callback parameter
@@ -453,7 +453,7 @@ export const dedupeOption = new Option(
   "Disable deduplication of results (0 or 1).",
 )
   .choices(["0", "1"])
-  .argParser(parseInt);
+  .argParser(Number.parseInt);
 
 /**
  * Option for debug parameter
@@ -465,7 +465,7 @@ export const debugOption = new Option(
   "Output assorted developer debug information (0 or 1).",
 )
   .choices(["0", "1"])
-  .argParser(parseInt);
+  .argParser(Number.parseInt);
 
 /**
  * Option for zoom parameter
@@ -475,4 +475,4 @@ export const debugOption = new Option(
 export const zoomOption = new Option(
   "--zoom <zoom>",
   "Level of detail required for the address (0-18).",
-).argParser(parseInt);
+).argParser(Number.parseInt);

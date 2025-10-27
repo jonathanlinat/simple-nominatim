@@ -26,7 +26,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { freeFormSearch } from "@simple-nominatim/core";
 
-import { freeFormSearchWrapper } from "../../search/free-form";
+import { freeFormSearchWrapper } from "../../search/freeForm";
 
 import type { FreeFormArgv } from "../../search/search.types";
 

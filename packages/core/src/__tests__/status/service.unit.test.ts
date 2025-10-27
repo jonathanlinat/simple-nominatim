@@ -65,8 +65,10 @@ describe("serviceStatus", () => {
       await serviceStatus({ format: "json" });
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
+
       expect(url).toContain("status?");
     });
 
@@ -91,16 +93,20 @@ describe("serviceStatus", () => {
       });
 
       let result = await serviceStatus({ format: "json" });
+
       expect(result).toStrictEqual(mockResponse);
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
+
       expect(url).toContain("format=json");
       expect(url).not.toMatch(/undefined/);
 
       vi.clearAllMocks();
       const textResponse = "OK";
+
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         text: async () => textResponse,
@@ -146,8 +152,10 @@ describe("serviceStatus", () => {
   describe("retry options", () => {
     it("should work with retry configuration", async () => {
       let callCount = 0;
+
       global.fetch = vi.fn().mockImplementation(async () => {
         callCount++;
+
         if (callCount === 1) {
           throw new Error("Network error");
         }
@@ -296,6 +304,7 @@ describe("serviceStatus", () => {
       expect(result).toStrictEqual({ status: "OK" });
       const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
         .calls[0]?.[0] as string;
+
       expect(calledUrl).toContain("format=json");
     });
 
@@ -307,13 +316,13 @@ describe("serviceStatus", () => {
 
       const result = await serviceStatus({
         format: "json",
-        // This should be skipped
         customParam: undefined,
       } as StatusOptions & { customParam?: undefined });
 
       expect(result).toStrictEqual({ status: "OK" });
       const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock
         .calls[0]?.[0] as string;
+
       expect(calledUrl).toContain("format=json");
       expect(calledUrl).not.toContain("customParam");
     });

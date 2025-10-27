@@ -47,10 +47,10 @@ export const latitudeSchema = z
   .string()
   .regex(/^-?\d+\.?\d*$/, "Latitude must be a valid number")
   .refine(
-    (val) => {
-      const num = parseFloat(val);
+    (value) => {
+      const number_ = Number.parseFloat(value);
 
-      return num >= -90 && num <= 90;
+      return number_ >= -90 && number_ <= 90;
     },
     { message: "Latitude must be between -90 and 90" },
   );
@@ -62,10 +62,10 @@ export const longitudeSchema = z
   .string()
   .regex(/^-?\d+\.?\d*$/, "Longitude must be a valid number")
   .refine(
-    (val) => {
-      const num = parseFloat(val);
+    (value) => {
+      const number_ = Number.parseFloat(value);
 
-      return num >= -180 && num <= 180;
+      return number_ >= -180 && number_ <= 180;
     },
     { message: "Longitude must be between -180 and 180" },
   );
@@ -143,9 +143,7 @@ export const safeValidateArgs = <T>(
   schema: z.ZodSchema<T>,
   data: unknown,
 ): { success: true; data: T } | { success: false; error: z.ZodError } => {
-  const result = schema.safeParse(data);
-
-  return result;
+  return schema.safeParse(data);
 };
 
 /**
@@ -162,9 +160,9 @@ export const safeValidateArgs = <T>(
 export const handleValidationError = (error: z.ZodError): never => {
   console.error("Validation error:");
 
-  error.issues.forEach((err) => {
-    console.error(`  - ${err.path.join(".")}: ${err.message}`);
-  });
+  for (const error_ of error.issues) {
+    console.error(`  - ${error_.path.join(".")}: ${error_.message}`);
+  }
 
   process.exit(1);
 };

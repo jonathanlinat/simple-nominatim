@@ -72,7 +72,7 @@ import {
   zoomOption,
 } from "./_shared/commanderOptions";
 import { geocodeReverseWrapper } from "./reverse/geocode";
-import { freeFormSearchWrapper } from "./search/free-form";
+import { freeFormSearchWrapper } from "./search/freeForm";
 import { structuredSearchWrapper } from "./search/structured";
 import { serviceStatusWrapper } from "./status/service";
 

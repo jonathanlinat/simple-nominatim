@@ -90,11 +90,11 @@ describe("serviceStatusWrapper", () => {
     });
 
     it.each([
-      ["noCache", false, "cache", {}],
+      ["noCache", false, "cache", undefined],
       ["noCache", true, "cache", { enabled: false }],
-      ["noRateLimit", false, "rateLimit", {}],
+      ["noRateLimit", false, "rateLimit", undefined],
       ["noRateLimit", true, "rateLimit", { enabled: false }],
-      ["noRetry", false, "retry", {}],
+      ["noRetry", false, "retry", undefined],
       ["noRetry", true, "retry", { enabled: false }],
     ] as const)(
       "should handle %s flag when set to %s",
@@ -107,6 +107,7 @@ describe("serviceStatusWrapper", () => {
         await serviceStatusWrapper(argv);
 
         const callArgs = vi.mocked(serviceStatus).mock.calls[0]?.[0];
+
         expect(callArgs?.[configKey]).toStrictEqual(expectedValue);
       },
     );
@@ -129,6 +130,7 @@ describe("serviceStatusWrapper", () => {
         await serviceStatusWrapper(argv);
 
         const callArgs = vi.mocked(serviceStatus).mock.calls[0]?.[0];
+
         expect(callArgs?.[configKey]).toStrictEqual(expectedConfig);
       },
     );
@@ -151,6 +153,52 @@ describe("serviceStatusWrapper", () => {
 
       mockExit.mockRestore();
     });
+
+    it.each([
+      ["noCache", false, "cache", undefined],
+      ["noCache", true, "cache", { enabled: false }],
+      ["noRateLimit", false, "rateLimit", undefined],
+      ["noRateLimit", true, "rateLimit", { enabled: false }],
+      ["noRetry", false, "retry", undefined],
+      ["noRetry", true, "retry", { enabled: false }],
+    ] as const)(
+      "should handle %s flag when set to %s",
+      async (flagName, flagValue, configKey, expectedValue) => {
+        const argv: ServiceStatusArgv = {
+          format: "json",
+          [flagName]: flagValue,
+        };
+
+        await serviceStatusWrapper(argv);
+
+        const callArgs = vi.mocked(serviceStatus).mock.calls[0]?.[0];
+
+        expect(callArgs?.[configKey]).toStrictEqual(expectedValue);
+      },
+    );
+
+    it.each([
+      ["cacheTtl", 5000, "cache", { ttl: 5000 }],
+      ["rateLimit", 5, "rateLimit", { limit: 5 }],
+      ["retryMaxAttempts", 5, "retry", { maxAttempts: 5 }],
+      ["cacheMaxSize", 200, "cache", { maxSize: 200 }],
+      ["rateLimitInterval", 2000, "rateLimit", { interval: 2000 }],
+      ["retryInitialDelay", 500, "retry", { initialDelay: 500 }],
+    ] as const)(
+      "should handle %s parameter",
+      async (paramName, paramValue, configKey, expectedConfig) => {
+        const argv: ServiceStatusArgv = {
+          format: "json",
+          [paramName]: paramValue,
+        };
+
+        await serviceStatusWrapper(argv);
+
+        const callArgs = vi.mocked(serviceStatus).mock.calls[0]?.[0];
+
+        expect(callArgs?.[configKey]).toStrictEqual(expectedConfig);
+      },
+    );
   });
 
   describe("response handling", () => {

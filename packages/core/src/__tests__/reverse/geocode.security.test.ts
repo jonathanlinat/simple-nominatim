@@ -64,7 +64,7 @@ describe("geocodeReverse", () => {
       },
     ];
 
-    coordinateScenarios.forEach(({ name, coordinates }) => {
+    for (const { name, coordinates } of coordinateScenarios) {
       it(`should handle ${name} in coordinates`, async () => {
         for (const { lat, lon } of coordinates) {
           await expect(
@@ -75,6 +75,6 @@ describe("geocodeReverse", () => {
           ).resolves.toBeDefined();
         }
       });
-    });
+    }
   });
 });

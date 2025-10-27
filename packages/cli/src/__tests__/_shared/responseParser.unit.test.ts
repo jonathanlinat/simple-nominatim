@@ -32,6 +32,7 @@ describe("responseParser", () => {
   let processExitSpy: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
+    vi.useFakeTimers();
     consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     processExitSpy = vi
@@ -43,11 +44,13 @@ describe("responseParser", () => {
     consoleLogSpy.mockRestore();
     consoleErrorSpy.mockRestore();
     processExitSpy.mockRestore();
+    vi.useRealTimers();
   });
 
   describe("successful responses", () => {
     it("should output JSON string for various response types", async () => {
       const objectResponse = { place_id: 123, name: "Test Place" };
+
       await responseParser(Promise.resolve(objectResponse));
       expect(consoleLogSpy).toHaveBeenCalledWith(
         JSON.stringify(objectResponse),
@@ -58,6 +61,7 @@ describe("responseParser", () => {
         { place_id: 1, name: "Place 1" },
         { place_id: 2, name: "Place 2" },
       ];
+
       await responseParser(Promise.resolve(arrayResponse));
       expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(arrayResponse));
 
@@ -90,6 +94,7 @@ describe("responseParser", () => {
         },
         tags: ["city", "capital"],
       };
+
       await responseParser(Promise.resolve(complexResponse));
       expect(consoleLogSpy).toHaveBeenCalledWith(
         JSON.stringify(complexResponse),
@@ -167,13 +172,13 @@ describe("responseParser", () => {
       },
     ];
 
-    errorScenarios.forEach(({ name, error, expectedMessage }) => {
+    for (const { name, error, expectedMessage } of errorScenarios) {
       it(`should handle ${name} with specific message`, async () => {
         await responseParser(Promise.reject(error));
         expect(consoleErrorSpy).toHaveBeenCalledWith(expectedMessage);
         expect(processExitSpy).toHaveBeenCalledWith(1);
       });
-    });
+    }
 
     it("should handle generic errors with error message", async () => {
       const errorCases = [
@@ -191,11 +196,13 @@ describe("responseParser", () => {
 
       for (const { input, expected } of errorCases) {
         await responseParser(Promise.reject(input));
+
         if (expected) {
           expect(consoleErrorSpy).toHaveBeenCalledWith(expected);
         } else {
           expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
         }
+
         expect(processExitSpy).toHaveBeenCalledWith(1);
         consoleErrorSpy.mockClear();
         processExitSpy.mockClear();
@@ -215,7 +222,10 @@ describe("responseParser", () => {
         setTimeout(() => resolve(response), 10);
       });
 
-      await responseParser(promise);
+      const resultPromise = responseParser(promise);
+
+      await vi.advanceTimersByTimeAsync(10);
+      await resultPromise;
 
       expect(consoleLogSpy).toHaveBeenCalledTimes(1);
       expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(response));
@@ -228,7 +238,10 @@ describe("responseParser", () => {
         setTimeout(() => reject(error), 10);
       });
 
-      await responseParser(promise);
+      const resultPromise = responseParser(promise);
+
+      await vi.advanceTimersByTimeAsync(10);
+      await resultPromise;
 
       expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
       expect(consoleErrorSpy).toHaveBeenCalledWith("Error: Async error");

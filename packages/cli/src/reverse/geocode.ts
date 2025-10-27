@@ -158,7 +158,6 @@ export const geocodeReverseWrapper = (
   };
 
   const response = geocodeReverse(params, options);
-  const handledResponse = responseParser(response);
 
-  return handledResponse;
+  return responseParser(response);
 };

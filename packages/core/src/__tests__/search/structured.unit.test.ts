@@ -68,8 +68,10 @@ describe("structuredSearch", () => {
       await structuredSearch({ city: "New York" }, { format: "json" });
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
+
       expect(url).toContain("search?");
       expect(url).toContain("city=New+York");
     });
@@ -115,8 +117,10 @@ describe("structuredSearch", () => {
       );
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
+
       expect(url).toContain("street=10+Downing+Street");
       expect(url).toContain("city=London");
       expect(url).toContain("county=Greater+London");
@@ -139,8 +143,10 @@ describe("structuredSearch", () => {
       );
 
       let callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       let url = callArgs![0] as string;
+
       expect(url).toContain("limit=5");
       expect(url).toContain("addressdetails=1");
 
@@ -200,8 +206,10 @@ describe("structuredSearch", () => {
   describe("retry options", () => {
     it("should work with retry configuration", async () => {
       let callCount = 0;
+
       global.fetch = vi.fn().mockImplementation(async () => {
         callCount++;
+
         if (callCount === 1) {
           throw new Error("Network error");
         }

@@ -35,4 +35,5 @@ interface TestResponse {
 }
 const testPromise: Promise<TestResponse> = Promise.resolve({ data: "test" });
 const parsedResponse = responseParser(testPromise);
+
 expectTypeOf(parsedResponse).toEqualTypeOf<Promise<void>>();

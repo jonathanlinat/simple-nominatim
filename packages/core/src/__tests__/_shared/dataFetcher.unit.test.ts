@@ -65,6 +65,7 @@ describe("dataFetcher", () => {
       });
 
       const params = new URLSearchParams({ q: "test" });
+
       await dataFetcher(endpoint, params);
 
       expect(global.fetch).toHaveBeenCalledWith(
@@ -84,11 +85,14 @@ describe("dataFetcher", () => {
       });
 
       const params = new URLSearchParams({ q: "London", limit: "5" });
+
       await dataFetcher(endpoint, params);
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
+
       expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
+
       expect(url).toContain("search?");
       expect(url).toContain("q=London");
       expect(url).toContain("limit=5");
@@ -98,6 +102,7 @@ describe("dataFetcher", () => {
   describe("response formats", () => {
     it("should parse JSON response by default", async () => {
       const jsonData = { place_id: 123, display_name: "Test Place" };
+
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => jsonData,
@@ -111,6 +116,7 @@ describe("dataFetcher", () => {
 
     it("should return text for format=text", async () => {
       const textData = "plain text response";
+
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         text: async () => textData,
@@ -124,6 +130,7 @@ describe("dataFetcher", () => {
 
     it("should return text for format=xml", async () => {
       const xmlData = "<xml>test</xml>";
+
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         text: async () => xmlData,
@@ -243,7 +250,6 @@ describe("dataFetcher", () => {
     it("should return cached data on cache hit", async () => {
       const cachedData = { cached: true, from: "cache" };
 
-      // Mock CacheManager.get to return cached data
       vi.spyOn(CacheManager.prototype, "get").mockReturnValue(cachedData);
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -260,7 +266,6 @@ describe("dataFetcher", () => {
       });
 
       expect(result).toStrictEqual(cachedData);
-      // Should not fetch when cache hit
       expect(global.fetch).not.toHaveBeenCalled();
     });
   });
@@ -345,8 +350,10 @@ describe("dataFetcher", () => {
       "should retry and succeed on %s",
       async (_description, firstCallResponse, expectedCalls) => {
         let callCount = 0;
+
         global.fetch = vi.fn().mockImplementation(async () => {
           callCount++;
+
           if (callCount === 1) {
             return firstCallResponse();
           }
@@ -369,6 +376,7 @@ describe("dataFetcher", () => {
           cache: { enabled: false },
           rateLimit: { enabled: false },
         });
+
         await vi.advanceTimersByTimeAsync(10);
         const result = await promise;
 
@@ -421,14 +429,15 @@ describe("dataFetcher", () => {
             cache: { enabled: false },
             rateLimit: { enabled: false },
           });
-        } catch (e) {
-          return e;
+        } catch (error) {
+          return error;
         }
       })();
 
       await vi.advanceTimersByTimeAsync(30);
 
       const result = await promise;
+
       expect(result).toBeInstanceOf(Error);
       expect((result as Error).message).toBe("Network error");
       expect(global.fetch).toHaveBeenCalledTimes(3);
@@ -455,12 +464,16 @@ describe("dataFetcher", () => {
 
       global.fetch = vi.fn().mockImplementation(async () => {
         callCount++;
+
         if (callCount > 1) {
           const currentTime =
             (vi.getMockedSystemTime() as Date)?.getTime() ?? 0;
+
           delays.push(currentTime - lastTime);
         }
+
         lastTime = (vi.getMockedSystemTime() as Date)?.getTime() ?? 0;
+
         if (callCount < 3) {
           throw new Error("Network error");
         }
@@ -470,7 +483,6 @@ describe("dataFetcher", () => {
 
       const params = new URLSearchParams({ q: "test" });
 
-      // Test exponential backoff
       const promise = dataFetcher(endpoint, params, {
         retry: {
           enabled: true,
@@ -483,6 +495,7 @@ describe("dataFetcher", () => {
         cache: { enabled: false },
         rateLimit: { enabled: false },
       });
+
       await vi.advanceTimersByTimeAsync(50);
       await vi.advanceTimersByTimeAsync(100);
       await promise;
@@ -492,11 +505,11 @@ describe("dataFetcher", () => {
       expect(delays[0]).toBeGreaterThanOrEqual(45);
       expect(delays[1]).toBeGreaterThanOrEqual(90);
 
-      // Test max delay enforcement
       vi.clearAllMocks();
       callCount = 0;
       global.fetch = vi.fn().mockImplementation(async () => {
         callCount++;
+
         if (callCount < 3) {
           throw new Error("Network error");
         }
@@ -516,17 +529,18 @@ describe("dataFetcher", () => {
         cache: { enabled: false },
         rateLimit: { enabled: false },
       });
+
       await vi.advanceTimersByTimeAsync(100);
       await vi.advanceTimersByTimeAsync(150);
       await maxDelayPromise;
 
       expect(global.fetch).toHaveBeenCalledTimes(3);
 
-      // Test jitter application
       vi.clearAllMocks();
       callCount = 0;
       global.fetch = vi.fn().mockImplementation(async () => {
         callCount++;
+
         if (callCount < 3) {
           throw new Error("Retry test");
         }
@@ -569,14 +583,15 @@ describe("dataFetcher", () => {
             cache: { enabled: false },
             rateLimit: { enabled: false },
           });
-        } catch (e) {
-          return e;
+        } catch (error) {
+          return error;
         }
       })();
 
       await vi.advanceTimersByTimeAsync(20);
 
       const result = await promise;
+
       expect(result).toBeInstanceOf(Error);
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
@@ -585,8 +600,10 @@ describe("dataFetcher", () => {
   describe("integration", () => {
     it("should work with cache, rate limiting, and retry together", async () => {
       let callCount = 0;
+
       global.fetch = vi.fn().mockImplementation(async () => {
         callCount++;
+
         if (callCount === 1) {
           throw new Error("Network error");
         }
@@ -606,6 +623,7 @@ describe("dataFetcher", () => {
           useJitter: false,
         },
       });
+
       await vi.advanceTimersByTimeAsync(10);
       const result = await promise;
 
@@ -651,17 +669,17 @@ describe("dataFetcher", () => {
             cache: { enabled: false },
             rateLimit: { enabled: false },
           });
-        } catch (e) {
-          return e;
+        } catch (error) {
+          return error;
         }
       })();
 
       const result = await promise;
+
       expect(result).toBeInstanceOf(Error);
       expect((result as Error).message).toBe(
         "Request failed after all retry attempts",
       );
-      // Loop never executes
       expect(global.fetch).not.toHaveBeenCalled();
     });
   });
