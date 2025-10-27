@@ -1,5 +1,16 @@
 # @simple-nominatim/cli
 
+## 0.6.0
+
+### Minor Changes
+
+- Comprehensive quality improvements including test optimization, API enhancements, and documentation standardization. ([#23](https://github.com/jonathanlinat/simple-nominatim/pull/23))
+
+### Patch Changes
+
+- Updated dependencies [[`c56d027`](https://github.com/jonathanlinat/simple-nominatim/commit/c56d027ed21fb997406ef985140673a987b5413c)]:
+  - @simple-nominatim/core@0.5.0
+
 ## 0.5.0
 
 ### Minor Changes
