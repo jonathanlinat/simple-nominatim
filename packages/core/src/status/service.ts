@@ -50,22 +50,6 @@ import type { StatusOptions } from "./status.types";
  *
  * @throws {Error} If the HTTP request fails (text format may throw on HTTP 500)
  *
- * @example
- * ```typescript
- * // Text format (default)
- * const textStatus = await serviceStatus({ format: 'text' });
- * // Returns: "OK"
- *
- * // JSON format with type safety
- * const jsonStatus = await serviceStatus<StatusJsonResponse>({ format: 'json' });
- * if (jsonStatus.status === 0) {
- *   console.log(`Last updated: ${jsonStatus.data_updated}`);
- * }
- *
- * // No parameters (uses default text format)
- * const status = await serviceStatus({});
- * ```
- *
  * @see {@link https://nominatim.org/release-docs/develop/api/Status/ | Nominatim Status API Documentation}
  */
 export const serviceStatus = async <T = unknown>(

@@ -38,15 +38,6 @@ interface CacheArgv {
 }
 
 /**
- * Interface for command-line arguments that include rate limit configuration
- */
-interface RateLimitArgv {
-  noRateLimit?: boolean;
-  rateLimit?: number;
-  rateLimitInterval?: number;
-}
-
-/**
  * Interface for command-line arguments that include retry configuration
  */
 interface RetryArgv {
@@ -67,18 +58,26 @@ export const buildCacheConfig = (argv: CacheArgv): CacheConfig | undefined => {
   const { noCache, cacheTtl, cacheMaxSize } = argv;
 
   if (
-    noCache === undefined &&
+    noCache !== true &&
     cacheTtl === undefined &&
     cacheMaxSize === undefined
   ) {
     return undefined;
   }
 
-  const config = {
-    ...(noCache && { enabled: false }),
-    ...(cacheTtl !== undefined && { ttl: cacheTtl }),
-    ...(cacheMaxSize !== undefined && { maxSize: cacheMaxSize }),
-  };
+  const config: CacheConfig = {};
+
+  if (noCache === true) {
+    config.enabled = false;
+  }
+
+  if (cacheTtl !== undefined) {
+    config.ttl = cacheTtl;
+  }
+
+  if (cacheMaxSize !== undefined) {
+    config.maxSize = cacheMaxSize;
+  }
 
   return Object.keys(config).length > 0 ? config : undefined;
 };
@@ -86,32 +85,48 @@ export const buildCacheConfig = (argv: CacheArgv): CacheConfig | undefined => {
 /**
  * Build rate limit configuration from command-line arguments
  *
- * @param {RateLimitArgv} argv Command-line arguments containing rate limit parameters
+ * @param {object} options Command-line arguments containing rate limit parameters
+ * @param {boolean} [options.noRateLimit] Disable rate limiting entirely
+ * @param {number} [options.rateLimit] Maximum number of requests per interval
+ * @param {number} [options.rateLimitInterval] Time interval in milliseconds
  * @returns {RateLimitConfig | undefined} Rate limit configuration object, or undefined if no rate limit params provided
  *
  * @internal
  */
-export const buildRateLimitConfig = (
-  argv: RateLimitArgv,
-): RateLimitConfig | undefined => {
-  const { noRateLimit, rateLimit, rateLimitInterval } = argv;
+export function buildRateLimitConfig(options: {
+  noRateLimit?: boolean;
+  rateLimit?: number;
+  rateLimitInterval?: number;
+}): RateLimitConfig | undefined {
+  const { noRateLimit, rateLimit, rateLimitInterval } = options;
+
+  const numericRateLimit =
+    typeof rateLimit === "number" ? rateLimit : undefined;
 
   if (
-    noRateLimit === undefined &&
-    rateLimit === undefined &&
+    noRateLimit !== true &&
+    numericRateLimit === undefined &&
     rateLimitInterval === undefined
   ) {
     return undefined;
   }
 
-  const config = {
-    ...(noRateLimit && { enabled: false }),
-    ...(rateLimit !== undefined && { limit: rateLimit }),
-    ...(rateLimitInterval !== undefined && { interval: rateLimitInterval }),
-  };
+  const config: RateLimitConfig = {};
+
+  if (noRateLimit === true) {
+    config.enabled = false;
+  }
+
+  if (numericRateLimit !== undefined) {
+    config.limit = numericRateLimit;
+  }
+
+  if (rateLimitInterval !== undefined) {
+    config.interval = rateLimitInterval;
+  }
 
   return Object.keys(config).length > 0 ? config : undefined;
-};
+}
 
 /**
  * Build retry configuration from command-line arguments
@@ -125,18 +140,26 @@ export const buildRetryConfig = (argv: RetryArgv): RetryConfig | undefined => {
   const { noRetry, retryMaxAttempts, retryInitialDelay } = argv;
 
   if (
-    noRetry === undefined &&
+    noRetry !== true &&
     retryMaxAttempts === undefined &&
     retryInitialDelay === undefined
   ) {
     return undefined;
   }
 
-  const config = {
-    ...(noRetry && { enabled: false }),
-    ...(retryMaxAttempts !== undefined && { maxAttempts: retryMaxAttempts }),
-    ...(retryInitialDelay !== undefined && { initialDelay: retryInitialDelay }),
-  };
+  const config: RetryConfig = {};
 
-  return Object.keys(config).length > 0 ? (config as RetryConfig) : undefined;
+  if (noRetry === true) {
+    config.enabled = false;
+  }
+
+  if (retryMaxAttempts !== undefined) {
+    config.maxAttempts = retryMaxAttempts;
+  }
+
+  if (retryInitialDelay !== undefined) {
+    config.initialDelay = retryInitialDelay;
+  }
+
+  return Object.keys(config).length > 0 ? config : undefined;
 };

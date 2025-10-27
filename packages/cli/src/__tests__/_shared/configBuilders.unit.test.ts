@@ -62,7 +62,7 @@ describe("configBuilders", () => {
           expect(function_({})).toBeUndefined();
         });
 
-        it("should set enabled: false when disable flag is true", () => {
+        it("should return config with enabled:false when disable flag is true", () => {
           expect(function_({ [disableFlag]: true })).toStrictEqual({
             enabled: false,
           });
