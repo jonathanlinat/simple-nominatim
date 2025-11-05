@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
+import type { SearchOptions } from "../_shared/_shared.types";
 import { dataFetcher } from "../_shared/dataFetcher";
 
 import type { StructuredSearchParams } from "./search.types";
-import type { SearchOptions } from "../_shared/_shared.types";
 
 /**
  * Performs a structured search query using the Nominatim API

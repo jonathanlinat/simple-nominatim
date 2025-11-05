@@ -30,180 +30,209 @@ import {
   buildRetryConfig,
 } from "../../_shared/configBuilders";
 
-describe("configBuilders", () => {
-  describe("common builder behavior", () => {
-    const builders = [
-      {
-        name: "buildCacheConfig",
-        function_: buildCacheConfig,
-        disableFlag: "noCache",
-        params: ["cacheTtl", "cacheMaxSize"],
-        outputKeys: ["enabled", "ttl", "maxSize"],
-      },
-      {
-        name: "buildRateLimitConfig",
-        function_: buildRateLimitConfig,
-        disableFlag: "noRateLimit",
-        params: ["rateLimit", "rateLimitInterval"],
-        outputKeys: ["enabled", "limit", "interval"],
-      },
-      {
-        name: "buildRetryConfig",
-        function_: buildRetryConfig,
-        disableFlag: "noRetry",
-        params: ["retryMaxAttempts", "retryInitialDelay"],
-        outputKeys: ["enabled", "maxAttempts", "initialDelay"],
-      },
-    ];
+describe("shared:config-builders", () => {
+  describe("buildCacheConfig", () => {
+    it("should return undefined when no cache parameters are provided", () => {
+      const result = buildCacheConfig({});
 
-    for (const { name, function_, disableFlag, params } of builders) {
-      describe(name, () => {
-        it("should return undefined for empty input", () => {
-          expect(function_({})).toBeUndefined();
-        });
-
-        it("should return config with enabled:false when disable flag is true", () => {
-          expect(function_({ [disableFlag]: true })).toStrictEqual({
-            enabled: false,
-          });
-        });
-
-        it("should return undefined when disable flag is false", () => {
-          expect(function_({ [disableFlag]: false })).toBeUndefined();
-        });
-
-        it("should include provided numeric parameters", () => {
-          const input = params.reduce(
-            (accumulator, param, index) => ({
-              ...accumulator,
-              [param]: (index + 1) * 100,
-            }),
-            {},
-          );
-          const result = function_(input);
-
-          expect(result).toBeDefined();
-          expect(Object.keys(result!).length).toBe(params.length);
-        });
-
-        it("should handle zero values", () => {
-          const input = params.reduce(
-            (accumulator, param) => ({ ...accumulator, [param]: 0 }),
-            {},
-          );
-          const result = function_(input);
-
-          expect(result).toBeDefined();
-
-          for (const value of Object.values(result!)) {
-            expect(value).toBe(0);
-          }
-        });
-      });
-    }
-  });
-
-  describe("specific parameter mapping", () => {
-    it("should map buildCacheConfig parameters correctly", () => {
-      expect(buildCacheConfig({ cacheTtl: 5000 })).toStrictEqual({ ttl: 5000 });
-      expect(buildCacheConfig({ cacheMaxSize: 100 })).toStrictEqual({
-        maxSize: 100,
-      });
-      expect(
-        buildCacheConfig({
-          noCache: true,
-          cacheTtl: 3000,
-          cacheMaxSize: 50,
-        }),
-      ).toStrictEqual({
-        enabled: false,
-        ttl: 3000,
-        maxSize: 50,
-      });
+      expect(result).toBeUndefined();
     });
 
-    it("should map buildRateLimitConfig parameters correctly", () => {
-      expect(buildRateLimitConfig({ rateLimit: 10 })).toStrictEqual({
-        limit: 10,
-      });
-      expect(buildRateLimitConfig({ rateLimitInterval: 1000 })).toStrictEqual({
-        interval: 1000,
-      });
-      expect(
-        buildRateLimitConfig({
-          noRateLimit: true,
-          rateLimit: 5,
-          rateLimitInterval: 2000,
-        }),
-      ).toStrictEqual({
-        enabled: false,
-        limit: 5,
-        interval: 2000,
-      });
+    it("should disable cache when noCache is true", () => {
+      const result = buildCacheConfig({ noCache: true });
+
+      expect(result).toBeDefined();
+      expect(result?.enabled).toBe(false);
     });
 
-    it("should map buildRetryConfig parameters correctly", () => {
-      expect(buildRetryConfig({ retryMaxAttempts: 5 })).toStrictEqual({
-        maxAttempts: 5,
-      });
-      expect(buildRetryConfig({ retryInitialDelay: 2000 })).toStrictEqual({
-        initialDelay: 2000,
-      });
-      expect(
-        buildRetryConfig({
-          noRetry: true,
-          retryMaxAttempts: 3,
-          retryInitialDelay: 1500,
-        }),
-      ).toStrictEqual({
-        enabled: false,
-        maxAttempts: 3,
-        initialDelay: 1500,
-      });
-    });
-  });
+    it("should set TTL when cacheTtl is provided", () => {
+      const result = buildCacheConfig({ cacheTtl: 60000 });
 
-  describe("integration scenarios", () => {
-    it("should build complete configuration", () => {
-      const argv = {
-        cacheTtl: 3600000,
-        cacheMaxSize: 100,
-        rateLimit: 1,
-        rateLimitInterval: 1000,
-        retryMaxAttempts: 3,
-        retryInitialDelay: 1000,
-      };
-
-      expect(buildCacheConfig(argv)).toStrictEqual({
-        ttl: 3600000,
-        maxSize: 100,
-      });
-      expect(buildRateLimitConfig(argv)).toStrictEqual({
-        limit: 1,
-        interval: 1000,
-      });
-      expect(buildRetryConfig(argv)).toStrictEqual({
-        maxAttempts: 3,
-        initialDelay: 1000,
-      });
+      expect(result).toBeDefined();
+      expect(result?.ttl).toBe(60000);
     });
 
-    it("should handle all features disabled", () => {
-      const argv = {
+    it("should set maxSize when cacheMaxSize is provided", () => {
+      const result = buildCacheConfig({ cacheMaxSize: 100 });
+
+      expect(result).toBeDefined();
+      expect(result?.maxSize).toBe(100);
+    });
+
+    it("should combine multiple cache parameters", () => {
+      const result = buildCacheConfig({
+        cacheTtl: 30000,
+        cacheMaxSize: 200,
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.ttl).toBe(30000);
+      expect(result?.maxSize).toBe(200);
+    });
+
+    it("should handle all cache parameters together", () => {
+      const result = buildCacheConfig({
+        noCache: false,
+        cacheTtl: 45000,
+        cacheMaxSize: 150,
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.enabled).toBeUndefined();
+      expect(result?.ttl).toBe(45000);
+      expect(result?.maxSize).toBe(150);
+    });
+
+    it("should only set enabled when noCache is true with other params", () => {
+      const result = buildCacheConfig({
         noCache: true,
-        noRateLimit: true,
-        noRetry: true,
-      };
+        cacheTtl: 60000,
+        cacheMaxSize: 100,
+      });
 
-      expect(buildCacheConfig(argv)).toStrictEqual({ enabled: false });
-      expect(buildRateLimitConfig(argv)).toStrictEqual({ enabled: false });
-      expect(buildRetryConfig(argv)).toStrictEqual({ enabled: false });
+      expect(result).toBeDefined();
+      expect(result?.enabled).toBe(false);
+      expect(result?.ttl).toBe(60000);
+      expect(result?.maxSize).toBe(100);
+    });
+  });
+
+  describe("buildRateLimitConfig", () => {
+    it("should return undefined when no rate limit parameters are provided", () => {
+      const result = buildRateLimitConfig({});
+
+      expect(result).toBeUndefined();
     });
 
-    it("should handle minimal configuration", () => {
-      expect(buildCacheConfig({})).toBeUndefined();
-      expect(buildRateLimitConfig({})).toBeUndefined();
-      expect(buildRetryConfig({})).toBeUndefined();
+    it("should disable rate limiting when noRateLimit is true", () => {
+      const result = buildRateLimitConfig({ noRateLimit: true });
+
+      expect(result).toBeDefined();
+      expect(result?.enabled).toBe(false);
+    });
+
+    it("should set limit when rateLimit is provided", () => {
+      const result = buildRateLimitConfig({ rateLimit: 10 });
+
+      expect(result).toBeDefined();
+      expect(result?.limit).toBe(10);
+    });
+
+    it("should set interval when rateLimitInterval is provided", () => {
+      const result = buildRateLimitConfig({ rateLimitInterval: 2000 });
+
+      expect(result).toBeDefined();
+      expect(result?.interval).toBe(2000);
+    });
+
+    it("should combine multiple rate limit parameters", () => {
+      const result = buildRateLimitConfig({
+        rateLimit: 5,
+        rateLimitInterval: 1500,
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.limit).toBe(5);
+      expect(result?.interval).toBe(1500);
+    });
+
+    it("should handle all rate limit parameters together", () => {
+      const result = buildRateLimitConfig({
+        noRateLimit: false,
+        rateLimit: 3,
+        rateLimitInterval: 3000,
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.enabled).toBeUndefined();
+      expect(result?.limit).toBe(3);
+      expect(result?.interval).toBe(3000);
+    });
+
+    it("should disable rate limiting with other params", () => {
+      const result = buildRateLimitConfig({
+        noRateLimit: true,
+        rateLimit: 10,
+        rateLimitInterval: 1000,
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.enabled).toBe(false);
+      expect(result?.limit).toBe(10);
+      expect(result?.interval).toBe(1000);
+    });
+
+    it("should handle numeric rateLimit correctly", () => {
+      const result = buildRateLimitConfig({ rateLimit: 0 });
+
+      expect(result).toBeDefined();
+      expect(result?.limit).toBe(0);
+    });
+  });
+
+  describe("buildRetryConfig", () => {
+    it("should return undefined when no retry parameters are provided", () => {
+      const result = buildRetryConfig({});
+
+      expect(result).toBeUndefined();
+    });
+
+    it("should disable retry when noRetry is true", () => {
+      const result = buildRetryConfig({ noRetry: true });
+
+      expect(result).toBeDefined();
+      expect(result?.enabled).toBe(false);
+    });
+
+    it("should set maxAttempts when retryMaxAttempts is provided", () => {
+      const result = buildRetryConfig({ retryMaxAttempts: 5 });
+
+      expect(result).toBeDefined();
+      expect(result?.maxAttempts).toBe(5);
+    });
+
+    it("should set initialDelay when retryInitialDelay is provided", () => {
+      const result = buildRetryConfig({ retryInitialDelay: 2000 });
+
+      expect(result).toBeDefined();
+      expect(result?.initialDelay).toBe(2000);
+    });
+
+    it("should combine multiple retry parameters", () => {
+      const result = buildRetryConfig({
+        retryMaxAttempts: 3,
+        retryInitialDelay: 1500,
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.maxAttempts).toBe(3);
+      expect(result?.initialDelay).toBe(1500);
+    });
+
+    it("should handle all retry parameters together", () => {
+      const result = buildRetryConfig({
+        noRetry: false,
+        retryMaxAttempts: 4,
+        retryInitialDelay: 1000,
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.enabled).toBeUndefined();
+      expect(result?.maxAttempts).toBe(4);
+      expect(result?.initialDelay).toBe(1000);
+    });
+
+    it("should disable retry with other params", () => {
+      const result = buildRetryConfig({
+        noRetry: true,
+        retryMaxAttempts: 2,
+        retryInitialDelay: 500,
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.enabled).toBe(false);
+      expect(result?.maxAttempts).toBe(2);
+      expect(result?.initialDelay).toBe(500);
     });
   });
 });

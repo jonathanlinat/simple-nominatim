@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
+import type { ReverseOptions } from "../_shared/_shared.types";
 import { dataFetcher } from "../_shared/dataFetcher";
 
 import type { GeocodeReverseParams } from "./reverse.types";
-import type { ReverseOptions } from "../_shared/_shared.types";
 
 /**
  * Performs reverse geocoding using the Nominatim API

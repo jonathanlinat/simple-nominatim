@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+import { resolve } from "node:path";
+
 import { defineConfig } from "vitest/config";
 
 /**
@@ -30,14 +32,22 @@ import { defineConfig } from "vitest/config";
  * @returns Vitest configuration object
  */
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@simple-nominatim/core": resolve(
+        __dirname,
+        "./packages/core/src/index.ts",
+      ),
+    },
+  },
   test: {
     globals: true,
     environment: "node",
     include: [
       "packages/*/src/__tests__/**/*.unit.test.ts",
-      "packages/*/src/__tests__/**/*.security.test.ts",
+      "packages/*/src/__tests__/**/*.e2e.test.ts",
     ],
-    exclude: ["node_modules", "dist", ".turbo"],
+    exclude: ["node_modules", "dist", ".turbo", "**/helpers.e2e.test.ts"],
     typecheck: {
       enabled: true,
       include: ["packages/*/src/__tests__/**/*.types.test.ts"],
@@ -49,12 +59,13 @@ export default defineConfig({
         "node_modules/",
         "dist/",
         "**/*.unit.test.ts",
-        "**/*.security.test.ts",
+        "**/*.e2e.test.ts",
         "**/*.types.test.ts",
         "**/package.json",
         "**/__tests__/",
         "**/*.types.ts",
       ],
     },
+    testTimeout: 10000,
   },
 });

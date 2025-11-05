@@ -22,17 +22,44 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from "vitest";
-
 import type { OutputFormat } from "@simple-nominatim/core";
+import { expectTypeOf } from "vitest";
 
 import type { FreeFormArgv, StructuredArgv } from "../../search/search.types";
 
-expectTypeOf<FreeFormArgv>().toMatchTypeOf<{
-  email?: string;
-  format: OutputFormat;
-  limit?: number;
+expectTypeOf<FreeFormArgv>().toMatchObjectType<{
   query: string;
+  format: OutputFormat;
+  email?: string;
+  limit?: number;
+  addressdetails?: 0 | 1;
+  extratags?: 0 | 1;
+  namedetails?: 0 | 1;
+  entrances?: 0 | 1;
+  acceptLanguage?: string;
+  countrycodes?: string;
+  layer?: string;
+  featuretype?: "country" | "state" | "city" | "settlement";
+  excludePlaceIds?: string;
+  viewbox?: string;
+  bounded?: 0 | 1;
+  polygonGeojson?: 0 | 1;
+  polygonKml?: 0 | 1;
+  polygonSvg?: 0 | 1;
+  polygonText?: 0 | 1;
+  polygonThreshold?: number;
+  jsonCallback?: string;
+  dedupe?: 0 | 1;
+  debug?: 0 | 1;
+  noCache?: boolean;
+  cacheTtl?: number;
+  cacheMaxSize?: number;
+  noRateLimit?: boolean;
+  rateLimit?: number;
+  rateLimitInterval?: number;
+  noRetry?: boolean;
+  retryMaxAttempts?: number;
+  retryInitialDelay?: number;
 }>();
 
 expectTypeOf<FreeFormArgv>()
@@ -45,18 +72,52 @@ expectTypeOf<FreeFormArgv>()
 expectTypeOf<FreeFormArgv>()
   .toHaveProperty("email")
   .toEqualTypeOf<string | undefined>();
+expectTypeOf<FreeFormArgv>()
+  .toHaveProperty("addressdetails")
+  .toEqualTypeOf<0 | 1 | undefined>();
+expectTypeOf<FreeFormArgv>()
+  .toHaveProperty("featuretype")
+  .toEqualTypeOf<"country" | "state" | "city" | "settlement" | undefined>();
 
-expectTypeOf<StructuredArgv>().toMatchTypeOf<{
+expectTypeOf<StructuredArgv>().toMatchObjectType<{
+  format: OutputFormat;
   amenity?: string;
   city?: string;
   country?: string;
   county?: string;
   email?: string;
-  format: OutputFormat;
   limit?: number;
   postalcode?: string;
   state?: string;
   street?: string;
+  addressdetails?: 0 | 1;
+  extratags?: 0 | 1;
+  namedetails?: 0 | 1;
+  entrances?: 0 | 1;
+  acceptLanguage?: string;
+  countrycodes?: string;
+  layer?: string;
+  featuretype?: "country" | "state" | "city" | "settlement";
+  excludePlaceIds?: string;
+  viewbox?: string;
+  bounded?: 0 | 1;
+  polygonGeojson?: 0 | 1;
+  polygonKml?: 0 | 1;
+  polygonSvg?: 0 | 1;
+  polygonText?: 0 | 1;
+  polygonThreshold?: number;
+  jsonCallback?: string;
+  dedupe?: 0 | 1;
+  debug?: 0 | 1;
+  noCache?: boolean;
+  cacheTtl?: number;
+  cacheMaxSize?: number;
+  noRateLimit?: boolean;
+  rateLimit?: number;
+  rateLimitInterval?: number;
+  noRetry?: boolean;
+  retryMaxAttempts?: number;
+  retryInitialDelay?: number;
 }>();
 
 expectTypeOf<StructuredArgv>()
@@ -89,20 +150,25 @@ expectTypeOf<StructuredArgv>()
 expectTypeOf<StructuredArgv>()
   .toHaveProperty("street")
   .toEqualTypeOf<string | undefined>();
+expectTypeOf<StructuredArgv>()
+  .toHaveProperty("addressdetails")
+  .toEqualTypeOf<0 | 1 | undefined>();
 
 const freeFormArgs: FreeFormArgv = {
   query: "Paris",
   format: "jsonv2",
   limit: 10,
   email: "test@example.com",
+  addressdetails: 1,
+  countrycodes: "fr",
 };
 
 expectTypeOf(freeFormArgs).toEqualTypeOf<FreeFormArgv>();
 
 const structuredArgs: StructuredArgv = {
-  country: "France",
   city: "Paris",
-  format: "geojson",
+  country: "France",
+  format: "json",
   limit: 5,
 };
 

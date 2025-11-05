@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+import type { DataFetcherOptions, RetryConfig } from "./_shared.types";
 import { CacheManager } from "./cacheManager";
 import {
   FETCHER_BASE_URL,
@@ -32,7 +33,59 @@ import {
 } from "./constants";
 import { RateLimiter } from "./rateLimiter";
 
-import type { DataFetcherOptions, RetryConfig } from "./_shared.types";
+/**
+ * Singleton cache manager instance
+ * Persists across all dataFetcher calls
+ */
+let cacheInstance: CacheManager | null = null;
+
+/**
+ * Singleton rate limiter instance
+ * Persists across all dataFetcher calls
+ */
+let rateLimiterInstance: RateLimiter | null = null;
+
+/**
+ * Get or create the cache manager instance
+ *
+ * @param config Cache configuration
+ * @returns Cache manager instance
+ */
+const getCacheManager = (config: DataFetcherOptions["cache"]): CacheManager => {
+  cacheInstance ??= new CacheManager({
+    ...DEFAULT_CACHE_CONFIG,
+    ...config,
+  });
+
+  return cacheInstance;
+};
+
+/**
+ * Get or create the rate limiter instance
+ *
+ * @param config Rate limiter configuration
+ * @returns Rate limiter instance
+ */
+const getRateLimiter = (
+  config: DataFetcherOptions["rateLimit"],
+): RateLimiter => {
+  rateLimiterInstance ??= new RateLimiter({
+    ...DEFAULT_RATE_LIMIT_CONFIG,
+    ...config,
+  });
+
+  return rateLimiterInstance;
+};
+
+/**
+ * Reset singleton instances (useful for testing)
+ *
+ * @internal
+ */
+export const resetDataFetcherInstances = (): void => {
+  cacheInstance = null;
+  rateLimiterInstance = null;
+};
 
 /**
  * Calculate delay with exponential backoff and optional jitter
@@ -156,15 +209,8 @@ export const dataFetcher = async <T = unknown>(
     ...retryConfig,
   };
 
-  const cache = new CacheManager({
-    ...DEFAULT_CACHE_CONFIG,
-    ...cacheConfig,
-  });
-
-  const rateLimiter = new RateLimiter({
-    ...DEFAULT_RATE_LIMIT_CONFIG,
-    ...rateLimitConfig,
-  });
+  const cache = getCacheManager(cacheConfig);
+  const rateLimiter = getRateLimiter(rateLimitConfig);
 
   if (cache.isEnabled()) {
     const cachedResponse = cache.get(endpoint, params);

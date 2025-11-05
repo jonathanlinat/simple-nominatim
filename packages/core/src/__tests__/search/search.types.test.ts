@@ -28,7 +28,7 @@ import type { FreeFormSearchParams, StructuredSearchParams } from "../../index";
 
 expectTypeOf<FreeFormSearchParams>().toEqualTypeOf<{ query: string }>();
 
-expectTypeOf<StructuredSearchParams>().toMatchTypeOf<{
+expectTypeOf<StructuredSearchParams>().toExtend<{
   amenity?: string;
   city?: string;
   country?: string;

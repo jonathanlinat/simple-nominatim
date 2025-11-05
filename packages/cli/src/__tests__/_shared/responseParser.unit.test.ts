@@ -22,17 +22,17 @@
  * SOFTWARE.
  */
 
+import type { MockInstance } from "vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { responseParser } from "../../_shared/responseParser";
 
-describe("responseParser", () => {
-  let consoleLogSpy: ReturnType<typeof vi.fn>;
-  let consoleErrorSpy: ReturnType<typeof vi.fn>;
-  let processExitSpy: ReturnType<typeof vi.fn>;
+describe("shared:response-parser", () => {
+  let consoleLogSpy: MockInstance<typeof console.log>;
+  let consoleErrorSpy: MockInstance<typeof console.error>;
+  let processExitSpy: MockInstance<typeof process.exit>;
 
   beforeEach(() => {
-    vi.useFakeTimers();
     consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     processExitSpy = vi
@@ -41,238 +41,287 @@ describe("responseParser", () => {
   });
 
   afterEach(() => {
-    consoleLogSpy.mockRestore();
-    consoleErrorSpy.mockRestore();
-    processExitSpy.mockRestore();
-    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   describe("successful responses", () => {
-    it("should output JSON string for various response types", async () => {
-      const objectResponse = { place_id: 123, name: "Test Place" };
-
-      await responseParser(Promise.resolve(objectResponse));
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        JSON.stringify(objectResponse),
-      );
-
-      consoleLogSpy.mockClear();
-      const arrayResponse = [
-        { place_id: 1, name: "Place 1" },
-        { place_id: 2, name: "Place 2" },
-      ];
-
-      await responseParser(Promise.resolve(arrayResponse));
-      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(arrayResponse));
-
-      consoleLogSpy.mockClear();
-      await responseParser(Promise.resolve("OK"));
-      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify("OK"));
-
-      consoleLogSpy.mockClear();
-      await responseParser(Promise.resolve(42));
-      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(42));
-
-      consoleLogSpy.mockClear();
-      await responseParser(Promise.resolve(true));
-      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(true));
-
-      consoleLogSpy.mockClear();
-      await responseParser(Promise.resolve(null));
-      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(null));
-
-      expect(consoleErrorSpy).not.toHaveBeenCalled();
-    });
-
-    it("should handle complex and empty data structures", async () => {
-      const complexResponse = {
-        place_id: 123,
-        address: {
-          city: "London",
-          country: "UK",
-          coordinates: { lat: 51.5074, lon: -0.1278 },
-        },
-        tags: ["city", "capital"],
-      };
-
-      await responseParser(Promise.resolve(complexResponse));
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        JSON.stringify(complexResponse),
-      );
-
-      consoleLogSpy.mockClear();
-      await responseParser(Promise.resolve({}));
-      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify({}));
-
-      consoleLogSpy.mockClear();
-      await responseParser(Promise.resolve([]));
-      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify([]));
-
-      expect(consoleErrorSpy).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("error handling", () => {
-    const errorScenarios = [
-      {
-        name: "rate limit errors",
-        error: new Error("HTTP error! Status: 429. Text: Too Many Requests"),
-        expectedMessage:
-          "Rate limit exceeded. Please try again later or reduce request frequency.",
-      },
-      {
-        name: "500 server errors",
-        error: new Error(
-          "HTTP error! Status: 500. Text: Internal Server Error",
-        ),
-        expectedMessage:
-          "Nominatim API is currently unavailable. Please try again later.",
-      },
-      {
-        name: "503 server errors",
-        error: new Error("HTTP error! Status: 503. Text: Service Unavailable"),
-        expectedMessage:
-          "Nominatim API is currently unavailable. Please try again later.",
-      },
-      {
-        name: "400 client errors",
-        error: new Error("HTTP error! Status: 400. Text: Bad Request"),
-        expectedMessage:
-          "Request failed. Please check your parameters and try again.",
-      },
-      {
-        name: "404 client errors",
-        error: new Error("HTTP error! Status: 404. Text: Not Found"),
-        expectedMessage:
-          "Request failed. Please check your parameters and try again.",
-      },
-      {
-        name: "network failures",
-        error: new Error("Network failure"),
-        expectedMessage:
-          "Network connection failed. Please check your internet connection.",
-      },
-      {
-        name: "network timeouts",
-        error: new Error("network timeout"),
-        expectedMessage:
-          "Network connection failed. Please check your internet connection.",
-      },
-      {
-        name: "fetch failures",
-        error: new Error("fetch failed"),
-        expectedMessage:
-          "Network connection failed. Please check your internet connection.",
-      },
-      {
-        name: "retry exhaustion",
-        error: new Error("Request failed after all retry attempts"),
-        expectedMessage:
-          "Request failed after multiple retry attempts. Please try again later.",
-      },
-    ];
-
-    for (const { name, error, expectedMessage } of errorScenarios) {
-      it(`should handle ${name} with specific message`, async () => {
-        await responseParser(Promise.reject(error));
-        expect(consoleErrorSpy).toHaveBeenCalledWith(expectedMessage);
-        expect(processExitSpy).toHaveBeenCalledWith(1);
-      });
-    }
-
-    it("should handle generic errors with error message", async () => {
-      const errorCases = [
-        { input: new Error("Generic error"), expected: "Error: Generic error" },
-        {
-          input: "String error message",
-          expected: "Error: String error message",
-        },
-        { input: 404, expected: "Error: 404" },
-        {
-          input: { message: "Custom error", code: "ERR_CUSTOM" },
-          expected: null,
-        },
-      ];
-
-      for (const { input, expected } of errorCases) {
-        await responseParser(Promise.reject(input));
-
-        if (expected) {
-          expect(consoleErrorSpy).toHaveBeenCalledWith(expected);
-        } else {
-          expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-        }
-
-        expect(processExitSpy).toHaveBeenCalledWith(1);
-        consoleErrorSpy.mockClear();
-        processExitSpy.mockClear();
-      }
-    });
-
-    it("should not log to stdout on error", async () => {
-      await responseParser(Promise.reject(new Error("Test error")));
-      expect(consoleLogSpy).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("promise handling", () => {
-    it("should wait for promise to resolve", async () => {
-      const response = { data: "test" };
-      const promise = new Promise<typeof response>((resolve) => {
-        setTimeout(() => resolve(response), 10);
-      });
-
-      const resultPromise = responseParser(promise);
-
-      await vi.advanceTimersByTimeAsync(10);
-      await resultPromise;
-
-      expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(response));
-      expect(processExitSpy).not.toHaveBeenCalled();
-    });
-
-    it("should wait for promise to reject", async () => {
-      const error = new Error("Async error");
-      const promise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(error), 10);
-      });
-
-      const resultPromise = responseParser(promise);
-
-      await vi.advanceTimersByTimeAsync(10);
-      await resultPromise;
-
-      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-      expect(consoleErrorSpy).toHaveBeenCalledWith("Error: Async error");
-      expect(processExitSpy).toHaveBeenCalledWith(1);
-    });
-  });
-
-  describe("type safety", () => {
-    it("should handle typed generic responses", async () => {
-      interface Place {
-        place_id: number;
-        name: string;
-      }
-
-      const response: Place = { place_id: 123, name: "Test" };
-      const promise = Promise.resolve(response);
-
-      await responseParser<Place>(promise);
-
-      expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(response));
-    });
-
-    it("should handle unknown type responses", async () => {
-      const response: unknown = { data: "test" };
-      const promise = Promise.resolve(response);
+    it("should output JSON response to console", async () => {
+      const mockResponse = { lat: "48.8566", lon: "2.3522", name: "Paris" };
+      const promise = Promise.resolve(mockResponse);
 
       await responseParser(promise);
 
       expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(response));
+      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(mockResponse));
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(processExitSpy).not.toHaveBeenCalled();
+    });
+
+    it("should handle array responses", async () => {
+      const mockResponse = [
+        { place_id: 1, name: "Paris" },
+        { place_id: 2, name: "London" },
+      ];
+      const promise = Promise.resolve(mockResponse);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).toHaveBeenCalledTimes(1);
+      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(mockResponse));
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(processExitSpy).not.toHaveBeenCalled();
+    });
+
+    it("should handle empty object responses", async () => {
+      const mockResponse = {};
+      const promise = Promise.resolve(mockResponse);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).toHaveBeenCalledTimes(1);
+      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(mockResponse));
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(processExitSpy).not.toHaveBeenCalled();
+    });
+
+    it("should handle null responses", async () => {
+      const mockResponse = null;
+      const promise = Promise.resolve(mockResponse);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).toHaveBeenCalledTimes(1);
+      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(mockResponse));
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(processExitSpy).not.toHaveBeenCalled();
+    });
+
+    it("should handle string responses", async () => {
+      const mockResponse = "OK";
+      const promise = Promise.resolve(mockResponse);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).toHaveBeenCalledTimes(1);
+      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(mockResponse));
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(processExitSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("rate limit errors", () => {
+    it("should handle HTTP 429 rate limit error", async () => {
+      const error = new Error("HTTP error! Status: 429");
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Rate limit exceeded. Please try again later or reduce request frequency.",
+      );
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe("server errors", () => {
+    it("should handle HTTP 500 server error", async () => {
+      const error = new Error("HTTP error! Status: 500");
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Nominatim API is currently unavailable. Please try again later.",
+      );
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle HTTP 502 bad gateway error", async () => {
+      const error = new Error("HTTP error! Status: 502");
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Nominatim API is currently unavailable. Please try again later.",
+      );
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle HTTP 503 service unavailable error", async () => {
+      const error = new Error("HTTP error! Status: 503");
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Nominatim API is currently unavailable. Please try again later.",
+      );
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe("client errors", () => {
+    it("should handle HTTP 400 bad request error", async () => {
+      const error = new Error("HTTP error! Status: 400");
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Request failed. Please check your parameters and try again.",
+      );
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle HTTP 404 not found error", async () => {
+      const error = new Error("HTTP error! Status: 404");
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Request failed. Please check your parameters and try again.",
+      );
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe("network errors", () => {
+    it("should handle network error with Network keyword", async () => {
+      const error = new Error("Network request failed");
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Network connection failed. Please check your internet connection.",
+      );
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle network error with lowercase network keyword", async () => {
+      const error = new Error("network timeout occurred");
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Network connection failed. Please check your internet connection.",
+      );
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle fetch failed error", async () => {
+      const error = new Error("fetch failed");
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Network connection failed. Please check your internet connection.",
+      );
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe("retry errors", () => {
+    it("should handle retry exhaustion error", async () => {
+      const error = new Error("Request failed after all retry attempts");
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Request failed after multiple retry attempts. Please try again later.",
+      );
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe("generic errors", () => {
+    it("should handle generic Error instances", async () => {
+      const error = new Error("Something went wrong");
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error: Something went wrong",
+      );
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle non-Error thrown values", async () => {
+      const error = "String error";
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith("Error: String error");
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle numeric error values", async () => {
+      const error = 404;
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith("Error: 404");
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it("should handle object error values", async () => {
+      const error = { code: "ERR_UNKNOWN", details: "Unknown error" };
+      const promise = Promise.reject(error);
+
+      await responseParser(promise);
+
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith("Error: [object Object]");
+      expect(processExitSpy).toHaveBeenCalledTimes(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1);
     });
   });
 });

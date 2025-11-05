@@ -9,7 +9,7 @@
   "bugs": "https://github.com/jonathanlinat/simple-nominatim/issues",
   "dependencies": {
     "@simple-nominatim/core": "workspace:*",
-    "commander": "^14.0.1",
+    "commander": "^14.0.2",
     "zod": "^4.1.12"
   },
   "devDependencies": {

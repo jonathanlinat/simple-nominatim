@@ -22,22 +22,38 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from "vitest";
-
 import type { StatusFormat } from "@simple-nominatim/core";
+import { expectTypeOf } from "vitest";
 
 import type { ServiceStatusArgv } from "../../status/status.types";
 
-expectTypeOf<ServiceStatusArgv>().toMatchTypeOf<{
+expectTypeOf<ServiceStatusArgv>().toMatchObjectType<{
   format: StatusFormat;
+  noCache?: boolean;
+  cacheTtl?: number;
+  cacheMaxSize?: number;
+  noRateLimit?: boolean;
+  rateLimit?: number;
+  rateLimitInterval?: number;
+  noRetry?: boolean;
+  retryMaxAttempts?: number;
+  retryInitialDelay?: number;
 }>();
 
 expectTypeOf<ServiceStatusArgv>()
   .toHaveProperty("format")
   .toEqualTypeOf<StatusFormat>();
+expectTypeOf<ServiceStatusArgv>()
+  .toHaveProperty("noCache")
+  .toEqualTypeOf<boolean | undefined>();
+expectTypeOf<ServiceStatusArgv>()
+  .toHaveProperty("cacheTtl")
+  .toEqualTypeOf<number | undefined>();
 
 const statusArgs: ServiceStatusArgv = {
   format: "json",
+  noCache: false,
+  cacheTtl: 3600000,
 };
 
 expectTypeOf(statusArgs).toEqualTypeOf<ServiceStatusArgv>();

@@ -62,6 +62,7 @@ const buildApiOptions = (argv: GeocodeReverseArgv) => {
     polygonSvg,
     polygonText,
     polygonThreshold,
+    jsonCallback,
     debug,
   } = argv;
 
@@ -82,6 +83,7 @@ const buildApiOptions = (argv: GeocodeReverseArgv) => {
     ...(polygonThreshold !== undefined && {
       polygon_threshold: polygonThreshold,
     }),
+    ...(jsonCallback && { json_callback: jsonCallback }),
     ...(debug !== undefined && { debug }),
   };
 };

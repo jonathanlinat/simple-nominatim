@@ -22,17 +22,39 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from "vitest";
-
 import type { OutputFormat } from "@simple-nominatim/core";
+import { expectTypeOf } from "vitest";
 
 import type { GeocodeReverseArgv } from "../../reverse/reverse.types";
 
-expectTypeOf<GeocodeReverseArgv>().toMatchTypeOf<{
-  email?: string;
-  format: OutputFormat;
+expectTypeOf<GeocodeReverseArgv>().toMatchObjectType<{
   latitude: string;
   longitude: string;
+  format: OutputFormat;
+  email?: string;
+  addressdetails?: 0 | 1;
+  extratags?: 0 | 1;
+  namedetails?: 0 | 1;
+  entrances?: 0 | 1;
+  acceptLanguage?: string;
+  zoom?: number;
+  layer?: string;
+  polygonGeojson?: 0 | 1;
+  polygonKml?: 0 | 1;
+  polygonSvg?: 0 | 1;
+  polygonText?: 0 | 1;
+  polygonThreshold?: number;
+  jsonCallback?: string;
+  debug?: 0 | 1;
+  noCache?: boolean;
+  cacheTtl?: number;
+  cacheMaxSize?: number;
+  noRateLimit?: boolean;
+  rateLimit?: number;
+  rateLimitInterval?: number;
+  noRetry?: boolean;
+  retryMaxAttempts?: number;
+  retryInitialDelay?: number;
 }>();
 
 expectTypeOf<GeocodeReverseArgv>()
@@ -47,12 +69,20 @@ expectTypeOf<GeocodeReverseArgv>()
 expectTypeOf<GeocodeReverseArgv>()
   .toHaveProperty("email")
   .toEqualTypeOf<string | undefined>();
+expectTypeOf<GeocodeReverseArgv>()
+  .toHaveProperty("addressdetails")
+  .toEqualTypeOf<0 | 1 | undefined>();
+expectTypeOf<GeocodeReverseArgv>()
+  .toHaveProperty("zoom")
+  .toEqualTypeOf<number | undefined>();
 
 const reverseArgs: GeocodeReverseArgv = {
   latitude: "48.8584",
   longitude: "2.2945",
   format: "json",
   email: "test@example.com",
+  addressdetails: 1,
+  zoom: 18,
 };
 
 expectTypeOf(reverseArgs).toEqualTypeOf<GeocodeReverseArgv>();
