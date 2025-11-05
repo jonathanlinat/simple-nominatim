@@ -30,8 +30,8 @@ import type {
   DataFetcherOptions,
   OutputFormat,
   RateLimitConfig,
-  ReverseOptions,
   RetryConfig,
+  ReverseOptions,
   SearchOptions,
 } from "../../index";
 
@@ -39,18 +39,18 @@ expectTypeOf<OutputFormat>().toEqualTypeOf<
   "xml" | "json" | "jsonv2" | "geojson" | "geocodejson"
 >();
 
-expectTypeOf<BaseOptions>().toMatchTypeOf<{
+expectTypeOf<BaseOptions>().toExtend<{
   email?: string;
   format: OutputFormat;
   cache?: CacheConfig;
   rateLimit?: RateLimitConfig;
 }>();
 
-expectTypeOf<SearchOptions>().toMatchTypeOf<BaseOptions>();
-expectTypeOf<SearchOptions>().toMatchTypeOf<{ limit?: number }>();
+expectTypeOf<SearchOptions>().toExtend<BaseOptions>();
+expectTypeOf<SearchOptions>().toExtend<{ limit?: number }>();
 
-expectTypeOf<ReverseOptions>().toMatchTypeOf<BaseOptions>();
-expectTypeOf<ReverseOptions>().toMatchTypeOf<{ zoom?: number }>();
+expectTypeOf<ReverseOptions>().toExtend<BaseOptions>();
+expectTypeOf<ReverseOptions>().toExtend<{ zoom?: number }>();
 
 expectTypeOf<RetryConfig>().toEqualTypeOf<{
   enabled?: boolean;

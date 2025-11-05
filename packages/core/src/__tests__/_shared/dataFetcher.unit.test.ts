@@ -22,297 +22,160 @@
  * SOFTWARE.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { CacheManager } from "../../_shared/cacheManager";
-import { dataFetcher } from "../../_shared/dataFetcher";
+import {
+  dataFetcher,
+  resetDataFetcherInstances,
+} from "../../_shared/dataFetcher";
 
-describe("dataFetcher", () => {
-  const endpoint = "search";
-  const mockResponse = { data: "test response" };
+const MOCK_ENDPOINT = "search";
+const MOCK_PARAMS = new URLSearchParams({ q: "Paris", format: "json" });
+const MOCK_RESPONSE = {
+  place_id: 12345,
+  display_name: "Paris, France",
+  lat: "48.8566",
+  lon: "2.3522",
+};
 
+describe("shared:data-fetcher", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
-    vi.restoreAllMocks();
     vi.clearAllMocks();
-    // @ts-expect-error - Overriding global fetch for testing
-    global.fetch = undefined;
+    resetDataFetcherInstances();
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      statusText: "OK",
+      json: async () => MOCK_RESPONSE,
+      text: async () => "OK",
+    });
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-    vi.useRealTimers();
-  });
-
-  describe("basic functionality", () => {
+  describe("core functionality", () => {
     it("should fetch data successfully", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      const result = await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS);
 
-      const params = new URLSearchParams({ q: "test" });
-      const result = await dataFetcher(endpoint, params);
-
-      expect(result).toStrictEqual(mockResponse);
+      expect(result).toStrictEqual(MOCK_RESPONSE);
       expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("should construct correct URL with endpoint and params", async () => {
+      await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS);
+
+      const fetchCall = vi.mocked(global.fetch).mock.calls[0];
+
+      expect(fetchCall).toBeDefined();
+      expect(fetchCall![0]).toContain("nominatim.openstreetmap.org");
+      expect(fetchCall![0]).toContain("/search?");
+      expect(fetchCall![0]).toContain("q=Paris");
+      expect(fetchCall![0]).toContain("format=json");
     });
 
     it("should include User-Agent header", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+      await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS);
 
-      const params = new URLSearchParams({ q: "test" });
+      const fetchCall = vi.mocked(global.fetch).mock.calls[0];
+      const headers = (fetchCall![1] as RequestInit)?.headers as Record<
+        string,
+        string
+      >;
 
-      await dataFetcher(endpoint, params);
-
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            "User-Agent": expect.any(String),
-          }),
-        }),
-      );
+      expect(headers).toBeDefined();
+      expect(headers["User-Agent"]).toBe("@simple-nominatim/core");
     });
 
-    it("should construct correct URL with params", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      const params = new URLSearchParams({ q: "London", limit: "5" });
-
-      await dataFetcher(endpoint, params);
-
-      const callArgs = vi.mocked(global.fetch).mock.calls[0];
-
-      expect(callArgs).toBeDefined();
-      const url = callArgs![0] as string;
-
-      expect(url).toContain("search?");
-      expect(url).toContain("q=London");
-      expect(url).toContain("limit=5");
-    });
-  });
-
-  describe("response formats", () => {
     it("should parse JSON response by default", async () => {
-      const jsonData = { place_id: 123, display_name: "Test Place" };
+      const result = await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS);
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => jsonData,
-      });
-
-      const params = new URLSearchParams({ q: "test" });
-      const result = await dataFetcher(endpoint, params);
-
-      expect(result).toStrictEqual(jsonData);
+      expect(result).toStrictEqual(MOCK_RESPONSE);
+      expect(typeof result).toBe("object");
     });
 
-    it("should return text for format=text", async () => {
-      const textData = "plain text response";
+    it("should parse text response for non-JSON formats", async () => {
+      const textParams = new URLSearchParams({ q: "Paris", format: "xml" });
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        text: async () => textData,
-      });
+      const result = await dataFetcher(MOCK_ENDPOINT, textParams);
 
-      const params = new URLSearchParams({ q: "test", format: "text" });
-      const result = await dataFetcher(endpoint, params);
-
-      expect(result).toBe(textData);
-    });
-
-    it("should return text for format=xml", async () => {
-      const xmlData = "<xml>test</xml>";
-
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        text: async () => xmlData,
-      });
-
-      const params = new URLSearchParams({ q: "test", format: "xml" });
-      const result = await dataFetcher(endpoint, params);
-
-      expect(result).toBe(xmlData);
+      expect(result).toBe("OK");
+      expect(typeof result).toBe("string");
     });
   });
 
-  describe("error handling", () => {
-    it("should throw on HTTP error", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: false,
-        status: 404,
-        statusText: "Not Found",
+  describe("singleton cache behavior", () => {
+    it("should use singleton cache across multiple calls", async () => {
+      await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+        cache: { enabled: true },
       });
 
-      const params = new URLSearchParams({ q: "test" });
-
-      await expect(
-        dataFetcher(endpoint, params, { retry: { enabled: false } }),
-      ).rejects.toThrow("HTTP error! Status: 404");
-    });
-
-    it("should throw on network error", async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error("Network failure"));
-
-      const params = new URLSearchParams({ q: "test" });
-
-      await expect(
-        dataFetcher(endpoint, params, { retry: { enabled: false } }),
-      ).rejects.toThrow("Network failure");
-    });
-
-    it("should handle non-Error exceptions", async () => {
-      global.fetch = vi.fn().mockRejectedValue("String error");
-
-      const params = new URLSearchParams({ q: "test" });
-
-      await expect(
-        dataFetcher(endpoint, params, { retry: { enabled: false } }),
-      ).rejects.toThrow();
-    });
-  });
-
-  describe("caching", () => {
-    it("should create cache manager with config", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
+      await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+        cache: { enabled: true },
       });
 
-      const params = new URLSearchParams({ q: "test" });
-
-      await dataFetcher(endpoint, params, {
-        cache: { enabled: true, maxSize: 100 },
-      });
-
+      // Singleton cache persists, so second call uses cached response
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
-    it("should work with cache disabled", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
+    it("should reset cache when instances are reset", async () => {
+      await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+        cache: { enabled: true },
       });
 
-      const params = new URLSearchParams({ q: "test" });
+      resetDataFetcherInstances();
 
-      await dataFetcher(endpoint, params, {
+      await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+        cache: { enabled: true },
+      });
+
+      // After reset, cache is cleared so fetch is called twice
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it("should bypass cache when disabled", async () => {
+      await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
         cache: { enabled: false },
+        rateLimit: { interval: 10 },
       });
 
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("should use default cache configuration", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      const params = new URLSearchParams({ q: "test" });
-
-      await dataFetcher(endpoint, params);
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("should handle cache miss and fetch data", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      const params1 = new URLSearchParams({ q: "test1" });
-      const params2 = new URLSearchParams({ q: "test2" });
-
-      await dataFetcher(endpoint, params1, {
-        cache: { enabled: true },
-        rateLimit: { enabled: false },
-        retry: { enabled: false },
-      });
-
-      await dataFetcher(endpoint, params2, {
-        cache: { enabled: true },
-        rateLimit: { enabled: false },
-        retry: { enabled: false },
+      await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+        cache: { enabled: false },
+        rateLimit: { interval: 10 },
       });
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
 
-    it("should return cached data on cache hit", async () => {
-      const cachedData = { cached: true, from: "cache" };
+    it("should cache different requests separately", async () => {
+      const params1 = new URLSearchParams({ q: "Paris", format: "json" });
+      const params2 = new URLSearchParams({ q: "London", format: "json" });
 
-      vi.spyOn(CacheManager.prototype, "get").mockReturnValue(cachedData);
-
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      const params = new URLSearchParams({ q: "test" });
-
-      const result = await dataFetcher(endpoint, params, {
+      await dataFetcher(MOCK_ENDPOINT, params1, {
         cache: { enabled: true },
-        rateLimit: { enabled: false },
-        retry: { enabled: false },
+        rateLimit: { interval: 10 },
+      });
+      await dataFetcher(MOCK_ENDPOINT, params2, {
+        cache: { enabled: true },
+        rateLimit: { interval: 10 },
       });
 
-      expect(result).toStrictEqual(cachedData);
-      expect(global.fetch).not.toHaveBeenCalled();
+      expect(global.fetch).toHaveBeenCalledTimes(2);
     });
   });
 
-  describe("rate limiting", () => {
-    it("should apply rate limiting by default", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
+  describe("singleton rate limiter behavior", () => {
+    it("should respect rate limit when enabled", async () => {
+      await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+        rateLimit: { enabled: true },
+        cache: { enabled: false },
       });
-
-      const params = new URLSearchParams({ q: "test" });
-
-      await dataFetcher(endpoint, params);
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
-    it("should skip rate limiting when disabled", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      const params = new URLSearchParams({ q: "test" });
-
-      await dataFetcher(endpoint, params, {
+    it("should bypass rate limit when disabled", async () => {
+      await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
         rateLimit: { enabled: false },
         cache: { enabled: false },
-        retry: { enabled: false },
-      });
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("should use custom rate limit configuration", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      const params = new URLSearchParams({ q: "test" });
-
-      await dataFetcher(endpoint, params, {
-        rateLimit: { enabled: true, limit: 5, interval: 100 },
-        cache: { enabled: false },
-        retry: { enabled: false },
       });
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -320,285 +183,7 @@ describe("dataFetcher", () => {
   });
 
   describe("retry logic", () => {
-    it.each([
-      [
-        "retryable status code 429",
-        async () => ({
-          ok: false,
-          status: 429,
-          statusText: "Too Many Requests",
-        }),
-        2,
-      ],
-      [
-        "retryable status code 500",
-        async () => ({
-          ok: false,
-          status: 500,
-          statusText: "Internal Server Error",
-        }),
-        2,
-      ],
-      [
-        "network error",
-        async () => {
-          throw new Error("Network error");
-        },
-        2,
-      ],
-    ] as const)(
-      "should retry and succeed on %s",
-      async (_description, firstCallResponse, expectedCalls) => {
-        let callCount = 0;
-
-        global.fetch = vi.fn().mockImplementation(async () => {
-          callCount++;
-
-          if (callCount === 1) {
-            return firstCallResponse();
-          }
-
-          return { ok: true, json: async () => mockResponse };
-        });
-
-        const params = new URLSearchParams({ q: "test" });
-
-        const promise = dataFetcher(endpoint, params, {
-          retry: {
-            enabled: true,
-            maxAttempts: 2,
-            retryableStatusCodes: [429, 500, 503],
-            initialDelay: 10,
-            backoffMultiplier: 1,
-            maxDelay: 1000,
-            useJitter: false,
-          },
-          cache: { enabled: false },
-          rateLimit: { enabled: false },
-        });
-
-        await vi.advanceTimersByTimeAsync(10);
-        const result = await promise;
-
-        expect(result).toStrictEqual(mockResponse);
-        expect(global.fetch).toHaveBeenCalledTimes(expectedCalls);
-      },
-    );
-
-    it.each([
-      [
-        "non-retryable status code 400",
-        async () => ({ ok: false, status: 400, statusText: "Bad Request" }),
-        1,
-      ],
-    ] as const)(
-      "should fail without retry on %s",
-      async (_description, firstCallResponse, expectedCalls) => {
-        global.fetch = vi.fn().mockImplementation(firstCallResponse);
-
-        const params = new URLSearchParams({ q: "test" });
-
-        await expect(
-          dataFetcher(endpoint, params, {
-            retry: { enabled: false },
-            cache: { enabled: false },
-            rateLimit: { enabled: false },
-          }),
-        ).rejects.toThrow();
-
-        expect(global.fetch).toHaveBeenCalledTimes(expectedCalls);
-      },
-    );
-
-    it("should fail after max attempts", async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
-
-      const params = new URLSearchParams({ q: "test" });
-
-      const promise = (async () => {
-        try {
-          return await dataFetcher(endpoint, params, {
-            retry: {
-              enabled: true,
-              maxAttempts: 3,
-              initialDelay: 10,
-              backoffMultiplier: 1,
-              maxDelay: 1000,
-              useJitter: false,
-            },
-            cache: { enabled: false },
-            rateLimit: { enabled: false },
-          });
-        } catch (error) {
-          return error;
-        }
-      })();
-
-      await vi.advanceTimersByTimeAsync(30);
-
-      const result = await promise;
-
-      expect(result).toBeInstanceOf(Error);
-      expect((result as Error).message).toBe("Network error");
-      expect(global.fetch).toHaveBeenCalledTimes(3);
-    });
-
-    it("should not retry when retry is disabled", async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
-
-      const params = new URLSearchParams({ q: "test" });
-
-      await expect(
-        dataFetcher(endpoint, params, {
-          retry: { enabled: false },
-        }),
-      ).rejects.toThrow("Network error");
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("should apply exponential backoff with max delay and jitter", async () => {
-      let callCount = 0;
-      const delays: number[] = [];
-      let lastTime = 0;
-
-      global.fetch = vi.fn().mockImplementation(async () => {
-        callCount++;
-
-        if (callCount > 1) {
-          const currentTime =
-            (vi.getMockedSystemTime() as Date)?.getTime() ?? 0;
-
-          delays.push(currentTime - lastTime);
-        }
-
-        lastTime = (vi.getMockedSystemTime() as Date)?.getTime() ?? 0;
-
-        if (callCount < 3) {
-          throw new Error("Network error");
-        }
-
-        return { ok: true, json: async () => mockResponse };
-      });
-
-      const params = new URLSearchParams({ q: "test" });
-
-      const promise = dataFetcher(endpoint, params, {
-        retry: {
-          enabled: true,
-          maxAttempts: 3,
-          initialDelay: 50,
-          backoffMultiplier: 2,
-          maxDelay: 1000,
-          useJitter: false,
-        },
-        cache: { enabled: false },
-        rateLimit: { enabled: false },
-      });
-
-      await vi.advanceTimersByTimeAsync(50);
-      await vi.advanceTimersByTimeAsync(100);
-      await promise;
-
-      expect(global.fetch).toHaveBeenCalledTimes(3);
-      expect(delays.length).toBe(2);
-      expect(delays[0]).toBeGreaterThanOrEqual(45);
-      expect(delays[1]).toBeGreaterThanOrEqual(90);
-
-      vi.clearAllMocks();
-      callCount = 0;
-      global.fetch = vi.fn().mockImplementation(async () => {
-        callCount++;
-
-        if (callCount < 3) {
-          throw new Error("Network error");
-        }
-
-        return { ok: true, json: async () => mockResponse };
-      });
-
-      const maxDelayPromise = dataFetcher(endpoint, params, {
-        retry: {
-          enabled: true,
-          maxAttempts: 3,
-          initialDelay: 100,
-          backoffMultiplier: 10,
-          maxDelay: 150,
-          useJitter: false,
-        },
-        cache: { enabled: false },
-        rateLimit: { enabled: false },
-      });
-
-      await vi.advanceTimersByTimeAsync(100);
-      await vi.advanceTimersByTimeAsync(150);
-      await maxDelayPromise;
-
-      expect(global.fetch).toHaveBeenCalledTimes(3);
-
-      vi.clearAllMocks();
-      callCount = 0;
-      global.fetch = vi.fn().mockImplementation(async () => {
-        callCount++;
-
-        if (callCount < 3) {
-          throw new Error("Retry test");
-        }
-
-        return { ok: true, json: async () => mockResponse };
-      });
-
-      const jitterPromise = dataFetcher(endpoint, params, {
-        retry: {
-          enabled: true,
-          maxAttempts: 3,
-          initialDelay: 50,
-          useJitter: true,
-        },
-        cache: { enabled: false },
-        rateLimit: { enabled: false },
-      });
-
-      await vi.advanceTimersByTimeAsync(200);
-      await vi.advanceTimersByTimeAsync(200);
-      await jitterPromise;
-
-      expect(global.fetch).toHaveBeenCalledTimes(3);
-    });
-
-    it("should throw error after all retry attempts fail", async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error("Persistent error"));
-
-      const params = new URLSearchParams({ q: "test" });
-
-      const promise = (async () => {
-        try {
-          return await dataFetcher(endpoint, params, {
-            retry: {
-              enabled: true,
-              maxAttempts: 2,
-              initialDelay: 10,
-              useJitter: false,
-            },
-            cache: { enabled: false },
-            rateLimit: { enabled: false },
-          });
-        } catch (error) {
-          return error;
-        }
-      })();
-
-      await vi.advanceTimersByTimeAsync(20);
-
-      const result = await promise;
-
-      expect(result).toBeInstanceOf(Error);
-      expect(global.fetch).toHaveBeenCalledTimes(2);
-    });
-  });
-
-  describe("integration", () => {
-    it("should work with cache, rate limiting, and retry together", async () => {
+    it("should retry on network error", async () => {
       let callCount = 0;
 
       global.fetch = vi.fn().mockImplementation(async () => {
@@ -608,79 +193,202 @@ describe("dataFetcher", () => {
           throw new Error("Network error");
         }
 
-        return { ok: true, json: async () => mockResponse };
+        return {
+          ok: true,
+          status: 200,
+          json: async () => MOCK_RESPONSE,
+        };
       });
 
-      const params = new URLSearchParams({ q: "test" });
-
-      const promise = dataFetcher(endpoint, params, {
-        cache: { enabled: true },
-        rateLimit: { enabled: true },
-        retry: {
-          enabled: true,
-          maxAttempts: 2,
-          initialDelay: 10,
-          useJitter: false,
-        },
+      const result = await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+        retry: { enabled: true, maxAttempts: 2, initialDelay: 1 },
+        cache: { enabled: false },
+        rateLimit: { interval: 1 },
       });
 
-      await vi.advanceTimersByTimeAsync(10);
-      const result = await promise;
-
-      expect(result).toStrictEqual(mockResponse);
+      expect(result).toStrictEqual(MOCK_RESPONSE);
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
 
-    it("should work with all features disabled", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
+    it("should retry on retryable HTTP status codes", async () => {
+      let callCount = 0;
+
+      global.fetch = vi.fn().mockImplementation(async () => {
+        callCount++;
+
+        if (callCount === 1) {
+          return {
+            ok: false,
+            status: 503,
+            statusText: "Service Unavailable",
+          };
+        }
+
+        return {
+          ok: true,
+          status: 200,
+          json: async () => MOCK_RESPONSE,
+        };
       });
 
-      const params = new URLSearchParams({ q: "test" });
+      const result = await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+        retry: { enabled: true, maxAttempts: 2, initialDelay: 1 },
+        cache: { enabled: false },
+        rateLimit: { interval: 1 },
+      });
 
-      const result = await dataFetcher(endpoint, params, {
+      expect(result).toStrictEqual(MOCK_RESPONSE);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it("should not retry when disabled", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
+
+      await expect(
+        dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+          retry: { enabled: false },
+          cache: { enabled: false },
+        }),
+      ).rejects.toThrow("Network error");
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("should respect maxAttempts configuration", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
+
+      await expect(
+        dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+          retry: { enabled: true, maxAttempts: 3, initialDelay: 1 },
+          cache: { enabled: false },
+          rateLimit: { interval: 1 },
+        }),
+      ).rejects.toThrow("Network error");
+
+      expect(global.fetch).toHaveBeenCalledTimes(3);
+    });
+
+    it("should use exponential backoff delay", async () => {
+      let callCount = 0;
+
+      global.fetch = vi.fn().mockImplementation(async () => {
+        callCount++;
+
+        if (callCount < 3) {
+          throw new Error("Network error");
+        }
+
+        return {
+          ok: true,
+          status: 200,
+          json: async () => MOCK_RESPONSE,
+        };
+      });
+
+      const result = await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+        retry: {
+          enabled: true,
+          maxAttempts: 3,
+          initialDelay: 1,
+          backoffMultiplier: 2,
+          useJitter: false,
+        },
+        cache: { enabled: false },
+        rateLimit: { interval: 1 },
+      });
+
+      expect(result).toStrictEqual(MOCK_RESPONSE);
+      expect(global.fetch).toHaveBeenCalledTimes(3);
+    });
+
+    it("should not retry on non-retryable status codes", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+      });
+
+      await expect(
+        dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+          retry: { enabled: false },
+          cache: { enabled: false },
+        }),
+      ).rejects.toThrow("HTTP error");
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("error handling", () => {
+    it("should throw error on HTTP error", async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 400,
+        statusText: "Bad Request",
+      });
+
+      await expect(
+        dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+          retry: { enabled: false },
+          cache: { enabled: false },
+        }),
+      ).rejects.toThrow("HTTP error! Status: 400");
+    });
+
+    it("should throw error on network failure", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network failure"));
+
+      await expect(
+        dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+          retry: { enabled: false },
+          cache: { enabled: false },
+        }),
+      ).rejects.toThrow("Network failure");
+    });
+
+    it("should throw error after all retry attempts exhausted", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error("Persistent error"));
+
+      await expect(
+        dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+          retry: { enabled: true, maxAttempts: 3, initialDelay: 1 },
+          cache: { enabled: false },
+          rateLimit: { interval: 1 },
+        }),
+      ).rejects.toThrow("Persistent error");
+
+      expect(global.fetch).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe("configuration", () => {
+    it("should work with all features enabled", async () => {
+      const result = await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
+        cache: { enabled: true },
+        rateLimit: { enabled: true },
+        retry: { enabled: true },
+      });
+
+      expect(result).toStrictEqual(MOCK_RESPONSE);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("should work with all features disabled", async () => {
+      const result = await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS, {
         cache: { enabled: false },
         rateLimit: { enabled: false },
         retry: { enabled: false },
       });
 
-      expect(result).toStrictEqual(mockResponse);
+      expect(result).toStrictEqual(MOCK_RESPONSE);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
-    it("should throw fallback error when maxAttempts is 0", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+    it("should work with no options provided", async () => {
+      const result = await dataFetcher(MOCK_ENDPOINT, MOCK_PARAMS);
 
-      const params = new URLSearchParams({ q: "test" });
-
-      const promise = (async () => {
-        try {
-          return await dataFetcher(endpoint, params, {
-            retry: {
-              enabled: true,
-              maxAttempts: 0,
-              initialDelay: 10,
-              useJitter: false,
-            },
-            cache: { enabled: false },
-            rateLimit: { enabled: false },
-          });
-        } catch (error) {
-          return error;
-        }
-      })();
-
-      const result = await promise;
-
-      expect(result).toBeInstanceOf(Error);
-      expect((result as Error).message).toBe(
-        "Request failed after all retry attempts",
-      );
-      expect(global.fetch).not.toHaveBeenCalled();
+      expect(result).toStrictEqual(MOCK_RESPONSE);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
 });

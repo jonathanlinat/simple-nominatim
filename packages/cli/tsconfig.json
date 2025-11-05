@@ -5,7 +5,7 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "helpers.e2e.test.ts"],
   "references": [
     {
       "path": "../core"

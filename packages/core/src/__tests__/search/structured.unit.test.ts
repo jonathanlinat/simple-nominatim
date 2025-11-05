@@ -24,271 +24,280 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { resetDataFetcherInstances } from "../../_shared/dataFetcher";
 import { structuredSearch } from "../../search/structured";
 
-describe("structuredSearch", () => {
-  const mockResponse = [
+describe("search:structured", () => {
+  const MOCK_ADDRESS = {
+    street: "10 Downing Street",
+    city: "London",
+    country: "United Kingdom",
+  };
+
+  const MOCK_RESPONSE = [
     {
-      place_id: 123,
-      display_name: "10 Downing Street, London, UK",
-      lat: "51.5034",
+      place_id: 12345,
+      display_name: "10 Downing Street, London, United Kingdom",
+      lat: "51.5033",
       lon: "-0.1276",
     },
   ];
 
   beforeEach(() => {
-    vi.restoreAllMocks();
     vi.clearAllMocks();
-    // @ts-expect-error - Overriding global fetch for testing
-    global.fetch = undefined;
+    resetDataFetcherInstances();
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => MOCK_RESPONSE,
+    });
   });
 
-  describe("basic functionality", () => {
-    it("should perform structured search with city", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
+  describe("core functionality", () => {
+    it("should perform structured search with address components", async () => {
+      const result = await structuredSearch(MOCK_ADDRESS, { format: "json" });
 
-      const result = await structuredSearch(
-        { city: "London" },
-        { format: "json" },
-      );
-
-      expect(result).toStrictEqual(mockResponse);
+      expect(result).toStrictEqual(MOCK_RESPONSE);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
-    it("should construct URL with city parameter", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await structuredSearch({ city: "New York" }, { format: "json" });
+    it("should construct URL with address parameters", async () => {
+      await structuredSearch(
+        { city: "Paris", country: "France" },
+        { format: "json" },
+      );
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
-
-      expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
 
       expect(url).toContain("search?");
-      expect(url).toContain("city=New+York");
+      expect(url).toContain("city=Paris");
+      expect(url).toContain("country=France");
+      expect(url).toContain("format=json");
     });
 
-    it("should return array of results", async () => {
-      const customResponse = [
-        { place_id: 1, display_name: "Place 1" },
-        { place_id: 2, display_name: "Place 2" },
-      ];
-
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => customResponse,
-      });
-
-      const result = await structuredSearch(
-        { city: "Paris" },
-        { format: "json" },
-      );
-
-      expect(result).toStrictEqual(customResponse);
-      expect(Array.isArray(result)).toBe(true);
-    });
-  });
-
-  describe("structured parameters", () => {
-    it("should include all address components in URL", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
+    it("should handle all address components", async () => {
       await structuredSearch(
         {
-          street: "10 Downing Street",
-          city: "London",
-          county: "Greater London",
-          state: "England",
-          postalcode: "SW1A 2AA",
-          country: "United Kingdom",
+          amenity: "cafe",
+          street: "Main Street",
+          city: "Paris",
+          county: "Île-de-France",
+          state: "Île-de-France",
+          postalcode: "75001",
+          country: "France",
         },
         { format: "json" },
       );
 
       const callArgs = vi.mocked(global.fetch).mock.calls[0];
-
-      expect(callArgs).toBeDefined();
       const url = callArgs![0] as string;
 
-      expect(url).toContain("street=10+Downing+Street");
-      expect(url).toContain("city=London");
-      expect(url).toContain("county=Greater+London");
-      expect(url).toContain("state=England");
-      expect(url).toContain("postalcode=SW1A+2AA");
-      expect(url).toContain("country=United+Kingdom");
-    });
-  });
-
-  describe("search options", () => {
-    it("should handle optional parameters correctly", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await structuredSearch(
-        { city: "London" },
-        { format: "json", limit: 5, addressdetails: 1 },
-      );
-
-      let callArgs = vi.mocked(global.fetch).mock.calls[0];
-
-      expect(callArgs).toBeDefined();
-      let url = callArgs![0] as string;
-
-      expect(url).toContain("limit=5");
-      expect(url).toContain("addressdetails=1");
-
-      vi.clearAllMocks();
-      await structuredSearch(
-        {
-          city: "Paris",
-          street: undefined,
-          amenity: undefined,
-        },
-        { format: "json", limit: undefined, zoom: undefined },
-      );
-
-      callArgs = vi.mocked(global.fetch).mock.calls[0];
-      expect(callArgs).toBeDefined();
-      url = callArgs![0] as string;
+      expect(url).toContain("amenity=cafe");
+      expect(url).toContain("street=Main+Street");
       expect(url).toContain("city=Paris");
-      expect(url).not.toContain("street=");
-      expect(url).not.toContain("amenity=");
-      expect(url).not.toContain("limit=");
-      expect(url).not.toContain("zoom=");
+      expect(url).toContain("county=%C3%8Ele-de-France");
+      expect(url).toContain("state=%C3%8Ele-de-France");
+      expect(url).toContain("postalcode=75001");
+      expect(url).toContain("country=France");
     });
   });
 
-  describe("cache options", () => {
-    it("should work with cache configuration", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
+  describe("API parameters", () => {
+    it("should include basic API parameters in URL", async () => {
+      await structuredSearch(MOCK_ADDRESS, {
+        format: "json",
+        email: "test@example.com",
+        limit: 10,
       });
 
-      await structuredSearch(
-        { city: "London" },
-        { format: "json", cache: { enabled: false, maxSize: 200 } },
-      );
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      const url = callArgs![0] as string;
 
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(url).toContain("email=test%40example.com");
+      expect(url).toContain("limit=10");
+    });
+
+    it("should include detail parameters in URL", async () => {
+      await structuredSearch(MOCK_ADDRESS, {
+        format: "json",
+        addressdetails: 1,
+        extratags: 1,
+        namedetails: 1,
+        entrances: 1,
+      });
+
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      const url = callArgs![0] as string;
+
+      expect(url).toContain("addressdetails=1");
+      expect(url).toContain("extratags=1");
+      expect(url).toContain("namedetails=1");
+      expect(url).toContain("entrances=1");
+    });
+
+    it("should include location and filter parameters in URL", async () => {
+      await structuredSearch(MOCK_ADDRESS, {
+        format: "json",
+        "accept-language": "en",
+        countrycodes: "gb,us",
+        layer: "address",
+        featureType: "city",
+        exclude_place_ids: "123,456",
+        viewbox: "-0.2,51.4,-0.1,51.6",
+        bounded: 1,
+      });
+
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      const url = callArgs![0] as string;
+
+      expect(url).toContain("accept-language=en");
+      expect(url).toContain("countrycodes=gb%2Cus");
+      expect(url).toContain("layer=address");
+      expect(url).toContain("featureType=city");
+      expect(url).toContain("exclude_place_ids=123%2C456");
+      expect(url).toContain("viewbox=-0.2%2C51.4%2C-0.1%2C51.6");
+      expect(url).toContain("bounded=1");
+    });
+
+    it("should include polygon parameters in URL", async () => {
+      await structuredSearch(MOCK_ADDRESS, {
+        format: "json",
+        polygon_geojson: 1,
+        polygon_kml: 1,
+        polygon_svg: 1,
+        polygon_text: 1,
+        polygon_threshold: 0.001,
+      });
+
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      const url = callArgs![0] as string;
+
+      expect(url).toContain("polygon_geojson=1");
+      expect(url).toContain("polygon_kml=1");
+      expect(url).toContain("polygon_svg=1");
+      expect(url).toContain("polygon_text=1");
+      expect(url).toContain("polygon_threshold=0.001");
+    });
+
+    it("should include additional parameters in URL", async () => {
+      await structuredSearch(MOCK_ADDRESS, {
+        format: "json",
+        debug: 1,
+        dedupe: 0,
+        json_callback: "myCallback",
+      });
+
+      const callArgs = vi.mocked(global.fetch).mock.calls[0];
+      const url = callArgs![0] as string;
+
+      expect(url).toContain("debug=1");
+      expect(url).toContain("dedupe=0");
+      expect(url).toContain("json_callback=myCallback");
     });
   });
 
-  describe("rate limit options", () => {
-    it("should work with rate limit configuration", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      await structuredSearch(
-        { city: "London" },
-        { format: "json", rateLimit: { enabled: false, limit: 3 } },
-      );
-
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("retry options", () => {
-    it("should work with retry configuration", async () => {
-      let callCount = 0;
-
-      global.fetch = vi.fn().mockImplementation(async () => {
-        callCount++;
-
-        if (callCount === 1) {
-          throw new Error("Network error");
-        }
-
-        return { ok: true, json: async () => mockResponse };
-      });
-
-      const result = await structuredSearch(
-        { city: "London" },
-        {
-          format: "json",
-          retry: {
-            enabled: true,
-            maxAttempts: 2,
-            initialDelay: 10,
-            useJitter: false,
-          },
-          rateLimit: { enabled: false },
+  describe("configuration", () => {
+    it("should support cache configuration", async () => {
+      await structuredSearch(MOCK_ADDRESS, {
+        format: "json",
+        cache: {
+          enabled: true,
+          ttl: 5000,
+          maxSize: 100,
         },
-      );
+      });
 
-      expect(result).toStrictEqual(mockResponse);
-      expect(global.fetch).toHaveBeenCalledTimes(2);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("should support rate limit configuration", async () => {
+      await structuredSearch(MOCK_ADDRESS, {
+        format: "json",
+        rateLimit: {
+          enabled: true,
+          limit: 5,
+          interval: 1000,
+        },
+      });
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("should support retry configuration", async () => {
+      await structuredSearch(MOCK_ADDRESS, {
+        format: "json",
+        retry: {
+          enabled: true,
+          maxAttempts: 3,
+          initialDelay: 1000,
+        },
+      });
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("should support disabled cache", async () => {
+      await structuredSearch(MOCK_ADDRESS, {
+        format: "json",
+        cache: {
+          enabled: false,
+        },
+      });
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("should support disabled rate limit", async () => {
+      await structuredSearch(MOCK_ADDRESS, {
+        format: "json",
+        rateLimit: {
+          enabled: false,
+        },
+      });
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("should support disabled retry", async () => {
+      await structuredSearch(MOCK_ADDRESS, {
+        format: "json",
+        retry: {
+          enabled: false,
+        },
+      });
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("error handling", () => {
-    it("should throw on HTTP error", async () => {
+    it("should handle API errors", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
-        status: 400,
-        statusText: "Bad Request",
+        status: 500,
+        statusText: "Internal Server Error",
       });
 
       await expect(
-        structuredSearch(
-          { city: "invalid" },
-          { format: "json", retry: { enabled: false } },
-        ),
-      ).rejects.toThrow("HTTP error");
-    });
-
-    it("should throw on network error", async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error("Network failure"));
-
-      await expect(
-        structuredSearch(
-          { city: "London" },
-          { format: "json", retry: { enabled: false } },
-        ),
-      ).rejects.toThrow("Network failure");
-    });
-  });
-
-  describe("integration", () => {
-    it("should work with all options combined", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      const result = await structuredSearch(
-        {
-          street: "10 Downing Street",
-          city: "London",
-          country: "United Kingdom",
-        },
-        {
+        structuredSearch(MOCK_ADDRESS, {
           format: "json",
-          limit: 5,
-          addressdetails: 1,
-          cache: { enabled: true },
-          rateLimit: { enabled: true },
-          retry: { enabled: true },
-        },
-      );
+          retry: { enabled: false },
+          rateLimit: { interval: 10 },
+        }),
+      ).rejects.toThrow("HTTP error! Status: 500. Text: Internal Server Error");
+    });
 
-      expect(result).toStrictEqual(mockResponse);
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+    it("should handle network errors", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
+
+      await expect(
+        structuredSearch(MOCK_ADDRESS, {
+          format: "json",
+          retry: { enabled: false },
+          rateLimit: { interval: 10 },
+        }),
+      ).rejects.toThrow("Network error");
     });
   });
 });

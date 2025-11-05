@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-import { expectTypeOf } from "vitest";
-
 import type { OutputFormat, StatusFormat } from "@simple-nominatim/core";
+import { expectTypeOf } from "vitest";
+import type { z } from "zod";
 
 import {
   outputFormatSchema,
@@ -40,8 +40,6 @@ import {
   safeValidateArgs,
   handleValidationError,
 } from "../../_shared/validation";
-
-import type { z } from "zod";
 
 type InferredOutputFormat = z.infer<typeof outputFormatSchema>;
 expectTypeOf<InferredOutputFormat>().toEqualTypeOf<OutputFormat>();

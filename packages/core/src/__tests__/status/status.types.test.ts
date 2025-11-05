@@ -25,24 +25,24 @@
 import { expectTypeOf } from "vitest";
 
 import type {
-  StatusOptions,
-  StatusFormat,
-  StatusSuccessResponse,
-  StatusErrorResponse,
-  StatusJsonResponse,
   CacheConfig,
   RateLimitConfig,
+  StatusErrorResponse,
+  StatusFormat,
+  StatusJsonResponse,
+  StatusOptions,
+  StatusSuccessResponse,
 } from "../../index";
 
 expectTypeOf<StatusFormat>().toEqualTypeOf<"text" | "json">();
 
-expectTypeOf<StatusOptions>().toMatchTypeOf<{
+expectTypeOf<StatusOptions>().toExtend<{
   format?: StatusFormat;
   cache?: CacheConfig;
   rateLimit?: RateLimitConfig;
 }>();
 
-expectTypeOf<StatusSuccessResponse>().toMatchTypeOf<{
+expectTypeOf<StatusSuccessResponse>().toMatchObjectType<{
   status: 0;
   message: "OK";
   data_updated: string;
@@ -50,7 +50,7 @@ expectTypeOf<StatusSuccessResponse>().toMatchTypeOf<{
   database_version: string;
 }>();
 
-expectTypeOf<StatusErrorResponse>().toMatchTypeOf<{
+expectTypeOf<StatusErrorResponse>().toMatchObjectType<{
   status: number;
   message: string;
 }>();

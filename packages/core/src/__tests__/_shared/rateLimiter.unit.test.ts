@@ -22,302 +22,268 @@
  * SOFTWARE.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { RateLimiter } from "../../_shared/rateLimiter";
 
-describe("RateLimiter", () => {
-  let limiter: RateLimiter;
+describe("shared:rate-limiter", () => {
+  let rateLimiter: RateLimiter;
 
   beforeEach(() => {
-    vi.useFakeTimers();
-    limiter = new RateLimiter();
+    vi.clearAllMocks();
+    rateLimiter = new RateLimiter({ interval: 10 });
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-    vi.useRealTimers();
-  });
+  describe("core functionality", () => {
+    it("should initialize with default configuration", () => {
+      const limiter = new RateLimiter();
 
-  describe("constructor()", () => {
-    it("should create with default configuration", () => {
-      const defaultLimiter = new RateLimiter();
-
-      expect(defaultLimiter.isEnabled()).toBe(true);
-      expect(defaultLimiter.getStats()).toStrictEqual({
+      expect(limiter.isEnabled()).toBe(true);
+      expect(limiter.getStats()).toStrictEqual({
         requestCount: 0,
         queuedCount: 0,
       });
     });
 
-    it("should create with custom configuration", () => {
-      const customLimiter = new RateLimiter({
-        enabled: false,
-        limit: 5,
-        interval: 2000,
-        strict: false,
-      });
+    it("should execute function and return result", async () => {
+      const mockFn = vi.fn().mockResolvedValue("result");
 
-      expect(customLimiter.isEnabled()).toBe(false);
-      expect(customLimiter.getStats()).toStrictEqual({
-        requestCount: 0,
-        queuedCount: 0,
-      });
+      const result = await rateLimiter.execute(mockFn);
+
+      expect(result).toBe("result");
+      expect(mockFn).toHaveBeenCalledTimes(1);
     });
 
-    it("should respect enabled option", () => {
-      const disabledLimiter = new RateLimiter({ enabled: false });
+    it("should track request count after execution", async () => {
+      const mockFn = vi.fn().mockResolvedValue("result");
 
-      expect(disabledLimiter.isEnabled()).toBe(false);
-    });
+      await rateLimiter.execute(mockFn);
 
-    it("should use default values for omitted options", () => {
-      const partialLimiter = new RateLimiter({ limit: 10 });
+      const stats = rateLimiter.getStats();
 
-      expect(partialLimiter.isEnabled()).toBe(true);
-    });
-  });
-
-  describe("execute()", () => {
-    it("should execute a function successfully", async () => {
-      const function_ = async () => "test result";
-
-      const result = await limiter.execute(function_);
-
-      expect(result).toBe("test result");
-    });
-
-    it("should execute function returning object", async () => {
-      const function_ = async () => ({ data: "test", status: "ok" });
-
-      const result = await limiter.execute(function_);
-
-      expect(result).toStrictEqual({ data: "test", status: "ok" });
-    });
-
-    it("should increment request count after execution", async () => {
-      const function_ = async () => "result";
-
-      await limiter.execute(function_);
-
-      expect(limiter.getStats().requestCount).toBe(1);
-    });
-
-    it("should increment queued count during execution", async () => {
-      const function_ = async () => {
-        const stats = limiter.getStats();
-
-        expect(stats.queuedCount).toBeGreaterThan(0);
-
-        return "result";
-      };
-
-      await limiter.execute(function_);
-    });
-
-    it("should decrement queued count after execution", async () => {
-      const function_ = async () => "result";
-
-      await limiter.execute(function_);
-
-      expect(limiter.getStats().queuedCount).toBe(0);
+      expect(stats.requestCount).toBe(1);
+      expect(stats.queuedCount).toBe(0);
     });
 
     it("should execute multiple functions sequentially", async () => {
-      const results: string[] = [];
-      const function1 = async () => {
-        results.push("first");
+      const mockFn1 = vi.fn().mockResolvedValue("result1");
+      const mockFn2 = vi.fn().mockResolvedValue("result2");
+      const mockFn3 = vi.fn().mockResolvedValue("result3");
 
-        return "first";
-      };
+      const result1 = await rateLimiter.execute(mockFn1);
+      const result2 = await rateLimiter.execute(mockFn2);
+      const result3 = await rateLimiter.execute(mockFn3);
 
-      const function2 = async () => {
-        results.push("second");
-
-        return "second";
-      };
-
-      const promise = Promise.all([
-        limiter.execute(function1),
-        limiter.execute(function2),
-      ]);
-
-      await vi.advanceTimersByTimeAsync(1000);
-      await promise;
-
-      expect(results).toHaveLength(2);
-      expect(limiter.getStats().requestCount).toBe(2);
-    });
-
-    it("should bypass rate limiting when disabled", async () => {
-      limiter.setEnabled(false);
-      const function_ = async () => "result";
-
-      const result = await limiter.execute(function_);
-
-      expect(result).toBe("result");
-      expect(limiter.getStats().requestCount).toBe(0);
-    });
-
-    it("should handle errors in executed function", async () => {
-      const function_ = async () => {
-        throw new Error("Test error");
-      };
-
-      await expect(limiter.execute(function_)).rejects.toThrow("Test error");
-    });
-
-    it("should decrement queued count even on error", async () => {
-      const function_ = async () => {
-        throw new Error("Test error");
-      };
-
-      try {
-        await limiter.execute(function_);
-      } catch {
-        /* Empty */
-      }
-
-      expect(limiter.getStats().queuedCount).toBe(0);
-    });
-  });
-
-  describe("getStats() and resetStats()", () => {
-    it("should track, return, and reset stats correctly", async () => {
-      const function_ = async () => "result";
-
-      let stats = limiter.getStats();
-
-      expect(stats).toStrictEqual({
-        requestCount: 0,
-        queuedCount: 0,
-      });
-
-      const promise1 = limiter.execute(function_);
-
-      await vi.advanceTimersByTimeAsync(500);
-      const promise2 = limiter.execute(function_);
-
-      await vi.advanceTimersByTimeAsync(500);
-      await promise1;
-      await promise2;
-
-      stats = limiter.getStats();
-      expect(stats.requestCount).toBe(2);
-
-      const stats1 = limiter.getStats();
-      const stats2 = limiter.getStats();
-
-      expect(stats1).toStrictEqual(stats2);
-      expect(stats1).not.toBe(stats2);
-
-      limiter.resetStats();
-      expect(limiter.getStats()).toStrictEqual({
-        requestCount: 0,
-        queuedCount: 0,
-      });
-    });
-  });
-
-  describe("isEnabled()", () => {
-    it("should return true by default", () => {
-      expect(limiter.isEnabled()).toBe(true);
-    });
-
-    it("should return false when disabled", () => {
-      const disabledLimiter = new RateLimiter({ enabled: false });
-
-      expect(disabledLimiter.isEnabled()).toBe(false);
-    });
-
-    it("should reflect current enabled state", () => {
-      expect(limiter.isEnabled()).toBe(true);
-
-      limiter.setEnabled(false);
-      expect(limiter.isEnabled()).toBe(false);
-
-      limiter.setEnabled(true);
-      expect(limiter.isEnabled()).toBe(true);
-    });
-  });
-
-  describe("setEnabled()", () => {
-    it("should enable rate limiting", () => {
-      const disabledLimiter = new RateLimiter({ enabled: false });
-
-      disabledLimiter.setEnabled(true);
-
-      expect(disabledLimiter.isEnabled()).toBe(true);
-    });
-
-    it("should disable rate limiting", () => {
-      limiter.setEnabled(false);
-
-      expect(limiter.isEnabled()).toBe(false);
-    });
-
-    it("should reset stats when disabling", async () => {
-      const function_ = async () => "result";
-
-      await limiter.execute(function_);
-
-      limiter.setEnabled(false);
-
-      expect(limiter.getStats()).toStrictEqual({
-        requestCount: 0,
-        queuedCount: 0,
-      });
-    });
-
-    it("should not reset stats when enabling", () => {
-      limiter.setEnabled(false);
-      limiter.setEnabled(true);
-
-      expect(limiter.getStats()).toStrictEqual({
-        requestCount: 0,
-        queuedCount: 0,
-      });
+      expect(result1).toBe("result1");
+      expect(result2).toBe("result2");
+      expect(result3).toBe("result3");
+      expect(rateLimiter.getStats().requestCount).toBe(3);
     });
   });
 
   describe("rate limiting behavior", () => {
-    it("should respect configured limit", async () => {
-      const customLimiter = new RateLimiter({ limit: 2, interval: 100 });
-      const function_ = async () => "result";
+    it("should throttle requests based on configured limit", async () => {
+      const limiter = new RateLimiter({ limit: 2, interval: 10 });
+      const mockFn = vi.fn().mockResolvedValue("result");
+
+      const startTime = Date.now();
 
       await Promise.all([
-        customLimiter.execute(function_),
-        customLimiter.execute(function_),
+        limiter.execute(mockFn),
+        limiter.execute(mockFn),
+        limiter.execute(mockFn),
       ]);
 
-      expect(customLimiter.getStats().requestCount).toBe(2);
+      const duration = Date.now() - startTime;
+
+      expect(mockFn).toHaveBeenCalledTimes(3);
+      expect(duration).toBeGreaterThanOrEqual(10);
     });
 
-    it("should work with different interval settings", async () => {
-      const fastLimiter = new RateLimiter({ limit: 10, interval: 50 });
-      const function_ = async () => "result";
+    it("should respect custom interval configuration", async () => {
+      const limiter = new RateLimiter({ limit: 1, interval: 10 });
+      const mockFn = vi.fn().mockResolvedValue("result");
 
-      const results = await Promise.all([
-        fastLimiter.execute(function_),
-        fastLimiter.execute(function_),
-        fastLimiter.execute(function_),
+      const startTime = Date.now();
+
+      await limiter.execute(mockFn);
+      await limiter.execute(mockFn);
+
+      const duration = Date.now() - startTime;
+
+      expect(duration).toBeGreaterThanOrEqual(10);
+    });
+
+    it("should bypass rate limiting when disabled", async () => {
+      const limiter = new RateLimiter({ enabled: false });
+      const mockFn = vi.fn().mockResolvedValue("result");
+
+      const startTime = Date.now();
+
+      await Promise.all([
+        limiter.execute(mockFn),
+        limiter.execute(mockFn),
+        limiter.execute(mockFn),
       ]);
 
-      expect(results).toHaveLength(3);
-      expect(fastLimiter.getStats().requestCount).toBe(3);
+      const duration = Date.now() - startTime;
+
+      expect(mockFn).toHaveBeenCalledTimes(3);
+      expect(duration).toBeLessThan(100);
+    });
+  });
+
+  describe("statistics tracking", () => {
+    it("should track request count correctly", async () => {
+      const mockFn = vi.fn().mockResolvedValue("result");
+
+      await rateLimiter.execute(mockFn);
+      await rateLimiter.execute(mockFn);
+      await rateLimiter.execute(mockFn);
+
+      const stats = rateLimiter.getStats();
+
+      expect(stats.requestCount).toBe(3);
     });
 
-    it("should handle strict vs non-strict mode", async () => {
-      const nonStrictLimiter = new RateLimiter({
-        limit: 2,
-        interval: 100,
-        strict: false,
+    it("should reset statistics", async () => {
+      const mockFn = vi.fn().mockResolvedValue("result");
+
+      await rateLimiter.execute(mockFn);
+      await rateLimiter.execute(mockFn);
+
+      rateLimiter.resetStats();
+
+      const stats = rateLimiter.getStats();
+
+      expect(stats.requestCount).toBe(0);
+      expect(stats.queuedCount).toBe(0);
+    });
+
+    it("should not increment request count when disabled", async () => {
+      const limiter = new RateLimiter({ enabled: false });
+      const mockFn = vi.fn().mockResolvedValue("result");
+
+      await limiter.execute(mockFn);
+      await limiter.execute(mockFn);
+
+      const stats = limiter.getStats();
+
+      expect(stats.requestCount).toBe(0);
+    });
+  });
+
+  describe("enable/disable behavior", () => {
+    it("should check if rate limiting is enabled", () => {
+      const enabledLimiter = new RateLimiter({ enabled: true });
+      const disabledLimiter = new RateLimiter({ enabled: false });
+
+      expect(enabledLimiter.isEnabled()).toBe(true);
+      expect(disabledLimiter.isEnabled()).toBe(false);
+    });
+
+    it("should toggle rate limiting enabled state", () => {
+      rateLimiter.setEnabled(false);
+      expect(rateLimiter.isEnabled()).toBe(false);
+
+      rateLimiter.setEnabled(true);
+      expect(rateLimiter.isEnabled()).toBe(true);
+    });
+
+    it("should reset stats when disabling rate limiting", async () => {
+      const mockFn = vi.fn().mockResolvedValue("result");
+
+      await rateLimiter.execute(mockFn);
+      await rateLimiter.execute(mockFn);
+
+      expect(rateLimiter.getStats().requestCount).toBe(2);
+
+      rateLimiter.setEnabled(false);
+
+      const stats = rateLimiter.getStats();
+
+      expect(stats.requestCount).toBe(0);
+      expect(stats.queuedCount).toBe(0);
+    });
+  });
+
+  describe("error handling", () => {
+    it("should propagate errors from executed function", async () => {
+      const error = new Error("Test error");
+      const mockFn = vi.fn().mockRejectedValue(error);
+
+      await expect(rateLimiter.execute(mockFn)).rejects.toThrow("Test error");
+    });
+
+    it("should not increment request count when function throws error", async () => {
+      const mockFn = vi.fn().mockRejectedValue(new Error("Test error"));
+
+      await expect(rateLimiter.execute(mockFn)).rejects.toThrow();
+
+      const stats = rateLimiter.getStats();
+
+      expect(stats.requestCount).toBe(0);
+    });
+
+    it("should handle multiple errors without incrementing count", async () => {
+      const mockFn = vi.fn().mockRejectedValue(new Error("Test error"));
+
+      await expect(rateLimiter.execute(mockFn)).rejects.toThrow();
+      await expect(rateLimiter.execute(mockFn)).rejects.toThrow();
+
+      const stats = rateLimiter.getStats();
+
+      expect(stats.requestCount).toBe(0);
+      expect(mockFn).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe("configuration options", () => {
+    it("should respect custom limit configuration", async () => {
+      const limiter = new RateLimiter({ limit: 3, interval: 10 });
+      const mockFn = vi.fn().mockResolvedValue("result");
+
+      const startTime = Date.now();
+
+      await Promise.all([
+        limiter.execute(mockFn),
+        limiter.execute(mockFn),
+        limiter.execute(mockFn),
+        limiter.execute(mockFn),
+      ]);
+
+      const duration = Date.now() - startTime;
+
+      expect(mockFn).toHaveBeenCalledTimes(4);
+      expect(duration).toBeGreaterThanOrEqual(10);
+    });
+
+    it("should handle strict mode configuration", async () => {
+      const strictLimiter = new RateLimiter({
+        limit: 1,
+        interval: 10,
+        strict: true,
       });
-      const function_ = async () => "result";
+      const mockFn = vi.fn().mockResolvedValue("result");
 
-      await nonStrictLimiter.execute(function_);
+      const startTime = Date.now();
 
-      expect(nonStrictLimiter.getStats().requestCount).toBe(1);
+      await strictLimiter.execute(mockFn);
+      await strictLimiter.execute(mockFn);
+
+      const duration = Date.now() - startTime;
+
+      expect(duration).toBeGreaterThanOrEqual(10);
+    });
+
+    it("should use default configuration when no config provided", () => {
+      const limiter = new RateLimiter();
+
+      expect(limiter.isEnabled()).toBe(true);
+      expect(limiter.getStats()).toStrictEqual({
+        requestCount: 0,
+        queuedCount: 0,
+      });
     });
   });
 });

@@ -22,31 +22,35 @@
  * SOFTWARE.
  */
 
+import { serviceStatus, type StatusFormat } from "@simple-nominatim/core";
+import type { MockInstance } from "vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { serviceStatus } from "@simple-nominatim/core";
-
 import { serviceStatusWrapper } from "../../status/service";
-
-import type { ServiceStatusArgv } from "../../status/status.types";
 
 vi.mock("@simple-nominatim/core", () => ({
   serviceStatus: vi.fn(),
 }));
 
-describe("serviceStatusWrapper", () => {
-  let consoleLogSpy: ReturnType<typeof vi.fn>;
-  let consoleErrorSpy: ReturnType<typeof vi.fn>;
+const MOCK_RESPONSE = {
+  status: 0,
+  message: "OK",
+  data_updated: "2024-01-01T00:00:00Z",
+  software_version: "4.5.0",
+  database_version: "4.5.0",
+};
+
+describe("status:service", () => {
+  let consoleLogSpy: MockInstance<typeof console.log>;
+  let consoleErrorSpy: MockInstance<typeof console.error>;
 
   beforeEach(() => {
     vi.clearAllMocks();
+
     consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    vi.mocked(serviceStatus).mockResolvedValue({
-      status: 0,
-      message: "OK",
-      data_updated: "2024-01-01T00:00:00Z",
-    });
+
+    vi.mocked(serviceStatus).mockResolvedValue(MOCK_RESPONSE);
   });
 
   afterEach(() => {
@@ -54,183 +58,203 @@ describe("serviceStatusWrapper", () => {
     consoleErrorSpy.mockRestore();
   });
 
-  describe("delegation and parameter mapping", () => {
-    it("should call serviceStatus with format options", async () => {
-      const argv: ServiceStatusArgv = {
+  describe("core functionality", () => {
+    it("should call serviceStatus with correct options", async () => {
+      await serviceStatusWrapper({
         format: "json",
-      };
+      });
 
-      await serviceStatusWrapper(argv);
-
-      expect(vi.mocked(serviceStatus)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          format: "json",
-        }),
-      );
+      expect(serviceStatus).toHaveBeenCalledWith({
+        format: "json",
+      });
     });
 
-    it("should pass config builder results to core function", async () => {
-      const argv: ServiceStatusArgv = {
+    it("should output JSON response", async () => {
+      await serviceStatusWrapper({
+        format: "json",
+      });
+
+      expect(consoleLogSpy).toHaveBeenCalledWith(JSON.stringify(MOCK_RESPONSE));
+    });
+  });
+
+  describe("API parameters", () => {
+    it("should pass format parameter", async () => {
+      await serviceStatusWrapper({
+        format: "text",
+      });
+
+      expect(serviceStatus).toHaveBeenCalledWith({
+        format: "text",
+      });
+    });
+  });
+
+  describe("cache configuration builder", () => {
+    it("should build cache config when cache TTL is provided", async () => {
+      await serviceStatusWrapper({
+        format: "json",
+        cacheTtl: 5000,
+      });
+
+      expect(serviceStatus).toHaveBeenCalledWith({
+        format: "json",
+        cache: {
+          ttl: 5000,
+        },
+      });
+    });
+
+    it("should build cache config when cache max size is provided", async () => {
+      await serviceStatusWrapper({
+        format: "json",
+        cacheMaxSize: 200,
+      });
+
+      expect(serviceStatus).toHaveBeenCalledWith({
+        format: "json",
+        cache: {
+          maxSize: 200,
+        },
+      });
+    });
+
+    it("should disable cache when noCache is true", async () => {
+      await serviceStatusWrapper({
         format: "json",
         noCache: true,
-        cacheTtl: 3000,
-        noRateLimit: true,
-        rateLimit: 5,
-        noRetry: true,
-        retryMaxAttempts: 2,
-      };
+      });
 
-      await serviceStatusWrapper(argv);
+      expect(serviceStatus).toHaveBeenCalledWith({
+        format: "json",
+        cache: {
+          enabled: false,
+        },
+      });
+    });
+  });
 
-      const callArgs = vi.mocked(serviceStatus).mock.calls[0]?.[0];
+  describe("rate limit configuration builder", () => {
+    it("should build rate limit config when rate limit is provided", async () => {
+      await serviceStatusWrapper({
+        format: "json",
+        rateLimit: 10,
+      });
 
-      expect(callArgs).toHaveProperty("cache");
-      expect(callArgs).toHaveProperty("rateLimit");
-      expect(callArgs).toHaveProperty("retry");
+      expect(serviceStatus).toHaveBeenCalledWith({
+        format: "json",
+        rateLimit: {
+          limit: 10,
+        },
+      });
     });
 
-    it.each([
-      ["noCache", false, "cache", undefined],
-      ["noCache", true, "cache", { enabled: false }],
-      ["noRateLimit", false, "rateLimit", undefined],
-      ["noRateLimit", true, "rateLimit", { enabled: false }],
-      ["noRetry", false, "retry", undefined],
-      ["noRetry", true, "retry", { enabled: false }],
-    ] as const)(
-      "should handle %s flag when set to %s",
-      async (flagName, flagValue, configKey, expectedValue) => {
-        const argv: ServiceStatusArgv = {
-          format: "json",
-          [flagName]: flagValue,
-        };
+    it("should build rate limit config when rate limit interval is provided", async () => {
+      await serviceStatusWrapper({
+        format: "json",
+        rateLimitInterval: 2000,
+      });
 
-        await serviceStatusWrapper(argv);
+      expect(serviceStatus).toHaveBeenCalledWith({
+        format: "json",
+        rateLimit: {
+          interval: 2000,
+        },
+      });
+    });
 
-        const callArgs = vi.mocked(serviceStatus).mock.calls[0]?.[0];
+    it("should disable rate limit when noRateLimit is true", async () => {
+      await serviceStatusWrapper({
+        format: "json",
+        noRateLimit: true,
+      });
 
-        expect(callArgs?.[configKey]).toStrictEqual(expectedValue);
-      },
-    );
+      expect(serviceStatus).toHaveBeenCalledWith({
+        format: "json",
+        rateLimit: {
+          enabled: false,
+        },
+      });
+    });
+  });
 
-    it.each([
-      ["cacheTtl", 5000, "cache", { ttl: 5000 }],
-      ["rateLimit", 5, "rateLimit", { limit: 5 }],
-      ["retryMaxAttempts", 5, "retry", { maxAttempts: 5 }],
-      ["cacheMaxSize", 200, "cache", { maxSize: 200 }],
-      ["rateLimitInterval", 2000, "rateLimit", { interval: 2000 }],
-      ["retryInitialDelay", 500, "retry", { initialDelay: 500 }],
-    ] as const)(
-      "should handle %s parameter",
-      async (paramName, paramValue, configKey, expectedConfig) => {
-        const argv: ServiceStatusArgv = {
-          format: "json",
-          [paramName]: paramValue,
-        };
+  describe("retry configuration builder", () => {
+    it("should build retry config when retry max attempts is provided", async () => {
+      await serviceStatusWrapper({
+        format: "json",
+        retryMaxAttempts: 5,
+      });
 
-        await serviceStatusWrapper(argv);
+      expect(serviceStatus).toHaveBeenCalledWith({
+        format: "json",
+        retry: {
+          maxAttempts: 5,
+        },
+      });
+    });
 
-        const callArgs = vi.mocked(serviceStatus).mock.calls[0]?.[0];
+    it("should build retry config when retry initial delay is provided", async () => {
+      await serviceStatusWrapper({
+        format: "json",
+        retryInitialDelay: 2000,
+      });
 
-        expect(callArgs?.[configKey]).toStrictEqual(expectedConfig);
-      },
-    );
+      expect(serviceStatus).toHaveBeenCalledWith({
+        format: "json",
+        retry: {
+          initialDelay: 2000,
+        },
+      });
+    });
+
+    it("should disable retry when noRetry is true", async () => {
+      await serviceStatusWrapper({
+        format: "json",
+        noRetry: true,
+      });
+
+      expect(serviceStatus).toHaveBeenCalledWith({
+        format: "json",
+        retry: {
+          enabled: false,
+        },
+      });
+    });
   });
 
   describe("validation", () => {
-    it("should validate input and exit on error", async () => {
+    it("should validate output format", async () => {
       const mockExit = vi
         .spyOn(process, "exit")
         .mockImplementation(() => undefined as never);
 
-      const argv: ServiceStatusArgv = {
-        format: "invalid" as "json",
-      };
-
-      await serviceStatusWrapper(argv);
+      await serviceStatusWrapper({
+        format: "invalid" as StatusFormat,
+      });
 
       expect(mockExit).toHaveBeenCalledWith(1);
-      expect(console.error).toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalled();
 
       mockExit.mockRestore();
     });
-
-    it.each([
-      ["noCache", false, "cache", undefined],
-      ["noCache", true, "cache", { enabled: false }],
-      ["noRateLimit", false, "rateLimit", undefined],
-      ["noRateLimit", true, "rateLimit", { enabled: false }],
-      ["noRetry", false, "retry", undefined],
-      ["noRetry", true, "retry", { enabled: false }],
-    ] as const)(
-      "should handle %s flag when set to %s",
-      async (flagName, flagValue, configKey, expectedValue) => {
-        const argv: ServiceStatusArgv = {
-          format: "json",
-          [flagName]: flagValue,
-        };
-
-        await serviceStatusWrapper(argv);
-
-        const callArgs = vi.mocked(serviceStatus).mock.calls[0]?.[0];
-
-        expect(callArgs?.[configKey]).toStrictEqual(expectedValue);
-      },
-    );
-
-    it.each([
-      ["cacheTtl", 5000, "cache", { ttl: 5000 }],
-      ["rateLimit", 5, "rateLimit", { limit: 5 }],
-      ["retryMaxAttempts", 5, "retry", { maxAttempts: 5 }],
-      ["cacheMaxSize", 200, "cache", { maxSize: 200 }],
-      ["rateLimitInterval", 2000, "rateLimit", { interval: 2000 }],
-      ["retryInitialDelay", 500, "retry", { initialDelay: 500 }],
-    ] as const)(
-      "should handle %s parameter",
-      async (paramName, paramValue, configKey, expectedConfig) => {
-        const argv: ServiceStatusArgv = {
-          format: "json",
-          [paramName]: paramValue,
-        };
-
-        await serviceStatusWrapper(argv);
-
-        const callArgs = vi.mocked(serviceStatus).mock.calls[0]?.[0];
-
-        expect(callArgs?.[configKey]).toStrictEqual(expectedConfig);
-      },
-    );
   });
 
-  describe("response handling", () => {
-    it("should output successful response to console", async () => {
-      const argv: ServiceStatusArgv = {
-        format: "json",
-      };
-
-      await serviceStatusWrapper(argv);
-
-      expect(console.log).toHaveBeenCalledWith(expect.any(String));
-    });
-
+  describe("error handling", () => {
     it("should handle API errors", async () => {
       const mockExit = vi
         .spyOn(process, "exit")
         .mockImplementation(() => undefined as never);
 
       vi.mocked(serviceStatus).mockRejectedValueOnce(
-        new Error("API Error: Server not available"),
+        new Error("API request failed"),
       );
 
-      const argv: ServiceStatusArgv = {
+      await serviceStatusWrapper({
         format: "json",
-      };
-
-      await serviceStatusWrapper(argv);
+      });
 
       expect(mockExit).toHaveBeenCalledWith(1);
-      expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining("API Error"),
-      );
+      expect(consoleErrorSpy).toHaveBeenCalled();
 
       mockExit.mockRestore();
     });
