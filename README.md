@@ -32,7 +32,7 @@ For detailed instructions on how to use the tools, navigate to the `./packages` 
 Before you can modify the source code and test the application locally, ensure you have the following tools/packages installed:
 
 - **Git**: [Download Git](https://git-scm.com/)
-- **Node.js (`22.17.1`)**: [Download Node.js](https://nodejs.org/dist/latest-v22.x/) or use [NVM](https://github.com/nvm-sh/nvm) for version management
+- **Node.js (`24.10.0`)**: [Download Node.js](https://nodejs.org/dist/latest-v24.x/) or use [NVM](https://github.com/nvm-sh/nvm) for version management
 - **pnpm (`10.18.3`)**: [Install pnpm](https://pnpm.io/installation#installing-a-specific-version)
 
 ### Coding Standards & Tools
@@ -69,6 +69,16 @@ It's recommended to familiarize yourself with these tools, their configurations,
    ```bash
    $ pnpm install
    ```
+
+### Running Tests
+
+- `pnpm test`: Runs the full automated suite (unit + e2e).
+- `pnpm test:unit`: Runs the unit tests only.
+- `pnpm test:e2e`: Runs the CLI e2e tests only. These hit the live public Nominatim service.
+- `pnpm test:coverage`: Runs the suite with V8 coverage (`text`, `json`, `html` reporters).
+
+> [!IMPORTANT]
+> The CLI e2e tests make real requests to the public Nominatim service. Expect network variability and upstream rate limiting.
 
 ## License
 

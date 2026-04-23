@@ -1,6 +1,5 @@
 {
   "source": ["package.json", "packages/*/package.json"],
-  "dependencyTypes": ["prod", "dev", "peer"],
   "semverGroups": [
     {
       "label": "Use caret ranges for most dependencies",

@@ -4,21 +4,33 @@ on:
     branches:
       - main
 concurrency: ${{ github.workflow }}-${{ github.ref }}
+permissions:
+  contents: read
 jobs:
-  security-audit:
-    name: Conduct security audit
+  validate:
+    name: Validate repository
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [24.10.0]
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/install-tools-dependencies
+        with:
+          node-version: ${{ matrix.node }}
       - run: pnpm security:audit
         shell: bash
-  build-test:
-    name: Build and test the packages
-    runs-on: ubuntu-latest
-    needs: security-audit
-    steps:
-      - uses: actions/checkout@v5
-      - uses: ./.github/actions/install-tools-dependencies
+      - run: pnpm changeset status --since=origin/main
+        shell: bash
+      - run: pnpm lint
+        shell: bash
+      - run: pnpm typecheck
+        shell: bash
+      - run: pnpm packages:build
+        shell: bash
       - run: pnpm test
         shell: bash
