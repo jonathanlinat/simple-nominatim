@@ -4,15 +4,11 @@
   "version": "0.5.2",
   "author": "Jonathan Linat (https://github.com/jonathanlinat)",
   "bugs": "https://github.com/jonathanlinat/simple-nominatim/issues",
-  "dependencies": {
-    "lru-cache": "^11.2.2",
-    "p-throttle": "^8.0.0"
-  },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "engines": {
-    "node": ">=22.17.1"
+    "node": ">=24.10.0"
   },
   "exports": {
     ".": {

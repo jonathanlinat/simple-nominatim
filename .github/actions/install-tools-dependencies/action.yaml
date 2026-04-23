@@ -1,9 +1,14 @@
+inputs:
+  node-version:
+    description: Node.js version to install
+    required: false
+    default: "24.10.0"
 runs:
   using: composite
   steps:
     - uses: actions/setup-node@v6
       with:
-        node-version: 22.17.1
+        node-version: ${{ inputs.node-version }}
     - uses: pnpm/action-setup@v4
       with:
         version: 10.18.3
@@ -15,5 +20,5 @@ runs:
         path: ${{ env.STORE_PATH }}
         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: ${{ runner.os }}-pnpm-store-
-    - run: pnpm install
+    - run: pnpm install --frozen-lockfile
       shell: bash

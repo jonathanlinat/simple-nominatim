@@ -1,60 +1,33 @@
-/**
- * MIT License
- *
- * Copyright (c) 2023-2025 Jonathan Linat <https://github.com/jonathanlinat>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+// SPDX-License-Identifier: MIT
 
-export type { CacheConfig } from "./_shared/cacheManager";
-export type { RateLimitConfig } from "./_shared/rateLimiter";
+export { freeFormSearch } from "./search/freeForm";
+export { structuredSearch } from "./search/structured";
+export { geocodeReverse } from "./reverse/geocode";
+export { serviceStatus } from "./status/service";
 
 export type {
   OutputFormat,
-  BaseOptions,
-  SearchOptions,
   ReverseOptions,
-  DataFetcherOptions,
-  RetryConfig,
+  SearchOptions,
 } from "./_shared/_shared.types";
+export type {
+  FreeFormSearchParams,
+  StructuredSearchParams,
+} from "./search/search.types";
+export type { GeocodeReverseParams } from "./reverse/reverse.types";
+export {
+  isStatusSuccess,
+  type StatusErrorResponse,
+  type StatusFormat,
+  type StatusJsonResponse,
+  type StatusOptions,
+  type StatusSuccessResponse,
+} from "./status/status.types";
 
 export {
-  DEFAULT_CACHE_CONFIG,
-  DEFAULT_RATE_LIMIT_CONFIG,
-  DEFAULT_RETRY_CONFIG,
-} from "./_shared/constants";
-
-export { geocodeReverse } from "./reverse/geocode";
-export type { GeocodeReverseParams } from "./reverse/reverse.types";
-
-export { freeFormSearch } from "./search/freeForm";
-export type { FreeFormSearchParams } from "./search/search.types";
-
-export { structuredSearch } from "./search/structured";
-export type { StructuredSearchParams } from "./search/search.types";
-
-export { serviceStatus } from "./status/service";
-export type {
-  StatusOptions,
-  StatusFormat,
-  StatusSuccessResponse,
-  StatusErrorResponse,
-  StatusJsonResponse,
-} from "./status/status.types";
-export { isStatusSuccess } from "./status/status.types";
+  HttpRequestError,
+  isRequestError,
+  NetworkRequestError,
+  RequestError,
+  type RequestErrorCode,
+} from "./_shared/requestErrors";

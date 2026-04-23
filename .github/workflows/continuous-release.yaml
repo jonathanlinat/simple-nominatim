@@ -4,6 +4,10 @@ on:
     branches:
       - main
 concurrency: ${{ github.workflow }}-${{ github.ref }}
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
 jobs:
   prepare-and-release:
     name: Prepare and release the packages
@@ -12,6 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/install-tools-dependencies
+      - run: pnpm packages:build
+        shell: bash
+      - run: pnpm test
+        shell: bash
       - uses: changesets/action@v1
         with:
           version: pnpm ci:version
