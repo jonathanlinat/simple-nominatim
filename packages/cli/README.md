@@ -40,8 +40,15 @@ Every subcommand also accepts `--help` to list its full option set.
 simple-nominatim reverse:geocode --latitude '37.4219999' --longitude '-122.0840575' --format 'jsonv2'
 ```
 
-**Required:** `--latitude`, `--longitude`, `--format`.
-**Optional:** `--email`, `--zoom` (0–18), `--addressdetails`, `--layer`.
+- **Required:**
+  - `--latitude`
+  - `--longitude`
+  - `--format`
+- **Optional:**
+  - `--email`
+  - `--zoom` (0–18)
+  - `--addressdetails`
+  - `--layer`
 
 ### `search:free-form`
 
@@ -49,8 +56,18 @@ simple-nominatim reverse:geocode --latitude '37.4219999' --longitude '-122.08405
 simple-nominatim search:free-form --query 'Mountain View, CA, USA' --format 'jsonv2'
 ```
 
-**Required:** `--query`, `--format`.
-**Optional:** `--email`, `--limit` (1–40), `--addressdetails`, `--countrycodes`, `--bounded`, `--viewbox`, `--layer`, `--feature-type`.
+- **Required:**
+  - `--query`
+  - `--format`
+- **Optional:**
+  - `--email`
+  - `--limit` (1–40)
+  - `--addressdetails`
+  - `--countrycodes`
+  - `--bounded`
+  - `--viewbox`
+  - `--layer`
+  - `--feature-type`
 
 ### `search:structured`
 
@@ -58,8 +75,17 @@ simple-nominatim search:free-form --query 'Mountain View, CA, USA' --format 'jso
 simple-nominatim search:structured --country 'USA' --city 'Mountain View' --street '1600 Amphitheatre Parkway' --format 'jsonv2'
 ```
 
-**Required:** `--format` and at least one component (`--amenity`, `--street`, `--city`, `--county`, `--state`, `--country`, `--postal-code`).
-**Optional:** same extras as `search:free-form`.
+- **Required:**
+  - `--format`
+  - At least one component:
+    - `--amenity`
+    - `--street`
+    - `--city`
+    - `--county`
+    - `--state`
+    - `--country`
+    - `--postal-code`
+- **Optional:** same extras as `search:free-form`
 
 > `search:free-form` and `search:structured` **cannot be combined** — use one or the other.
 
@@ -69,7 +95,8 @@ simple-nominatim search:structured --country 'USA' --city 'Mountain View' --stre
 simple-nominatim status:service --format 'json'
 ```
 
-**Optional:** `--format` (`text` | `json`, default `text`).
+- **Optional:**
+  - `--format` (`text` | `json`, default `text`)
 
 ## Exit Codes
 
