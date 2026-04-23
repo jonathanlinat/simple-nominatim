@@ -39,9 +39,15 @@ const result = await geocodeReverse(
 );
 ```
 
-**Required params:** `latitude`, `longitude` (WGS84).
-**Required options:** `format` (`xml` | `json` | `jsonv2` | `geojson` | `geocodejson`).
-**Common options:** `email`, `zoom` (0–18), `addressdetails`, `layer`.
+- **Required params:**
+  - `latitude`, `longitude` (WGS84)
+- **Required options:**
+  - `format` (`xml` | `json` | `jsonv2` | `geojson` | `geocodejson`)
+- **Common options:**
+  - `email`
+  - `zoom` (0–18)
+  - `addressdetails`
+  - `layer`
 
 ### Search — `freeFormSearch`
 
@@ -54,8 +60,18 @@ const results = await freeFormSearch(
 );
 ```
 
-**Required params:** `query`.
-**Common options:** `email`, `format`, `limit` (1–40), `addressdetails`, `countrycodes`, `bounded`, `viewbox`, `layer`, `featureType`.
+- **Required params:**
+  - `query`
+- **Common options:**
+  - `email`
+  - `format`
+  - `limit` (1–40)
+  - `addressdetails`
+  - `countrycodes`
+  - `bounded`
+  - `viewbox`
+  - `layer`
+  - `featureType`
 
 ### Search — `structuredSearch`
 
@@ -68,8 +84,15 @@ const results = await structuredSearch(
 );
 ```
 
-**Params (all optional, at least one required):** `amenity`, `street`, `city`, `county`, `state`, `country`, `postalCode`.
-**Options:** same as `freeFormSearch`.
+- **Params** (all optional, at least one required):
+  - `amenity`
+  - `street`
+  - `city`
+  - `county`
+  - `state`
+  - `country`
+  - `postalCode`
+- **Options:** same as `freeFormSearch`
 
 ### Status — `serviceStatus`
 
@@ -83,8 +106,8 @@ if (typeof status !== "string" && isStatusSuccess(status)) {
 }
 ```
 
-**Options:** `format` (`text` | `json`, default `text`).
-
+- **Options:**
+  - `format` (`text` | `json`, default `text`)
 - **Text format**: returns the string `"OK"` on success; throws on failure.
 - **JSON format**: returns `StatusSuccessResponse` (`status: 0`) or `StatusErrorResponse` (`status: 700+`).
 
