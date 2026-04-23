@@ -1,5 +1,14 @@
 # @simple-nominatim/cli
 
+## 0.7.1
+
+### Patch Changes
+
+- docs: convert inline option metadata to bullet lists in package READMEs for better readability ([#32](https://github.com/jonathanlinat/simple-nominatim/pull/32))
+
+- Updated dependencies [[`ed84af4`](https://github.com/jonathanlinat/simple-nominatim/commit/ed84af45f08ab8ce51041777dec44baf86ae0893)]:
+  - @simple-nominatim/core@0.6.1
+
 ## 0.7.0
 
 ### Minor Changes
