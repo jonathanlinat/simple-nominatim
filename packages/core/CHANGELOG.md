@@ -1,5 +1,11 @@
 # @simple-nominatim/core
 
+## 0.6.1
+
+### Patch Changes
+
+- docs: convert inline option metadata to bullet lists in package READMEs for better readability ([#32](https://github.com/jonathanlinat/simple-nominatim/pull/32))
+
 ## 0.6.0
 
 ### Minor Changes
