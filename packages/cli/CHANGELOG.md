@@ -1,5 +1,34 @@
 # @simple-nominatim/cli
 
+## 0.7.0
+
+### Minor Changes
+
+- Streamline the client around the four Nominatim endpoints. ([#29](https://github.com/jonathanlinat/simple-nominatim/pull/29))
+
+  **Breaking changes**
+  - Node.js `>=24.10.0` is now required (was `>=22.17.1`).
+  - Removed the built-in caching layer (`CacheConfig`, `DEFAULT_CACHE_CONFIG`)
+    and the `lru-cache` dependency. Wrap calls at the application layer if needed.
+  - Removed the built-in rate-limiting layer (`RateLimitConfig`,
+    `DEFAULT_RATE_LIMIT_CONFIG`) and the `p-throttle` dependency. Respect the
+    Nominatim usage policy from the caller.
+  - Removed the configurable retry layer (`RetryConfig`, `DEFAULT_RETRY_CONFIG`).
+  - Removed the `BaseOptions` and `DataFetcherOptions` public types; only
+    `SearchOptions`, `ReverseOptions`, and `StatusOptions` remain.
+
+  **New**
+  - Errors from the core are now structured: `RequestError`,
+    `HttpRequestError`, `NetworkRequestError`, and the `isRequestError`
+    type guard are exported.
+  - CLI `search:structured` now validates that at least one of `amenity`,
+    `city`, `country`, `county`, `postalCode`, `state`, or `street` is provided.
+
+### Patch Changes
+
+- Updated dependencies [[`ff467d1`](https://github.com/jonathanlinat/simple-nominatim/commit/ff467d1678f4ad08b740668bbafb0e45b8753ada)]:
+  - @simple-nominatim/core@0.6.0
+
 ## 0.6.2
 
 ### Patch Changes
